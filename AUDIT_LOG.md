@@ -243,4 +243,14 @@ Added it as a traceable requirement (FR-27 resource allocation & capacity).
 **Actions taken:**
 - CLAUDE.md: FR-27 (resource=100%/day, %-split, ≤100% per date, BLOCKER + save-time guard); FE-48 on EP-4; LaborLineItem gains resource_name/allocation_percent/start_date/end_date; Section 10 capacity note; folded into FR-25; traceability FR-27→EP-4,EP-12. Marked Should (Post-MVP); not yet built.
 
+---
+### [2026-06-12 09:15 UTC] — USER
+Add this to CLAUDE.md to fit into a feature. In the detail estimate card, add cost per SDLC phase. · Continue with your other work.
+
+### [2026-06-12 09:15 UTC] — AGENT
+Added FR-28 (cost per SDLC phase) to the spec, then resumed the admin UI build.
+**Actions taken:**
+- CLAUDE.md: FR-28 + FE-49 (EP-5); `sdlc_phase` enum on all 3 line-item entities; §10 per-phase rollup note; traceability FR-28→EP-5,EP-6. Should (Post-MVP), not yet built.
+- Continuing "other work": building Admin UI Part 2 (Users).
+
 <!-- Append new turns below this line -->

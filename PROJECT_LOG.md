@@ -199,4 +199,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Captured as a traceable **Should (Post-MVP)** requirement; not yet built. Implementation seam: extend labor lines + add a checklist capacity rule + a save-time over-allocation check.
 - **Next:** Continue admin UI (Parts 2/3) or build FR-27 — per user direction.
 
+### 2026-06-12 09:15 UTC — Spec: FR-28 cost per SDLC phase
+- **Action:** Added **FR-28** (line items tagged by SDLC phase → per-phase cost breakdown on the estimate detail card) to `CLAUDE.md`: FR table; **FE-49** on EP-5; `sdlc_phase[PLANNING|DESIGN|DEVELOPMENT|TESTING|DEPLOYMENT|MAINTENANCE]` added to all three line-item entities (§10); engine note (per-phase subtotals like categories; un-phased → "Unassigned"); traceability `FR-28 → EP-5, EP-6`. Marked **Should (Post-MVP)**.
+- **Why:** Direct user requirement (cost-per-SDLC-phase on the detail card).
+- **Files touched:** `CLAUDE.md` (§4.2, §5, §6, §10).
+- **Result:** Captured + traceable; not yet built. User said to continue with other work → proceeding to Admin UI Part 2 (Users).
+- **Next:** Build Admin UI Part 2 (Users admin page).
+
 <!-- Append new entries below this line -->
