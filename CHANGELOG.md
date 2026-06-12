@@ -6,6 +6,12 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Database — first real Prisma migration (NFR-5)
+
+#### Added
+- `apps/api/prisma/migrations/0_init` — the initial versioned migration (full MVP schema: 15 tables, 10 enums, FK constraints, indexes), generated from `schema.prisma` and verified to `migrate deploy` cleanly onto a fresh PostgreSQL. Replaces the `db push` baseline (`setup`/`migrate` now use `migrate deploy`).
+- `docs/DATABASE.md` — migration workflow, baselining an existing db-push database, schema overview, backup/restore.
+
 ### Sprint 4 — Estimate Governance (EP-12): workflow + smart checklist
 
 #### Added
