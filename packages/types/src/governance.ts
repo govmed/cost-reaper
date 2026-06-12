@@ -67,3 +67,33 @@ export const ChecklistResult = z.object({
   items: z.array(ChecklistItemResult),
 });
 export type ChecklistResult = z.infer<typeof ChecklistResult>;
+
+// ── Estimate workflow view (output) ──────────────────────────────────────────
+
+export interface WorkflowTransitionEventDto {
+  id: string;
+  fromStageKey: string | null;
+  toStageKey: string;
+  actorId: string;
+  note: string | null;
+  occurredAt: string;
+}
+
+export interface AvailableTransitionDto {
+  toStageKey: string;
+  toStageLabel: string;
+  label: string;
+  allowedRole: Role;
+  requiresChecklistPass: boolean;
+  /** true if the current user's role may perform it. */
+  allowedForUser: boolean;
+  /** true if a required checklist is currently blocking. */
+  blockedByChecklist: boolean;
+}
+
+export interface EstimateWorkflowDto {
+  currentStageKey: string | null;
+  currentStageLabel: string | null;
+  availableTransitions: AvailableTransitionDto[];
+  history: WorkflowTransitionEventDto[];
+}

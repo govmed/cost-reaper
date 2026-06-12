@@ -2,12 +2,20 @@ import { useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { downloadCsv } from '../lib/api';
 import {
+  useChecklist,
   useCloudPrices,
   useEstimate,
   useEstimateMutations,
   useRateCards,
+  useWorkflow,
 } from '../lib/queries';
-import type { BillingPeriod, CloudPrice, EstimateDetail } from '../lib/types';
+import type {
+  BillingPeriod,
+  ChecklistResult,
+  CloudPrice,
+  EstimateDetail,
+  EstimateWorkflow,
+} from '../lib/types';
 
 const PERIODS: BillingPeriod[] = ['ONE_TIME', 'MONTHLY', 'YEARLY'];
 
@@ -65,6 +73,8 @@ export default function EstimateEditorPage() {
   const m = useEstimateMutations(id ?? '');
   const { data: rateCards } = useRateCards();
   const { data: cloudPrices } = useCloudPrices();
+  const { data: workflow } = useWorkflow(id);
+  const { data: checklist } = useChecklist(id);
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
   if (error) return <p className="text-rose-700">{(error as Error).message}</p>;
@@ -111,6 +121,8 @@ export default function EstimateEditorPage() {
         <Card label="Grand total" value={`${t.grandTotal} ${cur}`} accent />
       </div>
 
+      <GovernanceSection workflow={workflow} checklist={checklist} m={m} />
+
       <Section title="Settings">
         <div className="flex flex-wrap gap-6 items-end">
           <NumberSetting
@@ -138,6 +150,94 @@ export default function EstimateEditorPage() {
 }
 
 type Mutations = ReturnType<typeof useEstimateMutations>;
+
+function GovernanceSection({
+  workflow,
+  checklist,
+  m,
+}: {
+  workflow: EstimateWorkflow | undefined;
+  checklist: ChecklistResult | undefined;
+  m: Mutations;
+}) {
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      <Section title="Approval workflow">
+        <div className="text-sm">
+          <span className="text-slate-500">Current stage:</span>{' '}
+          <span className="font-medium text-brand">{workflow?.currentStageLabel ?? '—'}</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {(workflow?.availableTransitions ?? []).map((tr) => {
+            const disabled = !tr.allowedForUser || tr.blockedByChecklist;
+            const reason = tr.blockedByChecklist
+              ? 'Blocked by the checklist'
+              : !tr.allowedForUser
+                ? `Requires the ${tr.allowedRole} role`
+                : '';
+            return (
+              <button
+                key={tr.toStageKey}
+                disabled={disabled}
+                title={reason}
+                onClick={() => m.transition.mutate({ toStageKey: tr.toStageKey })}
+                className="bg-brand text-white rounded px-3 py-1.5 text-sm disabled:opacity-40"
+              >
+                {tr.label}
+              </button>
+            );
+          })}
+          {(workflow?.availableTransitions.length ?? 0) === 0 && (
+            <span className="text-slate-400 text-sm">No transitions from here.</span>
+          )}
+        </div>
+        {workflow && workflow.history.length > 0 && (
+          <ul className="text-xs text-slate-500 space-y-0.5 pt-2 border-t border-slate-100">
+            {workflow.history.map((h) => (
+              <li key={h.id}>
+                {(h.fromStageKey ?? 'start') + ' → ' + h.toStageKey} ·{' '}
+                {new Date(h.occurredAt).toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+
+      <Section title="Smart checklist">
+        {checklist && (
+          <>
+            <div className="text-sm">
+              <span className={checklist.blocking ? 'text-rose-700' : 'text-emerald-700'}>
+                {checklist.blocking ? 'Blocking items present' : 'All blocking checks pass'}
+              </span>{' '}
+              <span className="text-slate-400">
+                · {Math.round(checklist.completeness * 100)}% complete
+              </span>
+            </div>
+            <ul className="text-sm space-y-1">
+              {checklist.items.map((i) => (
+                <li key={i.key} className="flex items-start gap-2">
+                  <span
+                    className={
+                      i.passed
+                        ? 'text-emerald-600'
+                        : i.severity === 'BLOCKER'
+                          ? 'text-rose-600'
+                          : 'text-amber-600'
+                    }
+                  >
+                    {i.passed ? '✓' : '✕'}
+                  </span>
+                  <span className="text-slate-600">{i.message}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </Section>
+    </div>
+  );
+}
 
 function Th({ children, right }: { children: ReactNode; right?: boolean }) {
   return <th className={`px-3 py-2 font-medium ${right ? 'text-right' : 'text-left'}`}>{children}</th>;

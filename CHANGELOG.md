@@ -6,6 +6,13 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Sprint 4 — Estimate Governance (EP-12): workflow + smart checklist
+
+#### Added
+- **Workflow engine** (FR-24): estimates flow through the seeded, configurable approval workflow (Draft → In Review → Approved → Final → Archived). Endpoints: `GET /workflows/default`, `GET /estimates/:id/workflow`, `POST /estimates/:id/transitions`. Transitions are **role-gated** and recorded as immutable history; estimates auto-attach the default workflow on create.
+- **Smart checklist** (FR-25): `GET /estimates/:id/checklist` evaluates rule-driven completeness (rate card, labor roles, cloud lines, amounts, billing periods, line presence). **Blocking checks gate workflow transitions** (`requiresChecklistPass`). Pure rule evaluator with unit tests.
+- **Web**: governance panel in the estimate editor — current stage, role/checklist-gated transition buttons + history, and the live checklist with pass/fail items.
+
 ### Sprint 3 — Web UI (EP-4/EP-8 frontend)
 
 #### Added
