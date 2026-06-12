@@ -168,4 +168,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** First CI run red — `checklist-rules.ts` union-spread needed `billingPeriod` on the cloud shape (TS2339); fixed (added field + mapping). **CI green** (build + security). Merged **PR #6** (`7e5fa89`).
 - **Next:** Await direction — Prisma migration, PDF/Excel, dashboard, scenarios, PERT, live cloud sync, or hardening.
 
+### 2026-06-12 07:55 UTC — First real Prisma migration `0_init` (PR #7)
+- **Action:** Docker daemon was up, so generated the initial migration **offline** with `prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script` in a throwaway `node:22-slim` container (installed openssl first). Created `apps/api/prisma/migrations/0_init/migration.sql` (349 lines: 10 enums, 15 tables, FKs, indexes) + `migration_lock.toml`. **Verified** by spinning up a fresh `postgres:16-alpine` on a docker network and running `prisma migrate deploy` → applied cleanly (16 tables incl. `_prisma_migrations`, recorded applied). Added `docs/DATABASE.md` (workflow, baselining, backup/restore).
+- **Why:** Replace the `db push` baseline with versioned migrations (NFR-5).
+- **Files touched:** `apps/api/prisma/migrations/**`, `docs/DATABASE.md`, `CHANGELOG.md`.
+- **Result:** CI green; merged **PR #7** (`d2f7dd1`). `setup.sh`/`migrate.sh` now use `migrate deploy` (they switch automatically once migrations exist).
+- **Next:** Await direction — PDF/Excel, dashboard, scenarios, PERT, live cloud sync, or hardening. (Also: added `Bash(docker *)` to settings.local.json per user approval.)
+
 <!-- Append new entries below this line -->

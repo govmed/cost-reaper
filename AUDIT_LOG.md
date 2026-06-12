@@ -199,4 +199,16 @@ Built, CI-verified, and merged the estimate-governance layer (FR-24/FR-25).
 - PR #6: first CI run red (one TS union error in checklist cloud shape) → fixed → CI green → merged into `main` (`7e5fa89`). Synced living files (Current State, PROJECT_LOG Chapter 4).
 - (Earlier this stretch: set bare-`Bash` allow-all in settings.local.json via update-config skill; saved standing-permission memory.)
 
+---
+### [2026-06-12 07:45 UTC] — USER
+Generate the first real Prisma migration · "I approve you interfacing with Docker. Please update your file."
+
+### [2026-06-12 07:55 UTC] — AGENT
+Generated, verified, and merged the first Prisma migration; broadened the Docker allow rule.
+**Actions taken:**
+- Docker up → generated `0_init` offline via `prisma migrate diff --from-empty` in a node container (openssl installed); `migration_lock.toml` added. Verified: spun up fresh postgres on a docker network, `prisma migrate deploy` applied cleanly (16 tables, recorded applied). Added `docs/DATABASE.md`.
+- PR #7 → CI green → merged into `main` (`d2f7dd1`); db-push baseline retired.
+- Settings: added `Bash(docker *)` to `.claude/settings.local.json` allow list (the harness keeps the granular list; bare-`Bash` didn't persist).
+- Synced living files (Current State, PROJECT_LOG).
+
 <!-- Append new turns below this line -->
