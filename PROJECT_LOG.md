@@ -182,4 +182,14 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** CI **build + e2e + security all green** (e2e ran the browser against the real Docker stack, 1m55s). Merged **PR #8** (`ad4a369`). All earlier non-blocking follow-ups now resolved.
 - **Next:** Await direction — PDF/Excel, dashboard, scenarios, PERT, live cloud sync.
 
+## Chapter 5 — Admin / Reference-data Web UI (started 2026-06-12)
+**Goal:** Build the management screens that were API-only (the user found no menus for rate cards / users / cloud prices). Phased: Part 1 Rate Cards, Part 2 Users, Part 3 Cloud Prices. (FE-10/45/38 frontend.)
+
+### 2026-06-12 08:55 UTC — Part 1: nav + Rate Cards management (PR #9)
+- **Action:** Backend — added rate-card **role endpoints** (`POST/PATCH/DELETE /rate-cards/:id/roles[/:roleId]`, admin-only, audited) + `UpdateRateCardRoleRequest` type (roles/rates were previously only settable at card creation). Web — top **nav** (Estimates · Rate cards), **`RateCardsPage`** (create cards; add/inline-edit/delete roles & rates → labor-cost customization; activate/deactivate; delete), query hooks. Verified all 5 gates (format/lint/typecheck/test/build) pass in-container.
+- **Why:** Close the UX gap the user hit ("where are the menu items to customize labor cost"); FE-10 frontend.
+- **Files touched:** `apps/api/src/modules/rate-cards/*`, `packages/types/src/rate-card.ts`, `apps/web/src/{App.tsx,pages/RateCardsPage.tsx,lib/queries.ts}`, CHANGELOG.
+- **Result:** CI build+e2e+security green. Merged **PR #9** (`dc51f4d`). **Rebuilt the local stack** (`docker compose up -d --build`) so it's live at localhost:5173 (rate-cards API 200, web 200).
+- **Next:** Part 2 (Users admin UI), Part 3 (Cloud Prices browse).
+
 <!-- Append new entries below this line -->

@@ -223,4 +223,15 @@ Hardened the project; CI is now fully blocking with a browser e2e job. (Docker n
 - PR #8 → CI build+e2e+security all green → merged into `main` (`ad4a369`). `pnpm-lock.yaml` now committed. Added `Bash(docker *)` allow rule earlier.
 - Synced living files (Current State, PROJECT_LOG Chapter 4 cont.).
 
+---
+### [2026-06-12 08:40 UTC] — USER
+What is the URL so I can test it? · Where are all the other menu items that will allow me to customize labor cost and non-labor? · Is this the first part of the feature? · Show me all the features left and the ones completed · Resume Part 1 (Rate Cards UI)
+
+### [2026-06-12 08:55 UTC] — AGENT
+Started the stack + gave URLs; explained the web only had the Estimates flow (admin screens were API-only); gave a full feature-status report; built Admin UI Part 1 (Rate Cards).
+**Actions taken:**
+- Started stack → http://localhost:5173 (admin@example.com / change_me), Swagger /docs. Clarified non-labor has no catalog (free-form per estimate).
+- Explained phasing (Part 1 Rate Cards · 2 Users · 3 Cloud Prices) and gave a complete ✅/🟡/⬜ feature status across all FR/FE/EP.
+- Built Part 1: rate-card role endpoints + nav + RateCardsPage + hooks; all 5 gates pass; PR #9 → CI green → merged (`dc51f4d`); rebuilt local stack so it's live.
+
 <!-- Append new turns below this line -->
