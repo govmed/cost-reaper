@@ -169,4 +169,11 @@ Recorded standing permission and stopped Bash prompts.
 **Actions taken:**
 - Saved memory `standing-permission.md` (proceed autonomously: merge/push/sprints without asking). Set `.claude/settings.local.json` permissions.allow to `Bash(*)` (blanket Bash allow). Proceeding to build Sprint 2.
 
+---
+### [2026-06-12 06:40 UTC] — AGENT (continuing "then 2" — Sprint 2)
+Built, CI-verified, and merged the Sprint 2 estimate-authoring core.
+**Actions taken:**
+- Added line-item DTOs + engine `lineTotal()`; built API estimates module (CRUD/clone, labor/non-labor/cloud lines, assumptions, search, engine `/totals`, CSV `/export`) + cloud-prices read; unit tests for engine-mapping + CSV.
+- Pushed `feature/sprint2-estimates`, opened **PR #4**; CI green (build + security pass); merged into `main` (`8c78b88`, branch deleted). Synced living files (Current State, PROJECT_LOG). Backend MVP essentially complete; web UI is next.
+
 <!-- Append new turns below this line -->

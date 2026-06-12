@@ -141,4 +141,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Why:** Deliver the MVP estimate-authoring core (the product's heart).
 - **Next:** Add line-item/estimate DTOs to `packages/types`; build estimates + cloud-pricing modules; totals endpoint via `@cost-reaper/engine`; CSV export; tests.
 
+### 2026-06-12 06:40 UTC — Sprint 2 core built, CI green, merged (PR #4)
+- **Action:** Built the estimate-authoring core: `packages/types` line-item inputs/DTOs + `UpdateEstimateRequest`/`EstimateListQuery`; engine `lineTotal()`; API **estimates** module (CRUD + clone, labor/non-labor/cloud line items + assumptions, list search/filter/pagination, engine-backed `/totals`, CSV `/export`) + **cloud-pricing** read module (FE-38); pure `engine-mapping` + `estimate-csv` with unit tests. Wired into `AppModule`. Updated `docs/API.md` + CHANGELOG.
+- **Why:** EP-4/EP-5/EP-6/EP-8/EP-11 — the MVP's heart; FR-4..FR-10, FR-21/22/23.
+- **Files touched:** `packages/{types,engine}/src/*`, `apps/api/src/modules/{estimates,cloud-pricing}/*`, `app.module.ts`, `docs/API.md`, `CHANGELOG.md`.
+- **Result:** **CI green** (build + security pass; engine-mapping + CSV + prior suites pass). Money kept exact (decimal strings; only counts are numbers, engine does the math). Merged **PR #4** into `main` (`8c78b88`). Backend MVP essentially complete.
+- **Next:** Web UI build-out (login → estimates list/search → estimate editor with line items + live totals → CSV); first real Prisma migration.
+
 <!-- Append new entries below this line -->
