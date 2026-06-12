@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Printable estimate summary (FE-23, FR-10)
+
+#### Added
+- **Printable summary** view at `/estimates/:id/print` (a "Printable summary" button in the estimate editor): a clean, read-only document — header/meta, labor/non-labor/cloud line tables, one-time/monthly/yearly/upcharge/contingency/grand totals, per-SDLC-phase and per-category breakdowns, and assumptions — with a **Print** button (`window.print()`). The app chrome is hidden when printing (`print:hidden`). Reuses the existing estimate detail payload (no new API). Covered by the Playwright e2e.
+
 ### Dashboard (FE-27, FR-18)
 
 #### Added

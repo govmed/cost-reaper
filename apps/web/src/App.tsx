@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import EstimatesPage from './pages/EstimatesPage';
 import EstimateEditorPage from './pages/EstimateEditorPage';
+import PrintSummaryPage from './pages/PrintSummaryPage';
 import RateCardsPage from './pages/RateCardsPage';
 import UsersPage from './pages/UsersPage';
 import CloudPricesPage from './pages/CloudPricesPage';
@@ -21,7 +22,7 @@ export default function App() {
   const { user, logout } = useAuth();
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-brand text-white px-5 py-3 flex items-center justify-between">
+      <header className="bg-brand text-white px-5 py-3 flex items-center justify-between print:hidden">
         <div className="flex items-center gap-6">
           <Link to="/" className="font-semibold text-lg">
             cost-reaper
@@ -80,6 +81,14 @@ export default function App() {
             element={
               <Protected>
                 <EstimateEditorPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/estimates/:id/print"
+            element={
+              <Protected>
+                <PrintSummaryPage />
               </Protected>
             }
           />
