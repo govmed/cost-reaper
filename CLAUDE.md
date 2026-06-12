@@ -585,18 +585,18 @@ Durable memory the agent reads at the start of every session. It holds the spec 
 ```markdown
 <!-- CURRENT STATE — update after every action -->
 - **Last updated (UTC):** 2026-06-12
-- **Repository:** https://github.com/govmed/cost-reaper  (project: *cost-reaper*) — remote is effectively empty (placeholder READMEs only); default branch `main` (unprotected). Working locally on `feature/ep1-foundation`; nothing pushed.
+- **Repository:** https://github.com/govmed/cost-reaper  (project: *cost-reaper*) — cleaned up: stale placeholder branches deleted, **`main` is the single trunk** (unprotected). **Trunk-based** workflow (ADR-0004). Sprint 0 scaffold is on `feature/ep1-foundation`, pushed, open as **PR #1** → `main`.
 - **Operating mode:** **AUTONOMOUS** — build without pausing for confirmation; log decisions; escalate only on hard blockers (see Section 0.1).
-- **Current sprint / increment:** Sprint 0 — Foundation
+- **Current sprint / increment:** Sprint 0 — Foundation (scaffolded; in PR review)
 - **Confirmed stack:** React + TS + Vite (Tailwind/shadcn, TanStack Table/Query, RHF+Zod) / **NestJS** API (Prisma) / **PostgreSQL 16**; pnpm + Turborepo monorepo with shared `packages/types` + pure `packages/engine`. See Section 9.
 - **Key capabilities:** multi-cloud compute pricing **AWS/GCP/Azure** (seeded catalog, FR-21); **upcharge %** global + per-line override (FR-22); **monthly & yearly** costing (FR-23); **identity management + RBAC role security** (FR-26, NFR-16, MVP); **customizable workflow engine** (FR-24) + **automated smart checklist** (FR-25) as modular governance (EP-12); **high modularity** as a design constraint (NFR-15). Live cloud price-API sync is post-MVP (FR-21a).
-- **MVP status:** not started (spec still being refined with the user)
-- **Done so far:** memory system established; stack + repo confirmed; autonomous mode set; cloud-pricing/upcharge/monthly-yearly requirements added. **2026-06-12:** inspected remote (empty placeholder branches); wrote Chapter 0 backlog; added **NFR-15 modularity + `packages/engine`**, **FR-24 customizable workflow + FR-25 smart checklist + EP-12**, **FR-26 identity/RBAC + NFR-16** + FE-45/FE-46.
-- **In progress:** capturing user-requested requirements into the spec; awaiting branch-strategy decision before pushing anything to GitHub.
-- **Next up:** confirm branch strategy (recommend trunk-based: feature branch → PR into `main`; clean up stale placeholder branches with human OK); then scaffold monorepo per Section 9; EP-1 (FE-1 scripts, FE-2 docker stack, FE-4 config, FE-5 health); seed cloud catalog (FE-38).
+- **MVP status:** Sprint 0 (EP-1 foundation) **scaffolded** and in PR review; MVP feature work (EP-2..EP-6/8/11) not yet started.
+- **Done so far:** memory system + spec (incl. NFR-15 modularity, FR-24 workflow, FR-25 checklist, FR-26 identity/RBAC). **2026-06-12:** deleted stale branches (trunk-based on `main`); scaffolded EP-1 — pnpm+Turborepo monorepo (`apps/{web,api}`, `packages/{types,engine,config}`), Docker stack (db/api/web) + healthchecks, cross-platform scripts + Makefile, `.env.example`/CI, shared Zod contract, **pure estimation engine + full Vitest suite**, NestJS `/health`+`/ready` + structured logging + RFC7807, full MVP Prisma schema + seed (admin, rate card, AWS/GCP/Azure catalog, default workflow, checklist rules), Vite/React shell, ARCHITECTURE + ADRs 0001–0006. Committed (`148809c`), pushed, **PR #1** opened.
+- **In progress:** PR #1 (`feature/ep1-foundation` → `main`) — awaiting CI + review/merge.
+- **Next up:** merge PR #1; then **generate the first real Prisma migration** (CI/Node) to replace the `db push` baseline; **Sprint 1** — EP-2 auth (FE-6/7/8/9, FR-1/2) + EP-3 rate-card CRUD (FE-10, FR-3) + finish FE-38 cloud catalog API + FE-30 audit trail.
 - **Assumptions (defaulted, see Section 0.1):** single-currency per estimate (MVP); JWT TTLs 15 min / 7 days; money NUMERIC(18,4), cloud unit prices NUMERIC(18,6); cloud compute defaults MONTHLY @ 730 hrs/month; upcharge before contingency; **modularity realized via monorepo packages + NestJS feature modules + strategy interfaces, not long-lived git branches**; **"workflow" interpreted as the estimate approval/review lifecycle** (data-driven `WorkflowEngine`); **checklist is rule-driven, computed on demand**, gating workflow transitions; identity/RBAC is **deny-by-default**, enforced server-side.
-- **Blockers / risks:** **NEEDS-HUMAN** — branch strategy + whether to push to GitHub now, and OK to delete the stale empty branches (`master`/`api`/`postgres`/`documentation`); deleting remote branches is human-gated (Section 0.1). Not blocking local build.
-- **How to run right now:** not yet runnable — repo not scaffolded. Target: `./scripts/setup.sh && ./scripts/start.sh`
+- **Blockers / risks:** none open (branch-strategy + cleanup decision resolved by the user: trunk-based, stale branches deleted). **Risk:** the container image build + full test run were not executed in the authoring env (no host Node) — relying on CI on PR #1 to confirm `builds clean`; schema currently provisioned via `prisma db push` until the first migration is generated.
+- **How to run right now:** `./scripts/setup.sh && ./scripts/start.sh` (Linux/macOS) or `*.ps1` (Windows). Needs only Docker. Web :5173 · API :8000/api/v1 · Swagger /docs.
 <!-- END CURRENT STATE -->
 ```
 

@@ -84,4 +84,17 @@ Folded all four considerations into `CLAUDE.md` as traceable requirements/featur
 - Synced `PROJECT_LOG.md` (two new chapter entries) and this `AUDIT_LOG.md`.
 - Outstanding: branch-strategy decision (NEEDS-HUMAN) before any GitHub push.
 
+---
+### [2026-06-12 04:28 UTC] — USER
+Start the build, trunk-based, and clean up the stale branches  ---  Keep refining the spec — add more requirements and I'll keep folding them in
+
+### [2026-06-12 04:40 UTC] — AGENT
+Cleaned up the remote, scaffolded the EP-1 foundation, and opened PR #1 — while keeping the spec open for more requirements.
+**Actions taken:**
+- Deleted stale branches `master`/`api`/`postgres`/`documentation` (gh api); `main` is the single trunk. Purged 16 macOS `Icon\r` artifacts polluting `.git/` that had blocked fetch; based `feature/ep1-foundation` on `main`.
+- Scaffolded 96 files: pnpm+Turborepo monorepo; Docker stack (db/api/web) + healthchecks; cross-platform scripts (.sh+.ps1) + Makefile; `.env.example` + ESLint/Prettier + CI; `@cost-reaper/types` (Zod contract); `@cost-reaper/engine` (pure decimal engine) + Vitest suite; NestJS `/health`+`/ready`, structured logging, RFC7807, full Prisma schema + seed; Vite/React shell; ARCHITECTURE + ADRs 0001–0006.
+- Static validation: `bash -n` all scripts OK, JSON parse OK, `docker compose config` VALID, Makefile tabs OK. Container build + tests deferred to CI (no host Node).
+- Commit `148809c`; pushed `feature/ep1-foundation`; opened PR #1 (https://github.com/govmed/cost-reaper/pull/1).
+- Updated CLAUDE.md Current State, PROJECT_LOG.md, this AUDIT_LOG.md. Spec remains open for further requirements per the user's instruction.
+
 <!-- Append new turns below this line -->

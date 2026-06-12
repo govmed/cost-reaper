@@ -81,4 +81,18 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Requirements captured and traceable. Priorities: FR-26 identity/RBAC = **Must (MVP)**; FR-24 workflow & FR-25 checklist = **Should (Post-MVP)** with the modular engine seams established in MVP (PO may re-prioritize). Interpretation assumption recorded: "workflow" = estimate approval/review lifecycle. No code yet.
 - **Next:** Confirm branch strategy with user; then scaffold EP-1 foundation.
 
+### 2026-06-12 04:17 UTC — Branch decision + remote cleanup (trunk-based)
+- **Action:** User chose **trunk-based** and authorized deleting stale branches. Wired `origin`, based `feature/ep1-foundation` on `main`, deleted `master`/`api`/`postgres`/`documentation` via `gh api`. Purged 16 macOS `Icon\r` artifacts that had polluted `.git/` (broke fetch).
+- **Why:** Modularity belongs in code, not long-lived per-component branches (ADR-0004). Cleanup is human-gated (Section 0.1) — explicit approval given.
+- **Files touched:** git refs only (remote); `docs/adr/0004-modularity-and-trunk-based-git.md` (later).
+- **Result:** Remote has only `main`. Recoverable SHAs logged: `30f2047` (master/api/postgres), `bfa0b1a` (documentation = main).
+- **Next:** Scaffold EP-1.
+
+### 2026-06-12 04:30 UTC — EP-1 foundation scaffolded, pushed, PR #1 opened
+- **Action:** Built the Sprint 0 foundation (96 files): pnpm+Turborepo monorepo (`apps/{web,api}`, `packages/{types,engine,config}`); Docker stack `db`/`api`/`web` with healthchecks; cross-platform `setup/start/stop/test/migrate/seed/logs` (`.sh`+`.ps1`) + `Makefile`; `.env.example` + root ESLint/Prettier + GitHub Actions CI; shared **Zod contract** (`@cost-reaper/types`); **pure estimation engine** (`@cost-reaper/engine`, decimal upcharge→contingency + monthly/yearly) with an exhaustive Vitest suite; NestJS API skeleton (`/health`+`/ready`, structured JSON logging + correlation ids, RFC7807 filter), full MVP **Prisma schema** + **seed** (admin, rate card, AWS/GCP/Azure catalog, default workflow, checklist rules); Vite/React shell; `docs/ARCHITECTURE.md` + ADRs 0001–0006.
+- **Why:** Delivers EP-1 (FE-1..FE-5); advances FR-12, NFR-1/2/3/6/7/9/10/15; seeds schema/contract for FR-21/22/23/24/25/26.
+- **Files touched:** see commit `148809c` (96 files).
+- **Result:** Static validation passed — `bash -n` (all scripts), JSON parse (all configs), `docker compose config` VALID (db/api/web), Makefile tabs OK. **Not** run in authoring env: container image build + full test suite (no host Node) → delegated to CI on PR #1. Committed, pushed `feature/ep1-foundation`, opened **PR #1** → `main`.
+- **Next:** CI/merge PR #1; generate first real Prisma migration to replace the `db push` baseline; start Sprint 1 (EP-2 auth, EP-3 rate cards).
+
 <!-- Append new entries below this line -->
