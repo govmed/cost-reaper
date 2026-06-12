@@ -20,6 +20,7 @@ const DETAIL_INCLUDE = {
   nonLaborItems: true,
   cloudItems: true,
   assumptions: { orderBy: { createdAt: 'asc' as const } },
+  currentStage: true,
 };
 
 @Injectable()
@@ -32,6 +33,12 @@ export class EstimatesService {
   // ── CRUD ───────────────────────────────────────────────────────────────────
 
   async create(dto: CreateEstimateRequest, ownerId: string) {
+    // Attach the seeded default workflow + initial stage (FR-24).
+    const def: any = await this.prisma.workflowDefinition.findFirst({
+      where: { isDefault: true },
+      include: { stages: true },
+    });
+    const initial = def?.stages.find((s: any) => s.isInitial) ?? def?.stages[0];
     const est = await this.prisma.estimate.create({
       data: {
         name: dto.name,
@@ -41,6 +48,8 @@ export class EstimatesService {
         ownerId,
         globalUpchargePercent: dto.globalUpchargePercent,
         contingencyPercent: dto.contingencyPercent,
+        workflowDefinitionId: def?.id ?? null,
+        currentStageId: initial?.id ?? null,
       },
     });
     await this.audit.record('Estimate', est.id, 'CREATE', ownerId);
@@ -65,13 +74,13 @@ export class EstimatesService {
     ]);
 
     return {
-      data: rows.map((e) => ({
+      data: rows.map((e: any) => ({
         id: e.id,
         name: e.name,
         status: e.status,
         currency: e.currency,
         ownerId: e.ownerId,
-        currentStageKey: null,
+        currentStageKey: e.currentStage?.key ?? null,
         grandTotal: this.computeTotals(e).grandTotal,
         updatedAt: e.updatedAt.toISOString(),
       })),
@@ -370,6 +379,8 @@ export class EstimatesService {
       currency: e.currency,
       rateCardId: e.rateCardId,
       ownerId: e.ownerId,
+      currentStageKey: e.currentStage?.key ?? null,
+      currentStageLabel: e.currentStage?.label ?? null,
       globalUpchargePercent: Number(e.globalUpchargePercent),
       contingencyPercent: Number(e.contingencyPercent),
       laborItems: e.laborItems.map((l: any) => ({

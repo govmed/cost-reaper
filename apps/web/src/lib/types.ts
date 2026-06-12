@@ -123,3 +123,42 @@ export interface CloudPrice {
   unitPrice: string;
   currency: string;
 }
+
+export interface ChecklistItem {
+  key: string;
+  description: string;
+  severity: string;
+  scope: string;
+  passed: boolean;
+  message: string;
+}
+export interface ChecklistResult {
+  passed: boolean;
+  blocking: boolean;
+  completeness: number;
+  items: ChecklistItem[];
+}
+
+export interface AvailableTransition {
+  toStageKey: string;
+  toStageLabel: string;
+  label: string;
+  allowedRole: string;
+  requiresChecklistPass: boolean;
+  allowedForUser: boolean;
+  blockedByChecklist: boolean;
+}
+export interface WorkflowEvent {
+  id: string;
+  fromStageKey: string | null;
+  toStageKey: string;
+  actorId: string;
+  note: string | null;
+  occurredAt: string;
+}
+export interface EstimateWorkflow {
+  currentStageKey: string | null;
+  currentStageLabel: string | null;
+  availableTransitions: AvailableTransition[];
+  history: WorkflowEvent[];
+}

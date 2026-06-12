@@ -15,6 +15,7 @@ import { UsersModule } from './modules/users/users.module';
 import { RateCardsModule } from './modules/rate-cards/rate-cards.module';
 import { CloudPricingModule } from './modules/cloud-pricing/cloud-pricing.module';
 import { EstimatesModule } from './modules/estimates/estimates.module';
+import { WorkflowModule } from './modules/workflow/workflow.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EstimatesModule } from './modules/estimates/estimates.module';
     RateCardsModule,
     CloudPricingModule,
     EstimatesModule,
+    WorkflowModule,
     // Next increments: workflow, checklist, export-pdf (NFR-15).
   ],
   providers: [
