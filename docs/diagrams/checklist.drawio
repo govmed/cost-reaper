@@ -1,0 +1,22 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Smart Checklist Gating" id="checklist">
+    <mxGraphModel dx="900" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="360" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t" value="Requested transition" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#0e7490;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="160" height="50" as="geometry" /></mxCell>
+        <mxCell id="dreq" value="requiresChecklistPass?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#a16207;" vertex="1" parent="1"><mxGeometry x="260" y="135" width="160" height="80" as="geometry" /></mxCell>
+        <mxCell id="eval" value="ChecklistEngine evaluates active rules" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="480" y="150" width="200" height="50" as="geometry" /></mxCell>
+        <mxCell id="dblk" value="Any BLOCKER failed?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#a16207;" vertex="1" parent="1"><mxGeometry x="730" y="135" width="160" height="80" as="geometry" /></mxCell>
+        <mxCell id="allow" value="Allow transition" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#166534;" vertex="1" parent="1"><mxGeometry x="500" y="280" width="160" height="50" as="geometry" /></mxCell>
+        <mxCell id="deny" value="Block &#183; return failing items" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#b91c1c;" vertex="1" parent="1"><mxGeometry x="740" y="20" width="180" height="50" as="geometry" /></mxCell>
+        <mxCell id="k1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="t" target="dreq"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="k2" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="dreq" target="allow"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="k3" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="dreq" target="eval"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="k4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="eval" target="dblk"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="k5" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="dblk" target="deny"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="k6" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="dblk" target="allow"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

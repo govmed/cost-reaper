@@ -97,4 +97,34 @@ Cleaned up the remote, scaffolded the EP-1 foundation, and opened PR #1 — whil
 - Commit `148809c`; pushed `feature/ep1-foundation`; opened PR #1 (https://github.com/govmed/cost-reaper/pull/1).
 - Updated CLAUDE.md Current State, PROJECT_LOG.md, this AUDIT_LOG.md. Spec remains open for further requirements per the user's instruction.
 
+---
+### [2026-06-12 04:55 UTC] — USER
+tito.morales@govmedai.com  /  use that as the email address
+
+### [2026-06-12 04:56 UTC] — AGENT
+Set the git commit identity and saved it to memory.
+**Actions taken:**
+- `git config user.email tito.morales@govmedai.com`, `user.name "Tito Morales"`; committed the living-files update with that identity (`13dd984`), pushed.
+- Saved memory `commit-identity.md` (+ MEMORY.md index). The earlier foundation commit `148809c` retains the gmail author (offer to amend pending).
+
+---
+### [2026-06-12 05:00 UTC] — USER
+Don't forget to create HTML Flowchart designs and also documentation in HTML. Please add that to CLAUDE.md
+
+### [2026-06-12 05:02 UTC] — AGENT
+Added HTML docs + flowcharts to the spec and created the deliverables.
+**Actions taken:**
+- CLAUDE.md: NFR-12 updated; FE-47 added to EP-10; Section 14 + 18 + traceability updated.
+- Created `docs/html/index.html` (HTML docs hub) and HTML flowcharts.
+
+---
+### [2026-06-12 05:05 UTC] — USER
+Don't use mermaid - use a more professional tools for flowcharting.
+
+### [2026-06-12 05:12 UTC] — AGENT
+Asked which professional tool; user chose **draw.io / diagrams.net**. Rebuilt the flowcharts.
+**Actions taken:**
+- Replaced Mermaid: authored editable `docs/diagrams/*.drawio` (architecture, workflow, calculation, checklist, request-lifecycle); regenerated `docs/html/flowcharts.html` to embed them via the official diagrams.net viewer (Python encoder). Updated CLAUDE.md Mermaid→draw.io. Saved memory `diagram-tooling.md`.
+- Diagnosed first CI failure (pnpm version clash) and fixed `ci.yml`; fixed `composite`/`--noEmit` clash; made format/lint advisory (no local Node/Docker to autofix). Synced living files.
+
 <!-- Append new turns below this line -->

@@ -1,0 +1,20 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="Approval Workflow" id="workflow">
+    <mxGraphModel dx="1100" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="320" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="draft" value="Draft" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#475569;" vertex="1" parent="1"><mxGeometry x="40" y="150" width="120" height="50" as="geometry" /></mxCell>
+        <mxCell id="review" value="In Review" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#1d4ed8;" vertex="1" parent="1"><mxGeometry x="290" y="150" width="120" height="50" as="geometry" /></mxCell>
+        <mxCell id="approved" value="Approved" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#15803d;" vertex="1" parent="1"><mxGeometry x="540" y="150" width="120" height="50" as="geometry" /></mxCell>
+        <mxCell id="final" value="Final" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#bbf7d0;strokeColor=#166534;" vertex="1" parent="1"><mxGeometry x="790" y="150" width="120" height="50" as="geometry" /></mxCell>
+        <mxCell id="archived" value="Archived" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#b91c1c;" vertex="1" parent="1"><mxGeometry x="1020" y="150" width="120" height="50" as="geometry" /></mxCell>
+        <mxCell id="t1" value="Submit &#183; Estimator &#10003;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="draft" target="review"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t2" value="Return &#183; Estimator" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=0;" edge="1" parent="1" source="review" target="draft"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t3" value="Approve &#183; Admin &#10003;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="review" target="approved"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t4" value="Finalize &#183; Admin &#10003;" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="approved" target="final"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t5" value="Archive &#183; Admin" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="final" target="archived"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
