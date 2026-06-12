@@ -25,6 +25,11 @@ export function lineTotal(baseAmount: string, quantity: number, scale = 4): stri
   return new Decimal(baseAmount).times(quantity).toFixed(scale);
 }
 
+/** Exact sum of decimal-string money values (never floats); used for roll-ups. */
+export function sumMoney(values: string[], scale = 4): string {
+  return values.reduce((acc, v) => acc.plus(new Decimal(v)), new Decimal(0)).toFixed(scale);
+}
+
 export function effectiveUpcharge(line: EngineLine, globalUpchargePercent: number): Decimal {
   const override = line.upchargePercentOverride;
   return d(override === null || override === undefined ? globalUpchargePercent : override);

@@ -257,4 +257,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Pipeline green (format/lint/typecheck/**test 43**/build); migration verified (4-migration fresh deploy + no drift; existing values preserved). Live smoke: admin added phase **DISCOVERY** → usable on a line (201) + shows in per-phase breakdown; invalid `BOGUS_PHASE` → **400 "not an active SDLC_PHASE value"**.
 - **Next:** commit → PR → CI-green → merge; then FE-54 part 2 (remaining descriptive enums) + the small finishing cluster.
 
+### 2026-06-12 — FE-27 Dashboard (FR-18)
+- **Action:** Merged FE-54 part 1 (PR #14). Built a **dashboard**: `GET /dashboard` (DashboardModule) backed by a pure, unit-tested `summarizeDashboard` (counts by status & stage, exact per-currency grand totals via new engine `sumMoney`, recent activity). Extracted `toMappableEstimate` into `engine-mapping` so estimates + dashboard share one projection (NFR-15). Web: `DashboardPage` (stat cards + by-stage + recent) + nav link + `/dashboard` route + `useDashboard` hook + shared `DashboardSummary` DTO. Extended Playwright e2e.
+- **Why:** FR-18 / FE-27 — a high-value, self-contained read-only feature.
+- **Files touched:** `packages/{types/src/dashboard.ts, engine/src/{estimation-engine,index}.ts}`, `apps/api/src/modules/dashboard/*`, `apps/api/src/modules/estimates/{engine-mapping,estimates.service}.ts`, `apps/api/src/app.module.ts`, `apps/web/src/{lib/types.ts,lib/queries.ts,pages/DashboardPage.tsx,App.tsx,e2e/smoke.spec.ts}`, CHANGELOG.
+- **Result:** Pipeline green (format/lint/typecheck/**test 47**/build; fixed a test-helper bug where `null ?? 'DRAFT'` masked the no-stage case). Live smoke: `/dashboard` → 3 estimates, USD 22340.0000, by-stage + recent populated; web 200.
+- **Next:** commit → PR → CI-green → merge; then FE-54 part 2 / governed cost categories.
+
 <!-- Append new entries below this line -->

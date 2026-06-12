@@ -163,6 +163,22 @@ export interface CloudPrice {
   currency: string;
 }
 
+export interface DashboardSummary {
+  totalEstimates: number;
+  byStatus: { status: string; count: number }[];
+  byStage: { stageKey: string; stageLabel: string; count: number }[];
+  totalsByCurrency: { currency: string; grandTotal: string }[];
+  recent: {
+    id: string;
+    name: string;
+    status: string;
+    currency: string;
+    currentStageKey: string | null;
+    grandTotal: string;
+    updatedAt: string;
+  }[];
+}
+
 export interface ReferenceType {
   id: string;
   code: string;
