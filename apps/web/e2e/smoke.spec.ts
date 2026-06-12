@@ -19,10 +19,10 @@ test('login → create estimate → add a line → see totals', async ({ page })
   await expect(page.getByText('Grand total')).toBeVisible();
 
   // Add a non-labor line (FR-6) and see it appear
-  await page.getByPlaceholder('Category (e.g. Licenses)').fill('Tooling');
+  await page.getByTitle('Cost category').selectOption('Licenses');
   await page.getByPlaceholder('amount').fill('1000');
   await page.getByRole('button', { name: 'Add non-labor' }).click();
-  await expect(page.getByRole('cell', { name: 'Tooling' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Licenses' })).toBeVisible();
 
   // The governance checklist panel renders (FR-25)
   await expect(page.getByRole('heading', { name: 'Smart checklist' })).toBeVisible();
@@ -53,7 +53,7 @@ test('SDLC phase breakdown (FR-28), resource capacity guard (FR-27) + stage gate
   await expect(page.getByRole('heading', { name })).toBeVisible();
 
   // FR-28: tag a non-labor line with an SDLC phase → per-phase breakdown appears.
-  await page.getByPlaceholder('Category (e.g. Licenses)').fill('Build server');
+  await page.getByTitle('Cost category').selectOption('Infrastructure');
   await page.getByPlaceholder('amount').fill('500');
   await page.locator('select:has(option:has-text("Phase…"))').nth(1).selectOption('DEVELOPMENT');
   await page.getByRole('button', { name: 'Add non-labor' }).click();
