@@ -253,4 +253,11 @@ Added FR-28 (cost per SDLC phase) to the spec, then resumed the admin UI build.
 - CLAUDE.md: FR-28 + FE-49 (EP-5); `sdlc_phase` enum on all 3 line-item entities; §10 per-phase rollup note; traceability FR-28→EP-5,EP-6. Should (Post-MVP), not yet built.
 - Continuing "other work": building Admin UI Part 2 (Users).
 
+---
+### [2026-06-12 09:35 UTC] — AGENT (continuing "other work")
+Completed the admin UI (Parts 2 & 3) and rebuilt the local stack.
+**Actions taken:**
+- Part 2 Users (UsersPage + UserDto + hooks; admin nav link) → PR #10 → CI green → merged. Part 3 Cloud Prices browse (CloudPricesPage + nav/route) → PR #11 → CI green → merged. Both verified all 5 gates locally.
+- `main` @ `d9165bf`; rebuilt local stack (`docker compose up -d --build`) — users/cloud-prices/rate-cards APIs + web all 200. Admin/reference-data UI section complete (Rate Cards · Users · Cloud Prices).
+
 <!-- Append new turns below this line -->

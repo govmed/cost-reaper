@@ -206,4 +206,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Captured + traceable; not yet built. User said to continue with other work → proceeding to Admin UI Part 2 (Users).
 - **Next:** Build Admin UI Part 2 (Users admin page).
 
+### 2026-06-12 09:35 UTC — Admin UI Parts 2 & 3 (Users, Cloud Prices) — section complete
+- **Action:** Continued the admin UI per "continue with your other work." **Part 2 (Users)** — `UsersPage` (list, create email/password/role/name, inline role change + activate/deactivate, delete; admin-only nav link), `UserDto` + hooks; backend already had `/users`. PR #10 merged (`ee19614`→main). **Part 3 (Cloud Prices)** — `CloudPricesPage` (browse seeded catalog, provider filter + text search, read-only), nav + route; backend `/cloud-prices` existed. PR #11 merged. Both verified (all 5 gates) + CI green (build/e2e/security).
+- **Why:** FE-45 + FE-38 frontends — finish the reference-data management section the user found missing.
+- **Files touched:** `apps/web/src/pages/{UsersPage,CloudPricesPage}.tsx`, `apps/web/src/{App.tsx,lib/queries.ts,lib/types.ts}`, CHANGELOG.
+- **Result:** **Admin UI complete** (Rate Cards · Users · Cloud Prices). Local stack rebuilt — all endpoints + web 200. `main` @ `d9165bf`.
+- **Next:** Build the spec'd post-MVP reqs (FR-27 resource capacity, FR-28 SDLC-phase costs) or other post-MVP — per user direction.
+
 <!-- Append new entries below this line -->
