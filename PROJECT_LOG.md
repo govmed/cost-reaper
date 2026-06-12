@@ -158,4 +158,14 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** **CI green** (vite build + tsc). Merged **PR #5** (`ce06e1c`). **The cost-reaper MVP is complete end-to-end** (backend + web, all CI-green). Runs via `setup.sh` + `start.sh` on any Docker host.
 - **Next:** Await direction on post-MVP — governance (workflow/checklist API/UI, the user's FR-24/25 asks), first real Prisma migration, PDF/Excel, dashboard, scenarios.
 
+## Chapter 4 — Sprint 4: Estimate Governance (started 2026-06-12)
+**Goal:** EP-12 — the WorkflowEngine (FR-24) + ChecklistEngine (FR-25) the user asked for earlier (seeded but no endpoints/UI).
+
+### 2026-06-12 07:35 UTC — Governance built, CI green (after 1 typecheck fix), merged (PR #6)
+- **Action:** Built `apps/api/src/modules/workflow/`: pure `checklist-rules` evaluator (+ unit tests), `ChecklistService`, `WorkflowService` (default-workflow read, lazy-assign, role-gated transitions with checklist gating, immutable history), `WorkflowController` (`/workflows/default`, `/estimates/:id/workflow`, `/estimates/:id/checklist`, `POST /estimates/:id/transitions`). Estimates auto-attach the default workflow on create; detail/list surface `currentStage`. Web: governance panel in the editor (stage, gated transition buttons + history, live checklist). Types: workflow output DTOs.
+- **Why:** FR-24 / FR-25 (EP-12) — the user's explicit earlier requests, finally wired end-to-end.
+- **Files touched:** `apps/api/src/modules/workflow/*`, `estimates.service.ts`, `app.module.ts`, `packages/types/governance.ts`, `apps/web/src/{lib,pages}/*`, CHANGELOG.
+- **Result:** First CI run red — `checklist-rules.ts` union-spread needed `billingPeriod` on the cloud shape (TS2339); fixed (added field + mapping). **CI green** (build + security). Merged **PR #6** (`7e5fa89`).
+- **Next:** Await direction — Prisma migration, PDF/Excel, dashboard, scenarios, PERT, live cloud sync, or hardening.
+
 <!-- Append new entries below this line -->

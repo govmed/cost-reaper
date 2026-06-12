@@ -187,4 +187,16 @@ Built and merged the web UI (MVP complete); persisted the full Bash allow + stan
 - Permissions: via the update-config skill set `.claude/settings.local.json` allow to bare `Bash` (allow-all) + `Skill(update-config)`; saved `standing-permission` memory (proceed without micro-approvals; only surface bigger decisions).
 - Synced living files (Current State → MVP COMPLETE, PROJECT_LOG Chapter 3).
 
+---
+### [2026-06-12 07:20 UTC] — USER
+Proceed with #1. (governance: workflow + checklist)
+
+### [2026-06-12 07:35 UTC] — AGENT
+Built, CI-verified, and merged the estimate-governance layer (FR-24/FR-25).
+**Actions taken:**
+- API `workflow` module: pure checklist evaluator (+ tests), ChecklistService, WorkflowService (role-gated transitions + checklist gating + history), WorkflowController (default workflow, per-estimate workflow, checklist eval, transitions). Estimates auto-attach the default workflow; detail/list surface current stage.
+- Web: governance panel in the estimate editor (stage + gated transition buttons + history + live checklist).
+- PR #6: first CI run red (one TS union error in checklist cloud shape) → fixed → CI green → merged into `main` (`7e5fa89`). Synced living files (Current State, PROJECT_LOG Chapter 4).
+- (Earlier this stretch: set bare-`Bash` allow-all in settings.local.json via update-config skill; saved standing-permission memory.)
+
 <!-- Append new turns below this line -->
