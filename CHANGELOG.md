@@ -6,6 +6,13 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Admin UI — Part 1: Rate Cards (FE-10 frontend)
+
+#### Added
+- **Top navigation** (Estimates · Rate cards) in the web app.
+- **Rate Cards page** — create rate cards (name + currency), and **add / inline-edit / delete roles & rates** (labor-cost customization), plus activate/deactivate and delete cards.
+- Backend: rate-card **role endpoints** (`POST/PATCH/DELETE /rate-cards/:id/roles[/:roleId]`, admin-only, audited) so individual roles/rates are editable after creation.
+
 ### Hardening (NFR-6)
 
 #### Changed
