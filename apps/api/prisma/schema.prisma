@@ -73,15 +73,6 @@ enum ChecklistScope {
   RESOURCE
 }
 
-enum SdlcPhase {
-  PLANNING
-  DESIGN
-  DEVELOPMENT
-  TESTING
-  DEPLOYMENT
-  MAINTENANCE
-}
-
 // ─── Identity (FR-1, FR-2, FR-26, NFR-16) ────────────────────────────────────
 
 model User {
@@ -201,7 +192,7 @@ model LaborLineItem {
   rateSnapshot            Decimal       @map("rate_snapshot") @db.Decimal(18, 4)
   upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
   billingPeriod           BillingPeriod @default(ONE_TIME) @map("billing_period")
-  sdlcPhase               SdlcPhase?    @map("sdlc_phase")
+  sdlcPhase               String?       @map("sdlc_phase")
   resourceName            String?       @map("resource_name")
   allocationPercent       Decimal       @default(100) @map("allocation_percent") @db.Decimal(5, 2)
   startDate               DateTime?     @map("start_date") @db.Date
@@ -223,7 +214,7 @@ model NonLaborLineItem {
   upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
   billingPeriod           BillingPeriod @default(ONE_TIME) @map("billing_period")
   periods                 Int           @default(1)
-  sdlcPhase               SdlcPhase?    @map("sdlc_phase")
+  sdlcPhase               String?       @map("sdlc_phase")
   lineTotal               Decimal       @map("line_total") @db.Decimal(18, 4)
 
   @@index([estimateId])
@@ -245,7 +236,7 @@ model CloudComputeLineItem {
   unitPriceSnapshot       Decimal       @map("unit_price_snapshot") @db.Decimal(18, 6)
   upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
   billingPeriod           BillingPeriod @default(MONTHLY) @map("billing_period")
-  sdlcPhase               SdlcPhase?    @map("sdlc_phase")
+  sdlcPhase               String?       @map("sdlc_phase")
   lineTotal               Decimal       @map("line_total") @db.Decimal(18, 4)
 
   @@index([estimateId])

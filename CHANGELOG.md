@@ -6,6 +6,13 @@ it ships a first release.
 
 ## [Unreleased]
 
+### FE-54 (part 1) — SDLC phase fully data-driven (FR-29, NFR-17)
+
+#### Changed
+- **SDLC phase is no longer a hard-coded enum.** Dropped the Prisma/Zod `SdlcPhase` enum; the `sdlc_phase` columns are now `TEXT` (migration `20260612160000_sdlc_phase_data_driven` converts in place with `USING ::text`, **preserving existing values**). The set of valid phases lives in the `SDLC_PHASE` reference table.
+- **Server-side validation** now checks a line's phase against the **active** `SDLC_PHASE` reference values (deny-by-default) via a new cached `ReferenceService.assertActiveCode`. The estimate editor's phase dropdowns offer **any active** phase (no hard-coded filter).
+- Net effect: an admin can **add/rename/re-order/retire an SDLC phase in Reference data with no code change** — the new phase is immediately selectable, storable, validated, and rolled up in the per-phase cost breakdown. Verified live (new "DISCOVERY" phase usable end-to-end; invalid phase → 400). This is the first column migrated off enums; the rest of FE-54 (status, billing period, role, provider, etc.) follows the same pattern.
+
 ### Sprint 11 — Reference Data Platform (FR-29, NFR-17, EP-13)
 
 #### Added

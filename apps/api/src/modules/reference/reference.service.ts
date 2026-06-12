@@ -23,6 +23,37 @@ export class ReferenceService {
     private readonly audit: AuditService,
   ) {}
 
+  /** Short-lived cache of active codes per type, so validation isn't a per-request query (NFR-1). */
+  private readonly codeCache = new Map<string, { codes: Set<string>; at: number }>();
+  private static readonly CACHE_TTL_MS = 60_000;
+
+  /** The active value codes for a reference type (cached). Empty set if the type is unknown. */
+  async getActiveCodes(typeCode: string): Promise<Set<string>> {
+    const hit = this.codeCache.get(typeCode);
+    if (hit && Date.now() - hit.at < ReferenceService.CACHE_TTL_MS) return hit.codes;
+    const type = await this.prisma.referenceType.findUnique({
+      where: { code: typeCode },
+      select: { id: true },
+    });
+    const rows = type
+      ? await this.prisma.referenceValue.findMany({
+          where: { referenceTypeId: type.id, isActive: true },
+          select: { code: true },
+        })
+      : [];
+    const codes = new Set(rows.map((r) => r.code));
+    this.codeCache.set(typeCode, { codes, at: Date.now() });
+    return codes;
+  }
+
+  /** Throw unless `code` is an active value of `typeCode` — deny-by-default validation (FR-29). */
+  async assertActiveCode(typeCode: string, code: string): Promise<void> {
+    const codes = await this.getActiveCodes(typeCode);
+    if (!codes.has(code)) {
+      throw new BadRequestException(`'${code}' is not an active ${typeCode} value`);
+    }
+  }
+
   async listTypes(): Promise<ReferenceTypeDto[]> {
     const types = await this.prisma.referenceType.findMany({
       orderBy: [{ displayOrder: 'asc' }, { code: 'asc' }],
@@ -105,6 +136,7 @@ export class ReferenceService {
       },
     });
     await this.audit.record('ReferenceValue', v.id, 'CREATE', actorId);
+    this.codeCache.clear();
     return toReferenceValueDto(v);
   }
 
@@ -137,6 +169,7 @@ export class ReferenceService {
       },
     });
     await this.audit.record('ReferenceValue', v.id, 'UPDATE', actorId);
+    this.codeCache.clear();
     return toReferenceValueDto(v);
   }
 
@@ -152,6 +185,7 @@ export class ReferenceService {
     }
     await this.prisma.referenceValue.delete({ where: { id } });
     await this.audit.record('ReferenceValue', id, 'DELETE', actorId);
+    this.codeCache.clear();
   }
 
   // ── internals ───────────────────────────────────────────────────────────────

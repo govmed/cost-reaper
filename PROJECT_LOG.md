@@ -250,4 +250,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Full pipeline green in a clean container (format/lint/typecheck/**test 43**/build). Live API smoke: 16 types seeded, `SDLC_PHASE` nested (phase→tasks), admin create→rename→deactivate→delete round-trip OK, built-in delete → 400, web page 200.
 - **Next:** commit → PR → CI-green → merge. Then finish **FE-54** (migrate remaining enum columns to FK-validate against reference tables).
 
+### 2026-06-12 — FE-54 part 1: SDLC phase fully data-driven
+- **Action:** Merged Sprint 11 (PR #13). Then migrated SDLC phase off its enum: dropped the Prisma/Zod `SdlcPhase` enum; `sdlc_phase` columns → `TEXT` via data-preserving migration `20260612160000_sdlc_phase_data_driven` (`ALTER … TYPE TEXT USING …::text`, then `DROP TYPE`). Added cached `ReferenceService.getActiveCodes`/`assertActiveCode` (60s TTL + clear-on-write) and wired `checkSdlcPhase` into estimate labor/non-labor/cloud writes (deny-by-default against active `SDLC_PHASE` values). Estimate-editor dropdowns now offer **any active** phase (removed the hard-coded filter); engine keeps `SDLC_PHASE_ORDER` only as a sort hint.
+- **Why:** FR-29 / NFR-17 / FE-54 — make the flagship reference example (SDLC phase) truly data-driven across DB/API/validation/UI/engine.
+- **Files touched:** `apps/api/prisma/{schema.prisma, migrations/20260612160000_…}`, `apps/api/src/modules/reference/reference.service.ts`, `apps/api/src/modules/estimates/{estimates.module,estimates.service,engine-mapping}.ts`, `packages/types/src/{common,estimate,line-items}.ts`, `apps/web/src/{lib/types.ts,pages/EstimateEditorPage.tsx}`, CHANGELOG.
+- **Result:** Pipeline green (format/lint/typecheck/**test 43**/build); migration verified (4-migration fresh deploy + no drift; existing values preserved). Live smoke: admin added phase **DISCOVERY** → usable on a line (201) + shows in per-phase breakdown; invalid `BOGUS_PHASE` → **400 "not an active SDLC_PHASE value"**.
+- **Next:** commit → PR → CI-green → merge; then FE-54 part 2 (remaining descriptive enums) + the small finishing cluster.
+
 <!-- Append new entries below this line -->
