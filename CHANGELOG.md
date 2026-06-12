@@ -6,6 +6,16 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Sprint 1 — Identity & Reference Data (EP-2, EP-3)
+
+#### Added
+- **Auth** (`/api/v1/auth`): register, login, refresh, logout, me — argon2 hashing, JWT access (15m) + refresh (7d). (FR-1, FE-6/7/9)
+- **RBAC**: deny-by-default `JwtAuthGuard` + `RolesGuard` app-wide; `@Roles` / `@Public` / `@CurrentUser` decorators; `ZodValidationPipe`. (FR-2, FR-26, NFR-16, FE-8/46)
+- **User management** (`/api/v1/users`, admin-only): list / create / update / delete. (FR-26, FE-45)
+- **Rate cards** (`/api/v1/rate-cards`): list/get for any authenticated user; create/update/delete admin-only, with roles + rates. (FR-3, FE-10)
+- **Audit trail**: create/modify on users + rate cards recorded as `AuditEvent`. (FR-11, FE-30)
+- Unit tests: `AuthService` (hash/verify + token roundtrip), `ZodValidationPipe`.
+
 ### Sprint 0 — Foundation (EP-1)
 
 #### Added
