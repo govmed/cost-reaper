@@ -89,3 +89,12 @@ test('Reference data admin page serves DB-driven values (FR-29)', async ({ page 
   await expect(page.getByRole('button', { name: 'Rename' }).first()).toBeVisible();
   await expect(page.getByText('Development').first()).toBeVisible();
 });
+
+test('Dashboard summarizes estimates (FR-18)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Dashboard' }).click();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+  await expect(page.getByText('Total value')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'By workflow stage' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Recent activity' })).toBeVisible();
+});

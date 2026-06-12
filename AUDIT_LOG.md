@@ -303,4 +303,12 @@ Reported feature status (54 total; ~38 done, ~16 left), then — per "just do it
 - Pipeline green (test 43). Live smoke: admin-added phase **DISCOVERY** usable end-to-end + in breakdown; invalid → 400.
 - Updated CHANGELOG + living files. Next: commit → PR → CI → merge; then FE-54 part 2.
 
+---
+### [2026-06-12 23:15 UTC] — AGENT (continuing autonomously, no prompt)
+Merged FE-54 part 1 (PR #14), then built **FE-27 Dashboard (FR-18)** — next highest-value item.
+**Actions taken:**
+- `GET /dashboard` + pure `summarizeDashboard` (counts by status/stage, exact per-currency totals via engine `sumMoney`, recent). Extracted shared `toMappableEstimate`. Web Dashboard page + nav/route + hook + DTO. e2e extended.
+- Pipeline green (test 47; fixed a test-helper `?? 'DRAFT'` bug). Live smoke: 3 estimates, USD 22340, by-stage + recent OK.
+- Next: commit → PR → CI → merge; then FE-54 part 2.
+
 <!-- Append new turns below this line -->

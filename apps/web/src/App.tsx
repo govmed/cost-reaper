@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './lib/auth';
 import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 import EstimatesPage from './pages/EstimatesPage';
 import EstimateEditorPage from './pages/EstimateEditorPage';
 import RateCardsPage from './pages/RateCardsPage';
@@ -29,6 +30,9 @@ export default function App() {
             <nav className="flex items-center gap-4 text-sm">
               <Link to="/" className="hover:underline">
                 Estimates
+              </Link>
+              <Link to="/dashboard" className="hover:underline">
+                Dashboard
               </Link>
               <Link to="/rate-cards" className="hover:underline">
                 Rate cards
@@ -76,6 +80,14 @@ export default function App() {
             element={
               <Protected>
                 <EstimateEditorPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <Protected>
+                <DashboardPage />
               </Protected>
             }
           />

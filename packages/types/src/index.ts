@@ -6,3 +6,4 @@ export * from './estimate';
 export * from './line-items';
 export * from './governance';
 export * from './reference';
+export * from './dashboard';

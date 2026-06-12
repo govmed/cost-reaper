@@ -3,6 +3,7 @@ import { api } from './api';
 import type {
   ChecklistResult,
   CloudPrice,
+  DashboardSummary,
   EstimateDetail,
   EstimateSummary,
   EstimateWorkflow,
@@ -204,4 +205,12 @@ export function useReferenceMutations(typeCode: string | undefined) {
       onSuccess,
     }),
   };
+}
+
+// ── Dashboard (FR-18) ─────────────────────────────────────────────────────────
+export function useDashboard() {
+  return useQuery({
+    queryKey: ['dashboard'],
+    queryFn: () => api<DashboardSummary>('/dashboard'),
+  });
 }

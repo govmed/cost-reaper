@@ -18,7 +18,7 @@ import type {
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { ReferenceService } from '../reference/reference.service';
-import { buildEngineInput, MappableEstimate } from './engine-mapping';
+import { buildEngineInput, toMappableEstimate } from './engine-mapping';
 import { CsvLine, toCsv } from './estimate-csv';
 
 const DETAIL_INCLUDE = {
@@ -415,45 +415,8 @@ export class EstimatesService {
     if (!e) throw new NotFoundException('Estimate not found');
   }
 
-  private toMappable(e: any): MappableEstimate {
-    const pct = (v: any) => (v == null ? null : Number(v));
-    return {
-      globalUpchargePercent: Number(e.globalUpchargePercent),
-      contingencyPercent: Number(e.contingencyPercent),
-      labor: e.laborItems.map((l: any) => ({
-        id: l.id,
-        roleName: l.rateCardRole?.roleName ?? null,
-        rateSnapshot: l.rateSnapshot.toString(),
-        quantity: Number(l.quantity),
-        units: Number(l.units),
-        billingPeriod: l.billingPeriod,
-        upchargePercentOverride: pct(l.upchargePercentOverride),
-        sdlcPhase: l.sdlcPhase ?? null,
-      })),
-      nonLabor: e.nonLaborItems.map((n: any) => ({
-        id: n.id,
-        category: n.category,
-        amount: n.amount.toString(),
-        periods: n.periods,
-        billingPeriod: n.billingPeriod,
-        upchargePercentOverride: pct(n.upchargePercentOverride),
-        sdlcPhase: n.sdlcPhase ?? null,
-      })),
-      cloud: e.cloudItems.map((c: any) => ({
-        id: c.id,
-        provider: c.provider,
-        unitPriceSnapshot: c.unitPriceSnapshot.toString(),
-        quantity: Number(c.quantity),
-        usageHoursPerMonth: Number(c.usageHoursPerMonth),
-        billingPeriod: c.billingPeriod,
-        upchargePercentOverride: pct(c.upchargePercentOverride),
-        sdlcPhase: c.sdlcPhase ?? null,
-      })),
-    };
-  }
-
   private computeTotals(e: any): EngineResult {
-    return computeEstimate(buildEngineInput(this.toMappable(e)));
+    return computeEstimate(buildEngineInput(toMappableEstimate(e)));
   }
 
   private toDetailDto(e: any) {

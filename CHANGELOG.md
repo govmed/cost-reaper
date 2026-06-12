@@ -6,6 +6,12 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Dashboard (FE-27, FR-18)
+
+#### Added
+- **Dashboard** — a new landing-adjacent page (nav link) summarizing estimates: total count, drafts/final, **grand totals per currency** (exact decimal sum), a **by-workflow-stage** breakdown, and **recent activity** (clickable). New `GET /dashboard` endpoint backed by a pure, unit-tested `summarizeDashboard` aggregator; grand totals computed via the shared estimation engine (new `sumMoney` helper). Read-only, available to any authenticated user. Extended Playwright e2e. Verified live.
+- Refactor: extracted `toMappableEstimate` into `engine-mapping` so the estimates and dashboard services share one estimate→engine projection (NFR-15).
+
 ### FE-54 (part 1) — SDLC phase fully data-driven (FR-29, NFR-17)
 
 #### Changed

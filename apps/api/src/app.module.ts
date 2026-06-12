@@ -17,6 +17,7 @@ import { CloudPricingModule } from './modules/cloud-pricing/cloud-pricing.module
 import { EstimatesModule } from './modules/estimates/estimates.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { ReferenceModule } from './modules/reference/reference.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { ReferenceModule } from './modules/reference/reference.module';
     EstimatesModule,
     WorkflowModule,
     ReferenceModule,
-    // Next increments: export-pdf, dashboard (NFR-15).
+    DashboardModule,
+    // Next increments: export-pdf, scenarios (NFR-15).
   ],
   providers: [
     // Auth runs first (authenticate), then RBAC (authorize) — deny-by-default (NFR-16).
