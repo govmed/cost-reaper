@@ -165,6 +165,31 @@ export interface CloudPrice {
   currency: string;
 }
 
+export interface ReferenceType {
+  id: string;
+  code: string;
+  displayName: string;
+  description: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  valueCount: number;
+}
+export interface ReferenceValue {
+  id: string;
+  referenceTypeId: string;
+  parentId: string | null;
+  code: string;
+  displayName: string;
+  description: string | null;
+  displayOrder: number;
+  isActive: boolean;
+  isBuiltin: boolean;
+  metadata: Record<string, unknown> | null;
+  children: ReferenceValue[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ChecklistItem {
   key: string;
   description: string;

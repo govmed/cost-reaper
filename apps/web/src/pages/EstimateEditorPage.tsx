@@ -7,6 +7,7 @@ import {
   useEstimate,
   useEstimateMutations,
   useRateCards,
+  useReferenceValues,
   useWorkflow,
 } from '../lib/queries';
 import { SDLC_PHASES } from '../lib/types';
@@ -339,6 +340,15 @@ function SdlcSelect({
   value: SdlcPhase | '';
   onChange: (v: SdlcPhase | '') => void;
 }) {
+  // Phase options + labels come from the DB-driven reference data (FR-29); fall
+  // back to the built-in codes while loading. We keep only codes the stored enum
+  // still accepts until the column is migrated off the enum (FE-54).
+  const { data } = useReferenceValues('SDLC_PHASE');
+  const valid = SDLC_PHASES as readonly string[];
+  const fromApi = (data ?? [])
+    .filter((r) => r.isActive && valid.includes(r.code))
+    .map((r) => ({ code: r.code as SdlcPhase, label: r.displayName }));
+  const options = fromApi.length ? fromApi : SDLC_PHASES.map((p) => ({ code: p, label: p }));
   return (
     <select
       value={value}
@@ -347,9 +357,9 @@ function SdlcSelect({
       title="SDLC phase"
     >
       <option value="">Phase…</option>
-      {SDLC_PHASES.map((p) => (
-        <option key={p} value={p}>
-          {p}
+      {options.map((o) => (
+        <option key={o.code} value={o.code}>
+          {o.label}
         </option>
       ))}
     </select>

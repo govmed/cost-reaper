@@ -78,3 +78,14 @@ test('SDLC phase breakdown (FR-28), resource capacity guard (FR-27) + stage gate
   await page.getByRole('button', { name: 'Add labor' }).click();
   await expect(page.getByText(/over-allocated/i)).toBeVisible();
 });
+
+test('Reference data admin page serves DB-driven values (FR-29)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Reference data' }).click();
+  await expect(page.getByRole('heading', { name: 'Reference data' })).toBeVisible();
+  // The seeded SDLC_PHASE type and its values render (default selection).
+  await page.getByRole('button', { name: /SDLC Phase/ }).click();
+  await expect(page.getByText('DEVELOPMENT', { exact: true }).first()).toBeVisible();
+  // A built-in value exposes Rename but not Delete.
+  await expect(page.getByRole('button', { name: 'Rename' }).first()).toBeVisible();
+});

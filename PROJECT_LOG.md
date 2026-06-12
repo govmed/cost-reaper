@@ -235,4 +235,19 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Spec current; reference-data refactor scoped as its own increment rather than bolted onto Sprint 10.
 - **Next:** ship Sprint 10; then plan Sprint 11.
 
+## Chapter 7 — Sprint 11: Reference Data Platform (started 2026-06-12)
+**Goal:** Deliver the user's mandate that **all reference values be database-driven, not hard-coded** (FR-29 / NFR-17 / EP-13). Build the generic reference tables + API + seed + admin UI, and start consuming them dynamically. Branch `feature/sprint11-reference-data`.
+
+### 2026-06-12 — Reference-data platform built and verified
+- **Action:**
+  - **Schema/migration (FE-50):** added `ReferenceType` + `ReferenceValue` (id, code, display_name, description, display_order, is_active, is_builtin, metadata_json, created_by/at, updated_by/at; **parent-child self-FK**; unique (type, code)). Migration `20260612140000_reference_data_platform` generated via `prisma migrate diff` and **verified** — all 3 migrations deploy on a fresh DB, drift check reports no difference.
+  - **API (FE-51):** `ReferenceModule` (controller→service) — `GET /reference/types`, `GET /reference/types/:code/values` (active or `?all=true`, nested/ordered), admin-only audited CRUD (`POST` type, `POST`/`PATCH`/`DELETE` value). Built-ins undeletable (deactivate instead); child/parent integrity guarded. Pure `buildReferenceTree`/`toReferenceValueDto` helper + `reference-tree.spec.ts`.
+  - **Seed (FE-52):** 16 baseline types (SDLC_PHASE incl. tasks, ESTIMATE_STATUS, BILLING_PERIOD, RATE_UNIT, CLOUD_PROVIDER, CLOUD_PRICE_UNIT, NON_LABOR_TYPE, ROLE, COST_CATEGORY, CHECKLIST_SEVERITY/SCOPE, WORKFLOW_STAGE, PRIORITY, RESOURCE_TYPE, TESTING_PHASE incl. types, DOCUMENT_TYPE) — idempotent, built-in.
+  - **Web (FE-53):** shared `reference.ts` contract; `useReferenceTypes`/`useReferenceValues`/`useReferenceMutations` hooks; **Reference data** admin page (type list → value tree, add/rename/reorder/activate/deactivate/delete) + admin nav/route.
+  - **FE-54 start:** estimate editor `SdlcSelect` now loads phase labels/order from `GET /reference/types/SDLC_PHASE/values` (filtered to valid enum codes, with fallback). Extended Playwright e2e for the reference page.
+- **Why:** FR-29 / NFR-17 / EP-13 (FE-50–54); honoring the user's "refactor so all reference values are DB-driven."
+- **Files touched:** `apps/api/prisma/{schema.prisma,seed.ts,migrations/20260612140000_…}`, `apps/api/src/modules/reference/*`, `apps/api/src/app.module.ts`, `packages/types/src/{reference.ts,index.ts}`, `apps/web/src/{lib/types.ts,lib/queries.ts,pages/ReferenceDataPage.tsx,App.tsx,pages/EstimateEditorPage.tsx,e2e/smoke.spec.ts}`, CHANGELOG.
+- **Result:** Full pipeline green in a clean container (format/lint/typecheck/**test 43**/build). Live API smoke: 16 types seeded, `SDLC_PHASE` nested (phase→tasks), admin create→rename→deactivate→delete round-trip OK, built-in delete → 400, web page 200.
+- **Next:** commit → PR → CI-green → merge. Then finish **FE-54** (migrate remaining enum columns to FK-validate against reference tables).
+
 <!-- Append new entries below this line -->

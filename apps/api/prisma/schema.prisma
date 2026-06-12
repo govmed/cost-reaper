@@ -361,3 +361,47 @@ model AuditEvent {
   @@index([entityType, entityId])
   @@map("audit_events")
 }
+
+// ─── Reference data platform (FR-29, NFR-17) ─────────────────────────────────
+// Generic, DB-driven reference/lookup values — no hard-coded enums in logic.
+
+model ReferenceType {
+  id           String           @id @default(uuid()) @db.Uuid
+  code         String           @unique
+  displayName  String           @map("display_name")
+  description  String?
+  displayOrder Int              @default(0) @map("display_order")
+  isActive     Boolean          @default(true) @map("is_active")
+  createdById  String?          @map("created_by") @db.Uuid
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedById  String?          @map("updated_by") @db.Uuid
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  values       ReferenceValue[]
+
+  @@map("reference_types")
+}
+
+model ReferenceValue {
+  id              String           @id @default(uuid()) @db.Uuid
+  referenceTypeId String           @map("reference_type_id") @db.Uuid
+  referenceType   ReferenceType    @relation(fields: [referenceTypeId], references: [id], onDelete: Cascade)
+  parentId        String?          @map("parent_id") @db.Uuid
+  parent          ReferenceValue?  @relation("ReferenceValueChildren", fields: [parentId], references: [id])
+  children        ReferenceValue[] @relation("ReferenceValueChildren")
+  code            String
+  displayName     String           @map("display_name")
+  description     String?
+  displayOrder    Int              @default(0) @map("display_order")
+  isActive        Boolean          @default(true) @map("is_active")
+  isBuiltin       Boolean          @default(false) @map("is_builtin")
+  metadataJson    Json?            @map("metadata_json")
+  createdById     String?          @map("created_by") @db.Uuid
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedById     String?          @map("updated_by") @db.Uuid
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@unique([referenceTypeId, code])
+  @@index([referenceTypeId])
+  @@index([parentId])
+  @@map("reference_values")
+}

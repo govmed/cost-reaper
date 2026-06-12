@@ -6,6 +6,19 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Sprint 11 — Reference Data Platform (FR-29, NFR-17, EP-13)
+
+#### Added
+- **Generic reference-data schema (FE-50):** `reference_type` + `reference_value` tables (id, code, display_name, description, display_order, is_active, created_by/at, updated_by/at) with a **parent-child self-relation** for grouped values (SDLC phase → tasks, testing phase → testing types). Migration `20260612140000_reference_data_platform` — verified fresh-DB deploy of all migrations + no drift.
+- **Reference API (FE-51):** `GET /reference/types`, `GET /reference/types/:code/values` (active or `?all=true`, nested + ordered), and admin-only audited CRUD (`POST /reference/types`, `POST /reference/types/:code/values`, `PATCH /reference/values/:id`, `DELETE /reference/values/:id`). Built-in values can be deactivated/renamed/re-sequenced but not deleted. Pure `buildReferenceTree` helper with unit tests.
+- **Seed (FE-52):** 16 baseline reference types (SDLC_PHASE incl. tasks, ESTIMATE_STATUS, BILLING_PERIOD, RATE_UNIT, CLOUD_PROVIDER, CLOUD_PRICE_UNIT, NON_LABOR_TYPE, ROLE, COST_CATEGORY, CHECKLIST_SEVERITY/SCOPE, WORKFLOW_STAGE, PRIORITY, RESOURCE_TYPE, TESTING_PHASE incl. types, DOCUMENT_TYPE) — idempotent, marked built-in.
+- **Admin UI (FE-53):** **Reference data** page (admin nav) — pick a type, view its values as a tree, add values, rename, re-order, activate/deactivate, and delete custom values.
+- **First dynamic consumer (FE-54 start):** the estimate editor's **SDLC-phase dropdowns now load labels/order from the reference API** (falling back to built-in codes); renaming/re-sequencing a phase in Reference data flows through without a code change.
+- Extended **Playwright e2e** (reference page serves seeded values + built-in Rename/no-Delete). Full pipeline green (format/lint/typecheck/test 43/build); reference API verified live (CRUD round-trip + built-in delete guard).
+
+#### Note
+Existing Prisma/Zod enums remain the stored type for now; migrating columns off enums to FK-validate against the reference table (the rest of **FE-54**) is the next increment. The interim `SdlcPhase` enum is first in line.
+
 ### Sprint 10 — Resource capacity, SDLC-phase costs & stage gates (FR-27, FR-28)
 
 #### Added

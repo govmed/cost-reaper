@@ -7,6 +7,7 @@ import EstimateEditorPage from './pages/EstimateEditorPage';
 import RateCardsPage from './pages/RateCardsPage';
 import UsersPage from './pages/UsersPage';
 import CloudPricesPage from './pages/CloudPricesPage';
+import ReferenceDataPage from './pages/ReferenceDataPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -36,9 +37,14 @@ export default function App() {
                 Cloud prices
               </Link>
               {user.role === 'ADMIN' && (
-                <Link to="/users" className="hover:underline">
-                  Users
-                </Link>
+                <>
+                  <Link to="/users" className="hover:underline">
+                    Users
+                  </Link>
+                  <Link to="/reference-data" className="hover:underline">
+                    Reference data
+                  </Link>
+                </>
               )}
             </nav>
           )}
@@ -94,6 +100,14 @@ export default function App() {
             element={
               <Protected>
                 <CloudPricesPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/reference-data"
+            element={
+              <Protected>
+                <ReferenceDataPage />
               </Protected>
             }
           />
