@@ -192,4 +192,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** CI build+e2e+security green. Merged **PR #9** (`dc51f4d`). **Rebuilt the local stack** (`docker compose up -d --build`) so it's live at localhost:5173 (rate-cards API 200, web 200).
 - **Next:** Part 2 (Users admin UI), Part 3 (Cloud Prices browse).
 
+### 2026-06-12 09:05 UTC — Spec: FR-27 resource allocation & capacity
+- **Action:** Added **FR-27** (a human resource = 100%/day, splittable by %, **must not exceed 100% on any date**) to `CLAUDE.md`: FR table; **FE-48** on EP-4; data model — `LaborLineItem` gains `resource_name`, `allocation_percent` (default 100), `start_date`/`end_date`; a Section 10 capacity note (ChecklistEngine `resource_capacity` BLOCKER + save-time guard, matched by `resource_name`); folded the rule into FR-25's baseline list; traceability `FR-27 → EP-4, EP-12`.
+- **Why:** Direct user requirement (resource capacity/over-allocation guard).
+- **Files touched:** `CLAUDE.md` (§4.2, §5, §6, §10).
+- **Result:** Captured as a traceable **Should (Post-MVP)** requirement; not yet built. Implementation seam: extend labor lines + add a checklist capacity rule + a save-time over-allocation check.
+- **Next:** Continue admin UI (Parts 2/3) or build FR-27 — per user direction.
+
 <!-- Append new entries below this line -->

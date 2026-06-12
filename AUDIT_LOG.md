@@ -234,4 +234,13 @@ Started the stack + gave URLs; explained the web only had the Estimates flow (ad
 - Explained phasing (Part 1 Rate Cards · 2 Users · 3 Cloud Prices) and gave a complete ✅/🟡/⬜ feature status across all FR/FE/EP.
 - Built Part 1: rate-card role endpoints + nav + RateCardsPage + hooks; all 5 gates pass; PR #9 → CI green → merged (`dc51f4d`); rebuilt local stack so it's live.
 
+---
+### [2026-06-12 09:05 UTC] — USER
+Can you also add to CLAUDE.md that a human resource equals 100% and they can be split in percentages. But for those dates they should not go over 100%
+
+### [2026-06-12 09:05 UTC] — AGENT
+Added it as a traceable requirement (FR-27 resource allocation & capacity).
+**Actions taken:**
+- CLAUDE.md: FR-27 (resource=100%/day, %-split, ≤100% per date, BLOCKER + save-time guard); FE-48 on EP-4; LaborLineItem gains resource_name/allocation_percent/start_date/end_date; Section 10 capacity note; folded into FR-25; traceability FR-27→EP-4,EP-12. Marked Should (Post-MVP); not yet built.
+
 <!-- Append new turns below this line -->
