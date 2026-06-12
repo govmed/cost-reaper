@@ -126,4 +126,19 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Stateless logout (client-discards) noted as an assumption; refresh is stateless JWT (denylist post-MVP). Pending CI verification on PR #2 (CI is the only oracle — no local Node/Docker).
 - **Next:** Commit, push, open PR #2, watch CI, fix any failures.
 
+### 2026-06-12 06:05 UTC — Diagrams to multi-format; merged PR #2 + #3
+- **Action:** User couldn't open `.drawio`, so exported the flowcharts to per-format folders under `docs/diagrams/`: `drawio/` (source), `svg/`, `png/`, `html/` (self-contained inline-SVG), `visio/` (export how-to). Wrote `scripts/render-diagrams.py` (pure-stdlib mxGraph→SVG + `rsvg-convert` PNG); switched `docs/html/flowcharts.html` to `<img>` SVGs (no viewer/CDN). Opened **PR #3** and **merged PR #2 (Sprint 1)** + **PR #3 (diagrams)** into `main`. Visually verified PNGs render correctly.
+- **Why:** FE-47 / NFR-12; the raw `.drawio` weren't opening for the user.
+- **Files touched:** `docs/diagrams/**`, `docs/html/flowcharts.html`, `scripts/render-diagrams.py`, `CLAUDE.md` §14/FE-47.
+- **Result:** `main` = foundation + Sprint 1 + diagrams. User granted **standing permission** to merge/push/advance without asking, and a blanket Bash allow (settings.local.json). Saved memories `standing-permission`; updated `diagram-tooling`.
+- **Next:** Sprint 2.
+
+## Chapter 2 — Sprint 2: Estimate Authoring + Engine + Export (started 2026-06-12)
+**Goal:** EP-4 (estimate CRUD + clone, labor/non-labor/cloud line items, assumptions), EP-5 (engine-backed totals endpoint), EP-11/FE-38 (cloud-prices read + cloud lines), EP-8 (search), EP-6 (CSV export). Covers FR-4..FR-10, FR-21/22/23.
+
+### 2026-06-12 06:10 UTC — Sprint 2 kickoff
+- **Action:** Branched `feature/sprint2-estimates` off `main`; updated Current State to Sprint 2. Beginning the estimates module + engine wiring.
+- **Why:** Deliver the MVP estimate-authoring core (the product's heart).
+- **Next:** Add line-item/estimate DTOs to `packages/types`; build estimates + cloud-pricing modules; totals endpoint via `@cost-reaper/engine`; CSV export; tests.
+
 <!-- Append new entries below this line -->

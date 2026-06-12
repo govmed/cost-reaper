@@ -13,6 +13,8 @@ import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RateCardsModule } from './modules/rate-cards/rate-cards.module';
+import { CloudPricingModule } from './modules/cloud-pricing/cloud-pricing.module';
+import { EstimatesModule } from './modules/estimates/estimates.module';
 
 @Module({
   imports: [
@@ -23,7 +25,9 @@ import { RateCardsModule } from './modules/rate-cards/rate-cards.module';
     AuthModule,
     UsersModule,
     RateCardsModule,
-    // Next increments: estimates, cloud-pricing, workflow, checklist, export (NFR-15).
+    CloudPricingModule,
+    EstimatesModule,
+    // Next increments: workflow, checklist, export-pdf (NFR-15).
   ],
   providers: [
     // Auth runs first (authenticate), then RBAC (authorize) — deny-by-default (NFR-16).

@@ -67,6 +67,25 @@ export const CreateEstimateRequest = z.object({
 });
 export type CreateEstimateRequest = z.infer<typeof CreateEstimateRequest>;
 
+export const UpdateEstimateRequest = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(4000).nullable().optional(),
+  status: EstimateStatus.optional(),
+  rateCardId: z.string().uuid().nullable().optional(),
+  globalUpchargePercent: Percent.optional(),
+  contingencyPercent: Percent.optional(),
+});
+export type UpdateEstimateRequest = z.infer<typeof UpdateEstimateRequest>;
+
+export const EstimateListQuery = z.object({
+  q: z.string().optional(),
+  status: EstimateStatus.optional(),
+  ownerId: z.string().uuid().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(200).default(20),
+});
+export type EstimateListQuery = z.infer<typeof EstimateListQuery>;
+
 export const EstimateSummaryDto = z.object({
   id: z.string().uuid(),
   name: z.string(),

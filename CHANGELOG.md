@@ -6,6 +6,16 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Sprint 2 — Estimate Authoring + Engine + Export (EP-4, EP-5, EP-6, EP-8, EP-11)
+
+#### Added
+- **Estimates** (`/api/v1/estimates`): create / list (search by name, filter by status & owner, paginated) / get (detail) / update / delete / **clone**. (FR-4, FR-9, FE-13/26)
+- **Line items** under an estimate: **labor** (role × qty × units, rate snapshot), **non-labor** (fixed/recurring), **cloud compute** (from the catalog, unit-price snapshot) + **assumptions**. (FR-5/6/8/21, FE-14/15/16/39)
+- **Totals** (`/estimates/:id/totals`): computed by `@cost-reaper/engine` — upcharge (global + per-line) → contingency → one-time/monthly/yearly + grand total + category subtotals. (FR-7, FR-22, FR-23)
+- **CSV export** (`/estimates/:id/export`). (FR-10, FE-21)
+- **Cloud prices** (`/api/v1/cloud-prices`): read the seeded AWS/GCP/Azure catalog with filters. (FR-21, FE-38)
+- Engine `lineTotal()` helper; unit tests for the engine mapping + CSV builder.
+
 ### Sprint 1 — Identity & Reference Data (EP-2, EP-3)
 
 #### Added
