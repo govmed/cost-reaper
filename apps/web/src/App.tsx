@@ -6,6 +6,7 @@ import EstimatesPage from './pages/EstimatesPage';
 import EstimateEditorPage from './pages/EstimateEditorPage';
 import RateCardsPage from './pages/RateCardsPage';
 import UsersPage from './pages/UsersPage';
+import CloudPricesPage from './pages/CloudPricesPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -30,6 +31,9 @@ export default function App() {
               </Link>
               <Link to="/rate-cards" className="hover:underline">
                 Rate cards
+              </Link>
+              <Link to="/cloud-prices" className="hover:underline">
+                Cloud prices
               </Link>
               {user.role === 'ADMIN' && (
                 <Link to="/users" className="hover:underline">
@@ -82,6 +86,14 @@ export default function App() {
             element={
               <Protected>
                 <UsersPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/cloud-prices"
+            element={
+              <Protected>
+                <CloudPricesPage />
               </Protected>
             }
           />
