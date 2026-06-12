@@ -1,60 +1,58 @@
-import { useEffect, useState } from 'react';
+import { type ReactNode } from 'react';
+import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useAuth } from './lib/auth';
+import LoginPage from './pages/LoginPage';
+import EstimatesPage from './pages/EstimatesPage';
+import EstimateEditorPage from './pages/EstimateEditorPage';
 
-const apiBase = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1';
-const healthUrl = new URL('/health', apiBase).toString();
-
-type Status = 'checking' | 'ok' | 'down';
+function Protected({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+  return <>{children}</>;
+}
 
 export default function App() {
-  const [status, setStatus] = useState<Status>('checking');
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(healthUrl)
-      .then((res) => {
-        if (!cancelled) setStatus(res.ok ? 'ok' : 'down');
-      })
-      .catch(() => {
-        if (!cancelled) setStatus('down');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const badge =
-    status === 'ok'
-      ? 'bg-emerald-100 text-emerald-800'
-      : status === 'down'
-        ? 'bg-rose-100 text-rose-800'
-        : 'bg-slate-100 text-slate-600';
-
+  const { user, logout } = useAuth();
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 font-sans flex items-center justify-center p-6">
-      <div className="max-w-xl w-full rounded-2xl bg-white shadow-sm border border-slate-200 p-8">
-        <h1 className="text-2xl font-semibold text-brand">cost-reaper</h1>
-        <p className="mt-2 text-slate-600">
-          Technology Project Cost Estimator — Sprint&nbsp;0 foundation is up.
-        </p>
-
-        <div className="mt-6 flex items-center gap-3">
-          <span className="text-sm text-slate-500">API health:</span>
-          <span className={`text-sm font-medium px-2.5 py-1 rounded-full ${badge}`}>
-            {status === 'checking' ? 'checking…' : status === 'ok' ? 'healthy' : 'unreachable'}
-          </span>
-        </div>
-
-        <dl className="mt-6 text-sm text-slate-500 space-y-1">
-          <div className="flex gap-2">
-            <dt className="font-medium text-slate-600">API</dt>
-            <dd>{apiBase}</dd>
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+      <header className="bg-brand text-white px-5 py-3 flex items-center justify-between">
+        <Link to="/" className="font-semibold text-lg">
+          cost-reaper
+        </Link>
+        {user && (
+          <div className="flex items-center gap-4 text-sm">
+            <span className="opacity-90">
+              {user.email} · {user.role}
+            </span>
+            <button onClick={logout} className="underline hover:no-underline">
+              Log out
+            </button>
           </div>
-          <div className="flex gap-2">
-            <dt className="font-medium text-slate-600">Docs</dt>
-            <dd>{new URL('/docs', apiBase).toString()}</dd>
-          </div>
-        </dl>
-      </div>
-    </main>
+        )}
+      </header>
+      <main className="max-w-6xl mx-auto p-5">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <Protected>
+                <EstimatesPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/estimates/:id"
+            element={
+              <Protected>
+                <EstimateEditorPage />
+              </Protected>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
