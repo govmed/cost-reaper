@@ -6,6 +6,19 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Sprint 10 — Resource capacity, SDLC-phase costs & stage gates (FR-27, FR-28)
+
+#### Added
+- **Resource allocation & capacity (FR-27, FE-48):** labor lines carry a **resource name**, **allocation %** (a resource = 100%/day, splittable), and an optional **start/end date** window. A pure `findCapacityViolations` engine function enforces that **no resource exceeds 100% on any date**; over-allocating writes are **rejected on save (400)** and a **`resource_capacity` BLOCKER checklist rule** gates workflow transitions. The estimate editor shows the new columns, an over-allocation banner, and the inline rejection message.
+- **Cost per SDLC phase (FR-28, FE-49):** every line item can be tagged with an **SDLC phase** (`PLANNING…MAINTENANCE`). The engine rolls up **per-phase subtotals** (one-time/monthly/yearly, post-upcharge) shown on a **"Cost by SDLC phase"** card and in the CSV export; un-phased lines roll up under **Unassigned**.
+- **Stage gates:** forward workflow transitions remain gated by the blocking checklist; the new capacity rule participates as a gate.
+- **DB migration** `20260612120000_resource_capacity_sdlc_phase` (SdlcPhase enum + `sdlc_phase` on all line items; `resource_name`/`allocation_percent`/`start_date`/`end_date` on labor). Verified to apply cleanly on a fresh DB with **no drift**.
+- **Tests:** new engine unit tests (capacity sweep-line edge cases; per-phase grouping), checklist `resource_capacity` rule tests, and an extended **Playwright e2e** (phase breakdown + capacity-guard rejection + stage-gate). Full pipeline green (format/lint/typecheck/test/build) and verified live end-to-end against the running stack.
+
+#### Spec (CLAUDE.md)
+- **FR-21a/FR-21b** — pull cloud prices from provider pricing sources + per-provider **"last pulled"** date (with a small freshness table).
+- **FR-29 / NFR-17 / EP-13 (+ ADR 0007)** — **database-driven reference data**: a generic `reference_type`/`reference_value` model (code/name/desc/order/active/audit + parent-child) to replace hard-coded enums across SDLC phases, statuses, roles, categories, etc. Migration of existing enums is scheduled as a dedicated increment (Sprint 11).
+
 ### Admin UI — Part 3: Cloud Prices browse (FE-38 frontend)
 
 #### Added

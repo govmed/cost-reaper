@@ -213,4 +213,26 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** **Admin UI complete** (Rate Cards · Users · Cloud Prices). Local stack rebuilt — all endpoints + web 200. `main` @ `d9165bf`.
 - **Next:** Build the spec'd post-MVP reqs (FR-27 resource capacity, FR-28 SDLC-phase costs) or other post-MVP — per user direction.
 
+## Chapter 6 — Sprint 10: Resource Capacity, SDLC-Phase Costs & Stage Gates (started 2026-06-12)
+**Goal:** Build the two spec'd requirements the user requested — **FR-27** (resource allocation/capacity, ≤100%/date) and **FR-28** (cost per SDLC phase) — plus the user's follow-ups: **stage gates** and **end-to-end testing**. Branch `feature/sprint10-phases-capacity-gates`.
+
+### 2026-06-12 — FR-27 + FR-28 + stage gates built and verified
+- **Action:**
+  - **Schema/migration:** added `SdlcPhase` enum + `sdlc_phase` to labor/non-labor/cloud lines (FR-28); `resource_name`/`allocation_percent`(default 100)/`start_date`/`end_date` to labor (FR-27). Generated migration `20260612120000_resource_capacity_sdlc_phase` via `prisma migrate diff` (read-only vs live `0_init` db); **verified** it deploys on a fresh DB and `migrate diff --from-migrations … --exit-code` reports **no drift**.
+  - **Engine (`packages/engine`):** `computeEstimate` now also emits **per-phase subtotals** (`phases`, lifecycle-ordered, Unassigned last). New pure `findCapacityViolations` (per-resource sweep-line over day boundaries) + unit tests. Shared contract (`packages/types`) extended (`SdlcPhase`, `PhaseSubtotal`, `CapacityViolationDto`, line inputs/DTOs, `IsoDate`, cross-field date refine).
+  - **API:** labor add/clone/detail persist + expose the new fields; **save-time 400 guard** rejects over-allocating writes; `toDetailDto` returns `capacityViolations`. **Checklist:** `resource_capacity` BLOCKER evaluator (reuses the engine fn) + seed rule → **gates workflow transitions** (the "stage gate"). CSV export gained an SDLC-phase column + per-phase summary.
+  - **Web:** estimate editor — labor form/table gained resource/alloc%/date-window/phase; non-labor & cloud gained phase; new **"Cost by SDLC phase"** card + **over-allocation banner** + inline rejection message.
+  - **E2E:** extended Playwright smoke (phase breakdown + capacity-guard rejection + stage-gate disabled button).
+- **Why:** FR-27 (FE-48), FR-28 (FE-49), FR-24/FR-25 gating; NFR-6 tests; honoring user asks "add stage gates" + "don't forget end to end testing".
+- **Files touched:** `apps/api/prisma/{schema.prisma,seed.ts,migrations/20260612120000_…}`, `packages/engine/src/{estimation-engine,resource-capacity,*.test}.ts`, `packages/types/src/{common,estimate,line-items}.ts`, `apps/api/src/modules/estimates/{estimates.service,engine-mapping,estimate-csv}.ts (+specs)`, `apps/api/src/modules/workflow/{checklist-rules,checklist.service}.ts (+spec)`, `apps/web/src/{pages/EstimateEditorPage.tsx,lib/types.ts,e2e/smoke.spec.ts}`, CHANGELOG.
+- **Result:** **Full pipeline green** in a clean Node container — format/lint/typecheck/**test 40 passing**/build. **Live API smoke** against the rebuilt stack confirmed: capacity write → `400 "…over-allocated to 120% on 2026-07-15…"`, `totals.phases` correct (DEV 1680 one-time, TESTING 500/mo·6000/yr), persisted labor fields, `resource_capacity` rule present+passing.
+- **Next:** commit → PR → CI-green → merge. Then Sprint 11 (reference-data platform, FR-29).
+
+### 2026-06-12 — Spec updates folded in (FR-21a/b, FR-29/NFR-17/EP-13)
+- **Action:** Per user: (1) **cloud price pull + per-provider "last pulled"** — enriched **FR-21a**, added **FR-21b** + a small freshness table (AWS/GCP/AZURE — MM/DD/CCYY). (2) **Database-driven reference data (no hard-coding)** — added **FR-29**, **NFR-17**, **EP-13** (FE-50–54), generic `reference_type`/`reference_value` data model (standard columns + parent-child), traceability, roadmap Sprint 11, and **ADR 0007**. Flagged the new `SdlcPhase` enum as interim, slated for migration under FE-54.
+- **Why:** capture the user's evolving spec; keep traceability intact.
+- **Files touched:** `CLAUDE.md` (§4.2, §4.3, §5, §6, §8, §10), `docs/adr/0007-database-driven-reference-data.md`.
+- **Result:** Spec current; reference-data refactor scoped as its own increment rather than bolted onto Sprint 10.
+- **Next:** ship Sprint 10; then plan Sprint 11.
+
 <!-- Append new entries below this line -->

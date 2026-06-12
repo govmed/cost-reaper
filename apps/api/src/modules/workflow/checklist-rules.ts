@@ -4,6 +4,7 @@ import type {
   ChecklistScope,
   ChecklistSeverity,
 } from '@cost-reaper/types';
+import { findCapacityViolations } from '@cost-reaper/engine';
 
 export interface ChecklistRuleDef {
   key: string;
@@ -22,6 +23,10 @@ export interface ChecklistEstimate {
     quantity: number;
     units: number;
     billingPeriod: string;
+    resourceName: string | null;
+    allocationPercent: number;
+    startDate: string | null;
+    endDate: string | null;
   }[];
   nonLabor: { amount: string; billingPeriod: string }[];
   cloud: {
@@ -102,6 +107,25 @@ const EVALUATORS: Record<string, Evaluator> = {
     return {
       passed: count > 0,
       message: count > 0 ? 'Estimate has line items.' : 'Add at least one line item.',
+    };
+  },
+  resource_capacity: (e) => {
+    const violations = findCapacityViolations(
+      e.labor.map((l) => ({
+        resourceName: l.resourceName,
+        allocationPercent: l.allocationPercent,
+        startDate: l.startDate,
+        endDate: l.endDate,
+      })),
+    );
+    if (!violations.length) {
+      return { passed: true, message: 'No resource exceeds 100% on any date.' };
+    }
+    const v = violations[0];
+    const more = violations.length > 1 ? ` (+${violations.length - 1} more)` : '';
+    return {
+      passed: false,
+      message: `${v.resourceName} is over-allocated to ${v.totalPercent}% on ${v.date}${more}.`,
     };
   },
 };

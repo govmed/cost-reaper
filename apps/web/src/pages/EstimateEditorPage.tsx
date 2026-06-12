@@ -9,12 +9,15 @@ import {
   useRateCards,
   useWorkflow,
 } from '../lib/queries';
+import { SDLC_PHASES } from '../lib/types';
 import type {
   BillingPeriod,
+  CapacityViolation,
   ChecklistResult,
   CloudPrice,
   EstimateDetail,
   EstimateWorkflow,
+  SdlcPhase,
 } from '../lib/types';
 
 const PERIODS: BillingPeriod[] = ['ONE_TIME', 'MONTHLY', 'YEARLY'];
@@ -122,6 +125,10 @@ export default function EstimateEditorPage() {
         <Card label="Yearly" value={`${t.yearlyTotal} ${cur}`} />
         <Card label="Grand total" value={`${t.grandTotal} ${cur}`} accent />
       </div>
+
+      {est.capacityViolations.length > 0 && <CapacityBanner violations={est.capacityViolations} />}
+
+      <PhaseBreakdownSection phases={t.phases} cur={cur} />
 
       <GovernanceSection workflow={workflow} checklist={checklist} m={m} />
 
@@ -241,6 +248,62 @@ function GovernanceSection({
   );
 }
 
+function CapacityBanner({ violations }: { violations: CapacityViolation[] }) {
+  return (
+    <div className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm" role="alert">
+      <div className="font-semibold text-rose-800">Resource over-allocation (FR-27)</div>
+      <ul className="mt-1 space-y-0.5 text-rose-700">
+        {violations.map((v) => (
+          <li key={`${v.resourceName}-${v.date}`}>
+            <span className="font-medium">{v.resourceName}</span> is allocated {v.totalPercent}% on{' '}
+            {v.date} (max 100%).
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function PhaseBreakdownSection({
+  phases,
+  cur,
+}: {
+  phases: EstimateDetail['totals']['phases'];
+  cur: string;
+}) {
+  if (phases.length === 0) return null;
+  return (
+    <Section title="Cost by SDLC phase">
+      <table className="w-full text-sm">
+        <thead className="text-slate-500">
+          <tr>
+            <Th>Phase</Th>
+            <Th right>One-time</Th>
+            <Th right>Monthly</Th>
+            <Th right>Yearly</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {phases.map((p) => (
+            <tr key={p.phase} className="border-t border-slate-100">
+              <td className="px-3 py-2 font-medium">{p.phase}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {p.oneTime} {cur}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {p.monthly} {cur}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {p.yearly} {cur}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Section>
+  );
+}
+
 function Th({ children, right }: { children: ReactNode; right?: boolean }) {
   return (
     <th className={`px-3 py-2 font-medium ${right ? 'text-right' : 'text-left'}`}>{children}</th>
@@ -269,6 +332,40 @@ function PeriodSelect({
   );
 }
 
+function SdlcSelect({
+  value,
+  onChange,
+}: {
+  value: SdlcPhase | '';
+  onChange: (v: SdlcPhase | '') => void;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value as SdlcPhase | '')}
+      className="border border-slate-300 rounded px-2 py-1 text-sm"
+      title="SDLC phase"
+    >
+      <option value="">Phase…</option>
+      {SDLC_PHASES.map((p) => (
+        <option key={p} value={p}>
+          {p}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/** Short '7/01–7/31' window for a labor line (FR-27). */
+function fmtWindow(start: string | null, end: string | null): string {
+  if (!start || !end) return '—';
+  const d = (iso: string) => {
+    const [, m, day] = iso.split('-');
+    return `${Number(m)}/${day}`;
+  };
+  return `${d(start)}–${d(end)}`;
+}
+
 function LaborSection({
   est,
   roles,
@@ -282,58 +379,82 @@ function LaborSection({
   const [units, setUnits] = useState('1');
   const [quantity, setQuantity] = useState('1');
   const [period, setPeriod] = useState<BillingPeriod>('ONE_TIME');
+  const [phase, setPhase] = useState<SdlcPhase | ''>('');
+  const [resourceName, setResourceName] = useState('');
+  const [allocation, setAllocation] = useState('100');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   function add() {
     if (!roleId) return;
-    m.addLabor.mutate({
+    const body: Record<string, unknown> = {
       rateCardRoleId: roleId,
       units: Number.parseFloat(units) || 0,
       quantity: Number.parseFloat(quantity) || 1,
       billingPeriod: period,
-    });
-    setRoleId('');
+    };
+    if (phase) body.sdlcPhase = phase;
+    if (resourceName.trim()) {
+      body.resourceName = resourceName.trim();
+      body.allocationPercent = Number.parseFloat(allocation) || 100;
+    }
+    if (startDate && endDate) {
+      body.startDate = startDate;
+      body.endDate = endDate;
+    }
+    m.addLabor.mutate(body, { onSuccess: () => setRoleId('') });
   }
 
   return (
     <Section title="Labor">
-      <table className="w-full text-sm">
-        <thead className="text-slate-500">
-          <tr>
-            <Th>Role</Th>
-            <Th right>Qty</Th>
-            <Th right>Units</Th>
-            <Th right>Rate</Th>
-            <Th>Billing</Th>
-            <Th right>Line total</Th>
-            <Th>{''}</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {est.laborItems.map((l) => (
-            <tr key={l.id} className="border-t border-slate-100">
-              <td className="px-3 py-2">{l.roleName ?? l.description ?? '—'}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{l.quantity}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{l.units}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{l.rateSnapshot}</td>
-              <td className="px-3 py-2">{l.billingPeriod}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{l.lineTotal}</td>
-              <td className="px-3 py-2 text-right">
-                <button
-                  onClick={() => m.delLabor.mutate(l.id)}
-                  className="text-rose-600 hover:underline"
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-slate-500">
+            <tr>
+              <Th>Role</Th>
+              <Th>Resource</Th>
+              <Th right>Alloc</Th>
+              <Th>Window</Th>
+              <Th>Phase</Th>
+              <Th right>Qty</Th>
+              <Th right>Units</Th>
+              <Th right>Rate</Th>
+              <Th>Billing</Th>
+              <Th right>Line total</Th>
+              <Th>{''}</Th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {est.laborItems.map((l) => (
+              <tr key={l.id} className="border-t border-slate-100">
+                <td className="px-3 py-2">{l.roleName ?? l.description ?? '—'}</td>
+                <td className="px-3 py-2">{l.resourceName ?? '—'}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{l.allocationPercent}%</td>
+                <td className="px-3 py-2 whitespace-nowrap">{fmtWindow(l.startDate, l.endDate)}</td>
+                <td className="px-3 py-2">{l.sdlcPhase ?? '—'}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{l.quantity}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{l.units}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{l.rateSnapshot}</td>
+                <td className="px-3 py-2">{l.billingPeriod}</td>
+                <td className="px-3 py-2 text-right tabular-nums">{l.lineTotal}</td>
+                <td className="px-3 py-2 text-right">
+                  <button
+                    onClick={() => m.delLabor.mutate(l.id)}
+                    className="text-rose-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
         <select
           value={roleId}
           onChange={(e) => setRoleId(e.target.value)}
-          className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64"
+          className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
         >
           <option value="">Select role…</option>
           {roles.map((r) => (
@@ -342,6 +463,37 @@ function LaborSection({
             </option>
           ))}
         </select>
+        <input
+          value={resourceName}
+          onChange={(e) => setResourceName(e.target.value)}
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-36"
+          placeholder="resource (optional)"
+        />
+        <input
+          value={allocation}
+          onChange={(e) => setAllocation(e.target.value)}
+          type="number"
+          min="0"
+          max="100"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
+          title="Allocation %"
+          placeholder="alloc %"
+        />
+        <input
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          type="date"
+          className="border border-slate-300 rounded px-2 py-1 text-sm"
+          title="Start date"
+        />
+        <input
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          type="date"
+          className="border border-slate-300 rounded px-2 py-1 text-sm"
+          title="End date"
+        />
+        <SdlcSelect value={phase} onChange={setPhase} />
         <input
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
@@ -365,6 +517,11 @@ function LaborSection({
           Add labor
         </button>
       </div>
+      {m.addLabor.isError && (
+        <p className="text-rose-700 text-sm" role="alert">
+          {(m.addLabor.error as Error).message}
+        </p>
+      )}
     </Section>
   );
 }
@@ -373,6 +530,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<BillingPeriod>('ONE_TIME');
+  const [phase, setPhase] = useState<SdlcPhase | ''>('');
 
   function add() {
     if (!category.trim() || !amount) return;
@@ -382,6 +540,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
       type: period === 'ONE_TIME' ? 'FIXED' : 'RECURRING',
       billingPeriod: period,
       periods: 1,
+      ...(phase ? { sdlcPhase: phase } : {}),
     });
     setCategory('');
     setAmount('');
@@ -395,6 +554,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
             <Th>Category</Th>
             <Th right>Amount</Th>
             <Th>Billing</Th>
+            <Th>Phase</Th>
             <Th right>Line total</Th>
             <Th>{''}</Th>
           </tr>
@@ -405,6 +565,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
               <td className="px-3 py-2">{n.category}</td>
               <td className="px-3 py-2 text-right tabular-nums">{n.amount}</td>
               <td className="px-3 py-2">{n.billingPeriod}</td>
+              <td className="px-3 py-2">{n.sdlcPhase ?? '—'}</td>
               <td className="px-3 py-2 text-right tabular-nums">{n.lineTotal}</td>
               <td className="px-3 py-2 text-right">
                 <button
@@ -433,6 +594,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
           placeholder="amount"
         />
         <PeriodSelect value={period} onChange={setPeriod} />
+        <SdlcSelect value={phase} onChange={setPhase} />
         <button
           onClick={add}
           disabled={!category.trim() || !amount}
@@ -457,6 +619,7 @@ function CloudSection({
   const [priceId, setPriceId] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [hours, setHours] = useState('730');
+  const [phase, setPhase] = useState<SdlcPhase | ''>('');
 
   function add() {
     if (!priceId) return;
@@ -465,6 +628,7 @@ function CloudSection({
       quantity: Number.parseFloat(quantity) || 1,
       usageHoursPerMonth: Number.parseFloat(hours) || 730,
       billingPeriod: 'MONTHLY',
+      ...(phase ? { sdlcPhase: phase } : {}),
     });
     setPriceId('');
   }
@@ -478,6 +642,7 @@ function CloudSection({
             <Th right>Qty</Th>
             <Th right>Hrs/mo</Th>
             <Th right>Unit price</Th>
+            <Th>Phase</Th>
             <Th right>Line total</Th>
             <Th>{''}</Th>
           </tr>
@@ -492,6 +657,7 @@ function CloudSection({
               <td className="px-3 py-2 text-right tabular-nums">{c.quantity}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.usageHoursPerMonth}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.unitPriceSnapshot}</td>
+              <td className="px-3 py-2">{c.sdlcPhase ?? '—'}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.lineTotal}</td>
               <td className="px-3 py-2 text-right">
                 <button
@@ -532,6 +698,7 @@ function CloudSection({
           className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
           placeholder="hrs/mo"
         />
+        <SdlcSelect value={phase} onChange={setPhase} />
         <button
           onClick={add}
           disabled={!priceId}

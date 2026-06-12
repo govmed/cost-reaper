@@ -8,6 +8,28 @@ export type Role = z.infer<typeof Role>;
 export const BillingPeriod = z.enum(['ONE_TIME', 'MONTHLY', 'YEARLY']);
 export type BillingPeriod = z.infer<typeof BillingPeriod>;
 
+/** SDLC phase a line item belongs to, for cost-per-phase breakdown (FR-28). */
+export const SdlcPhase = z.enum([
+  'PLANNING',
+  'DESIGN',
+  'DEVELOPMENT',
+  'TESTING',
+  'DEPLOYMENT',
+  'MAINTENANCE',
+]);
+export type SdlcPhase = z.infer<typeof SdlcPhase>;
+
+/** Canonical SDLC ordering; lines without a phase roll up under this label, shown last (FR-28). */
+export const SDLC_PHASE_ORDER: SdlcPhase[] = [
+  'PLANNING',
+  'DESIGN',
+  'DEVELOPMENT',
+  'TESTING',
+  'DEPLOYMENT',
+  'MAINTENANCE',
+];
+export const UNASSIGNED_PHASE = 'Unassigned';
+
 /** Labor rate unit (FR-3). */
 export const RateUnit = z.enum(['HOUR', 'DAY']);
 export type RateUnit = z.infer<typeof RateUnit>;

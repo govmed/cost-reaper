@@ -7,6 +7,7 @@ export interface CsvLine {
   unit: string;
   rate: string;
   billingPeriod: string;
+  phase: string;
   lineTotal: string;
 }
 
@@ -24,10 +25,28 @@ export function toCsv(
     ['Estimate', meta.name],
     ['Currency', meta.currency],
     [],
-    ['Type', 'Description', 'Quantity', 'Unit', 'Rate/Amount', 'Billing', 'Line total'],
+    [
+      'Type',
+      'Description',
+      'Quantity',
+      'Unit',
+      'Rate/Amount',
+      'Billing',
+      'SDLC phase',
+      'Line total',
+    ],
   ];
   for (const l of lines) {
-    rows.push([l.type, l.description, l.quantity, l.unit, l.rate, l.billingPeriod, l.lineTotal]);
+    rows.push([
+      l.type,
+      l.description,
+      l.quantity,
+      l.unit,
+      l.rate,
+      l.billingPeriod,
+      l.phase || 'Unassigned',
+      l.lineTotal,
+    ]);
   }
   rows.push(
     [],
@@ -41,5 +60,11 @@ export function toCsv(
     ['Yearly total', totals.yearlyTotal],
     ['GRAND TOTAL', totals.grandTotal],
   );
+  if (totals.phases.length) {
+    rows.push([], ['Cost by SDLC phase', 'One-time', 'Monthly', 'Yearly']);
+    for (const p of totals.phases) {
+      rows.push([p.phase, p.oneTime, p.monthly, p.yearly]);
+    }
+  }
   return rows.map((r) => r.map(esc).join(',')).join('\n') + '\n';
 }

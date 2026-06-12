@@ -1,5 +1,20 @@
 export type Role = 'ADMIN' | 'ESTIMATOR' | 'VIEWER';
 export type BillingPeriod = 'ONE_TIME' | 'MONTHLY' | 'YEARLY';
+export type SdlcPhase =
+  | 'PLANNING'
+  | 'DESIGN'
+  | 'DEVELOPMENT'
+  | 'TESTING'
+  | 'DEPLOYMENT'
+  | 'MAINTENANCE';
+export const SDLC_PHASES: SdlcPhase[] = [
+  'PLANNING',
+  'DESIGN',
+  'DEVELOPMENT',
+  'TESTING',
+  'DEPLOYMENT',
+  'MAINTENANCE',
+];
 
 export interface AuthUser {
   id: string;
@@ -35,6 +50,13 @@ export interface EngineResult {
   yearlyTotal: string;
   grandTotal: string;
   categories: { category: string; oneTime: string; monthly: string; yearly: string }[];
+  phases: { phase: string; oneTime: string; monthly: string; yearly: string }[];
+}
+
+export interface CapacityViolation {
+  resourceName: string;
+  date: string;
+  totalPercent: number;
 }
 
 export interface LaborLine {
@@ -46,6 +68,11 @@ export interface LaborLine {
   rateSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
+  sdlcPhase: SdlcPhase | null;
+  resourceName: string | null;
+  allocationPercent: number;
+  startDate: string | null;
+  endDate: string | null;
   lineTotal: string;
 }
 export interface NonLaborLine {
@@ -56,6 +83,7 @@ export interface NonLaborLine {
   amount: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
+  sdlcPhase: SdlcPhase | null;
   periods: number;
   lineTotal: string;
 }
@@ -70,6 +98,7 @@ export interface CloudLine {
   unitPriceSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
+  sdlcPhase: SdlcPhase | null;
   lineTotal: string;
 }
 export interface Assumption {
@@ -93,6 +122,7 @@ export interface EstimateDetail {
   cloudItems: CloudLine[];
   assumptions: Assumption[];
   totals: EngineResult;
+  capacityViolations: CapacityViolation[];
 }
 
 export interface EstimateSummary {

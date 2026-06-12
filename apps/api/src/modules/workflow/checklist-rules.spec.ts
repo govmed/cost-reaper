@@ -39,6 +39,10 @@ describe('evaluateChecklist', () => {
           quantity: 1,
           units: 8,
           billingPeriod: 'ONE_TIME',
+          resourceName: null,
+          allocationPercent: 100,
+          startDate: null,
+          endDate: null,
         },
       ],
     });
@@ -58,10 +62,97 @@ describe('evaluateChecklist', () => {
           quantity: 1,
           units: 8,
           billingPeriod: 'ONE_TIME',
+          resourceName: null,
+          allocationPercent: 100,
+          startDate: null,
+          endDate: null,
         },
       ],
     });
     expect(r.items.find((i) => i.key === 'labor_role_assigned')?.passed).toBe(false);
     expect(r.blocking).toBe(true);
+  });
+});
+
+describe('resource_capacity rule (FR-27)', () => {
+  const CAP: ChecklistRuleDef[] = [
+    { key: 'resource_capacity', description: 'Capacity', severity: 'BLOCKER', scope: 'RESOURCE' },
+  ];
+  const laborLine = (over: Partial<ChecklistEstimate['labor'][number]>) => ({
+    rateCardRoleId: 'r',
+    rateSnapshot: '100',
+    quantity: 1,
+    units: 8,
+    billingPeriod: 'ONE_TIME',
+    resourceName: null,
+    allocationPercent: 100,
+    startDate: null,
+    endDate: null,
+    ...over,
+  });
+
+  it('passes when overlapping allocations stay within 100%', () => {
+    const r = evaluateChecklist(CAP, {
+      ...empty,
+      labor: [
+        laborLine({
+          resourceName: 'Ada',
+          allocationPercent: 60,
+          startDate: '2026-07-01',
+          endDate: '2026-07-31',
+        }),
+        laborLine({
+          resourceName: 'Ada',
+          allocationPercent: 40,
+          startDate: '2026-07-10',
+          endDate: '2026-07-20',
+        }),
+      ],
+    });
+    expect(r.blocking).toBe(false);
+  });
+
+  it('blocks when a resource exceeds 100% on overlapping dates', () => {
+    const r = evaluateChecklist(CAP, {
+      ...empty,
+      labor: [
+        laborLine({
+          resourceName: 'Ada',
+          allocationPercent: 70,
+          startDate: '2026-07-01',
+          endDate: '2026-07-31',
+        }),
+        laborLine({
+          resourceName: 'Ada',
+          allocationPercent: 50,
+          startDate: '2026-07-15',
+          endDate: '2026-08-15',
+        }),
+      ],
+    });
+    expect(r.blocking).toBe(true);
+    expect(r.items[0].message).toContain('Ada');
+    expect(r.items[0].message).toContain('2026-07-15');
+  });
+
+  it('does not flag non-overlapping windows (handoff on adjacent days)', () => {
+    const r = evaluateChecklist(CAP, {
+      ...empty,
+      labor: [
+        laborLine({
+          resourceName: 'Ada',
+          allocationPercent: 100,
+          startDate: '2026-07-01',
+          endDate: '2026-07-15',
+        }),
+        laborLine({
+          resourceName: 'Ada',
+          allocationPercent: 100,
+          startDate: '2026-07-16',
+          endDate: '2026-07-31',
+        }),
+      ],
+    });
+    expect(r.blocking).toBe(false);
   });
 });

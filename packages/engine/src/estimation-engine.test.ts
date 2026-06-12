@@ -12,6 +12,7 @@ function line(
     quantity: p.quantity ?? 1,
     billingPeriod: p.billingPeriod,
     upchargePercentOverride: p.upchargePercentOverride ?? null,
+    sdlcPhase: p.sdlcPhase ?? null,
   };
 }
 
@@ -157,6 +158,38 @@ describe('computeEstimate', () => {
       monthly: '0.0000',
       yearly: '0.0000',
     });
+  });
+
+  it('groups cost per SDLC phase in lifecycle order, Unassigned last (FR-28)', () => {
+    const r = computeEstimate(
+      input({
+        lines: [
+          line({ id: 'a', baseAmount: '1000', billingPeriod: 'ONE_TIME', sdlcPhase: 'TESTING' }),
+          line({ id: 'b', baseAmount: '2000', billingPeriod: 'ONE_TIME', sdlcPhase: 'PLANNING' }),
+          line({ id: 'c', baseAmount: '500', billingPeriod: 'MONTHLY', sdlcPhase: 'DEVELOPMENT' }),
+          line({ id: 'd', baseAmount: '300', billingPeriod: 'ONE_TIME' }), // no phase
+        ],
+      }),
+    );
+    expect(r.phases.map((p) => p.phase)).toEqual([
+      'PLANNING',
+      'DEVELOPMENT',
+      'TESTING',
+      'Unassigned',
+    ]);
+    expect(r.phases.find((p) => p.phase === 'PLANNING')).toEqual({
+      phase: 'PLANNING',
+      oneTime: '2000.0000',
+      monthly: '0.0000',
+      yearly: '0.0000',
+    });
+    expect(r.phases.find((p) => p.phase === 'DEVELOPMENT')).toEqual({
+      phase: 'DEVELOPMENT',
+      oneTime: '0.0000',
+      monthly: '500.0000',
+      yearly: '6000.0000',
+    });
+    expect(r.phases.find((p) => p.phase === 'Unassigned')?.oneTime).toBe('300.0000');
   });
 
   it('rounds money half-up to the configured scale', () => {

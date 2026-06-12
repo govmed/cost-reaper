@@ -27,6 +27,10 @@ export class ChecklistService {
         quantity: Number(l.quantity),
         units: Number(l.units),
         billingPeriod: l.billingPeriod,
+        resourceName: l.resourceName ?? null,
+        allocationPercent: Number(l.allocationPercent),
+        startDate: l.startDate ? l.startDate.toISOString().slice(0, 10) : null,
+        endDate: l.endDate ? l.endDate.toISOString().slice(0, 10) : null,
       })),
       nonLabor: est.nonLaborItems.map((n: any) => ({
         amount: n.amount.toString(),

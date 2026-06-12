@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BillingPeriod, Currency, EstimateStatus, Money, Percent } from './common';
+import { BillingPeriod, Currency, EstimateStatus, Money, Percent, SdlcPhase } from './common';
 
 // ── Estimation-engine I/O (the shared contract the pure engine implements) ───
 
@@ -15,6 +15,8 @@ export const EngineLine = z.object({
   billingPeriod: BillingPeriod,
   /** Per-line upcharge override; null → estimate's global upcharge applies (FR-22). */
   upchargePercentOverride: Percent.nullable().default(null),
+  /** SDLC phase this line rolls up under; null → "Unassigned" (FR-28). */
+  sdlcPhase: SdlcPhase.nullable().default(null),
 });
 export type EngineLine = z.infer<typeof EngineLine>;
 
@@ -36,6 +38,23 @@ export const CategorySubtotal = z.object({
 });
 export type CategorySubtotal = z.infer<typeof CategorySubtotal>;
 
+/** Post-upcharge, pre-contingency subtotal for one SDLC phase (FR-28). */
+export const PhaseSubtotal = z.object({
+  phase: z.string(),
+  oneTime: Money,
+  monthly: Money,
+  yearly: Money,
+});
+export type PhaseSubtotal = z.infer<typeof PhaseSubtotal>;
+
+/** A resource over-allocation on a given date (FR-27). */
+export const CapacityViolationDto = z.object({
+  resourceName: z.string(),
+  date: z.string(),
+  totalPercent: z.number(),
+});
+export type CapacityViolationDto = z.infer<typeof CapacityViolationDto>;
+
 export const EngineResult = z.object({
   /** Post-upcharge, pre-contingency subtotals. */
   oneTimeSubtotal: Money,
@@ -52,6 +71,8 @@ export const EngineResult = z.object({
   /** one-time + annualized (yearly) recurring, post-contingency. */
   grandTotal: Money,
   categories: z.array(CategorySubtotal),
+  /** Cost rolled up per SDLC phase (FR-28). */
+  phases: z.array(PhaseSubtotal),
 });
 export type EngineResult = z.infer<typeof EngineResult>;
 

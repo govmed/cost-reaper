@@ -1,5 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { computeEstimate, lineTotal } from '@cost-reaper/engine';
+import {
+  type AllocationLine,
+  computeEstimate,
+  findCapacityViolations,
+  lineTotal,
+} from '@cost-reaper/engine';
 import type {
   AssumptionInput,
   CloudLineInput,
@@ -22,6 +27,27 @@ const DETAIL_INCLUDE = {
   assumptions: { orderBy: { createdAt: 'asc' as const } },
   currentStage: true,
 };
+
+/** Prisma `@db.Date` round-trips as a UTC-midnight Date; expose it as 'YYYY-MM-DD'. */
+function toIsoDate(d: Date | string | null): string | null {
+  if (!d) return null;
+  return (d instanceof Date ? d.toISOString() : d).slice(0, 10);
+}
+
+/** Project a stored labor row to the engine's capacity contract (FR-27). */
+function toAllocationLine(l: {
+  resourceName: string | null;
+  allocationPercent: unknown;
+  startDate: Date | null;
+  endDate: Date | null;
+}): AllocationLine {
+  return {
+    resourceName: l.resourceName,
+    allocationPercent: Number(l.allocationPercent),
+    startDate: toIsoDate(l.startDate),
+    endDate: toIsoDate(l.endDate),
+  };
+}
 
 @Injectable()
 export class EstimatesService {
@@ -143,6 +169,11 @@ export class EstimatesService {
             rateSnapshot: l.rateSnapshot,
             upchargePercentOverride: l.upchargePercentOverride,
             billingPeriod: l.billingPeriod,
+            sdlcPhase: l.sdlcPhase,
+            resourceName: l.resourceName,
+            allocationPercent: l.allocationPercent,
+            startDate: l.startDate,
+            endDate: l.endDate,
             lineTotal: l.lineTotal,
           })),
         },
@@ -155,6 +186,7 @@ export class EstimatesService {
             upchargePercentOverride: n.upchargePercentOverride,
             billingPeriod: n.billingPeriod,
             periods: n.periods,
+            sdlcPhase: n.sdlcPhase,
             lineTotal: n.lineTotal,
           })),
         },
@@ -170,6 +202,7 @@ export class EstimatesService {
             unitPriceSnapshot: c.unitPriceSnapshot,
             upchargePercentOverride: c.upchargePercentOverride,
             billingPeriod: c.billingPeriod,
+            sdlcPhase: c.sdlcPhase,
             lineTotal: c.lineTotal,
           })),
         },
@@ -203,6 +236,7 @@ export class EstimatesService {
         unit: l.units.toString(),
         rate: l.rateSnapshot.toString(),
         billingPeriod: l.billingPeriod,
+        phase: l.sdlcPhase ?? '',
         lineTotal: l.lineTotal.toString(),
       })),
       ...e.nonLaborItems.map((n: any) => ({
@@ -212,6 +246,7 @@ export class EstimatesService {
         unit: 'period',
         rate: n.amount.toString(),
         billingPeriod: n.billingPeriod,
+        phase: n.sdlcPhase ?? '',
         lineTotal: n.lineTotal.toString(),
       })),
       ...e.cloudItems.map((c: any) => ({
@@ -221,6 +256,7 @@ export class EstimatesService {
         unit: `${c.usageHoursPerMonth}h/mo`,
         rate: c.unitPriceSnapshot.toString(),
         billingPeriod: c.billingPeriod,
+        phase: c.sdlcPhase ?? '',
         lineTotal: c.lineTotal.toString(),
       })),
     ];
@@ -242,6 +278,27 @@ export class EstimatesService {
       if (!role) throw new NotFoundException('Rate-card role not found');
       rate = role.rate.toString();
     }
+
+    // Resource-capacity stage guard (FR-27): reject a write that pushes any
+    // resource over 100% on any date, considering this estimate's existing lines.
+    const existing = await this.prisma.laborLineItem.findMany({
+      where: { estimateId },
+      select: { resourceName: true, allocationPercent: true, startDate: true, endDate: true },
+    });
+    const candidate: AllocationLine = {
+      resourceName: dto.resourceName ?? null,
+      allocationPercent: dto.allocationPercent,
+      startDate: dto.startDate ?? null,
+      endDate: dto.endDate ?? null,
+    };
+    const violations = findCapacityViolations([...existing.map(toAllocationLine), candidate]);
+    if (violations.length) {
+      const v = violations[0];
+      throw new BadRequestException(
+        `${v.resourceName} would be over-allocated to ${v.totalPercent}% on ${v.date} (max 100%).`,
+      );
+    }
+
     await this.prisma.laborLineItem.create({
       data: {
         estimateId,
@@ -252,6 +309,11 @@ export class EstimatesService {
         rateSnapshot: rate,
         upchargePercentOverride: dto.upchargePercentOverride ?? null,
         billingPeriod: dto.billingPeriod,
+        sdlcPhase: dto.sdlcPhase ?? null,
+        resourceName: dto.resourceName ?? null,
+        allocationPercent: dto.allocationPercent,
+        startDate: dto.startDate ? new Date(dto.startDate) : null,
+        endDate: dto.endDate ? new Date(dto.endDate) : null,
         lineTotal: lineTotal(rate, dto.quantity * dto.units),
       },
     });
@@ -271,6 +333,7 @@ export class EstimatesService {
         upchargePercentOverride: dto.upchargePercentOverride ?? null,
         billingPeriod: dto.billingPeriod,
         periods: dto.periods,
+        sdlcPhase: dto.sdlcPhase ?? null,
         lineTotal: lineTotal(dto.amount, dto.periods),
       },
     });
@@ -296,6 +359,7 @@ export class EstimatesService {
         unitPriceSnapshot: snapshot,
         upchargePercentOverride: dto.upchargePercentOverride ?? null,
         billingPeriod: dto.billingPeriod,
+        sdlcPhase: dto.sdlcPhase ?? null,
         lineTotal: lineTotal(snapshot, dto.quantity * dto.usageHoursPerMonth),
       },
     });
@@ -354,6 +418,7 @@ export class EstimatesService {
         units: Number(l.units),
         billingPeriod: l.billingPeriod,
         upchargePercentOverride: pct(l.upchargePercentOverride),
+        sdlcPhase: l.sdlcPhase ?? null,
       })),
       nonLabor: e.nonLaborItems.map((n: any) => ({
         id: n.id,
@@ -362,6 +427,7 @@ export class EstimatesService {
         periods: n.periods,
         billingPeriod: n.billingPeriod,
         upchargePercentOverride: pct(n.upchargePercentOverride),
+        sdlcPhase: n.sdlcPhase ?? null,
       })),
       cloud: e.cloudItems.map((c: any) => ({
         id: c.id,
@@ -371,6 +437,7 @@ export class EstimatesService {
         usageHoursPerMonth: Number(c.usageHoursPerMonth),
         billingPeriod: c.billingPeriod,
         upchargePercentOverride: pct(c.upchargePercentOverride),
+        sdlcPhase: c.sdlcPhase ?? null,
       })),
     };
   }
@@ -403,6 +470,11 @@ export class EstimatesService {
         rateSnapshot: l.rateSnapshot.toString(),
         upchargePercentOverride: pct(l.upchargePercentOverride),
         billingPeriod: l.billingPeriod,
+        sdlcPhase: l.sdlcPhase ?? null,
+        resourceName: l.resourceName ?? null,
+        allocationPercent: Number(l.allocationPercent),
+        startDate: toIsoDate(l.startDate),
+        endDate: toIsoDate(l.endDate),
         lineTotal: l.lineTotal.toString(),
       })),
       nonLaborItems: e.nonLaborItems.map((n: any) => ({
@@ -414,6 +486,7 @@ export class EstimatesService {
         upchargePercentOverride: pct(n.upchargePercentOverride),
         billingPeriod: n.billingPeriod,
         periods: n.periods,
+        sdlcPhase: n.sdlcPhase ?? null,
         lineTotal: n.lineTotal.toString(),
       })),
       cloudItems: e.cloudItems.map((c: any) => ({
@@ -428,6 +501,7 @@ export class EstimatesService {
         unitPriceSnapshot: c.unitPriceSnapshot.toString(),
         upchargePercentOverride: pct(c.upchargePercentOverride),
         billingPeriod: c.billingPeriod,
+        sdlcPhase: c.sdlcPhase ?? null,
         lineTotal: c.lineTotal.toString(),
       })),
       assumptions: e.assumptions.map((a: any) => ({
@@ -436,6 +510,7 @@ export class EstimatesService {
         createdAt: a.createdAt.toISOString(),
       })),
       totals: this.computeTotals(e),
+      capacityViolations: findCapacityViolations(e.laborItems.map(toAllocationLine)),
     };
   }
 }
