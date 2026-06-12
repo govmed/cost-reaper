@@ -6,6 +6,15 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Sprint 3 — Web UI (EP-4/EP-8 frontend)
+
+#### Added
+- **Web app** (React + Vite + Tailwind, TanStack Query, React Router) consuming the REST API:
+  - **Login** with JWT (token storage + transparent refresh). (FR-1)
+  - **Estimates list** with name search + create. (FR-9, FE-13/26)
+  - **Estimate editor**: edit upcharge/contingency/status; add/delete **labor / non-labor / cloud** line items (role & cloud pickers from the API) + assumptions; **live one-time/monthly/yearly/grand totals**; **CSV export** (authenticated blob download). (FR-4..FR-8, FR-21/22/23, FR-10)
+- Typed API client, auth context, query hooks.
+
 ### Sprint 2 — Estimate Authoring + Engine + Export (EP-4, EP-5, EP-6, EP-8, EP-11)
 
 #### Added
