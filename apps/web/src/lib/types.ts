@@ -1,13 +1,11 @@
 export type Role = 'ADMIN' | 'ESTIMATOR' | 'VIEWER';
 export type BillingPeriod = 'ONE_TIME' | 'MONTHLY' | 'YEARLY';
-export type SdlcPhase =
-  | 'PLANNING'
-  | 'DESIGN'
-  | 'DEVELOPMENT'
-  | 'TESTING'
-  | 'DEPLOYMENT'
-  | 'MAINTENANCE';
-export const SDLC_PHASES: SdlcPhase[] = [
+/**
+ * SDLC phase is data-driven (FR-29) — the dropdown loads active values from the
+ * `SDLC_PHASE` reference type. These are only a **fallback** shown before that
+ * request resolves; the stored value is a plain code string.
+ */
+export const SDLC_PHASES: string[] = [
   'PLANNING',
   'DESIGN',
   'DEVELOPMENT',
@@ -68,7 +66,7 @@ export interface LaborLine {
   rateSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
   resourceName: string | null;
   allocationPercent: number;
   startDate: string | null;
@@ -83,7 +81,7 @@ export interface NonLaborLine {
   amount: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
   periods: number;
   lineTotal: string;
 }
@@ -98,7 +96,7 @@ export interface CloudLine {
   unitPriceSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
   lineTotal: string;
 }
 export interface Assumption {

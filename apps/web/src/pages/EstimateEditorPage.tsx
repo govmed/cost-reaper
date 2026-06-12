@@ -18,7 +18,6 @@ import type {
   CloudPrice,
   EstimateDetail,
   EstimateWorkflow,
-  SdlcPhase,
 } from '../lib/types';
 
 const PERIODS: BillingPeriod[] = ['ONE_TIME', 'MONTHLY', 'YEARLY'];
@@ -333,26 +332,19 @@ function PeriodSelect({
   );
 }
 
-function SdlcSelect({
-  value,
-  onChange,
-}: {
-  value: SdlcPhase | '';
-  onChange: (v: SdlcPhase | '') => void;
-}) {
-  // Phase options + labels come from the DB-driven reference data (FR-29); fall
-  // back to the built-in codes while loading. We keep only codes the stored enum
-  // still accepts until the column is migrated off the enum (FE-54).
+function SdlcSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  // Options + labels come from the DB-driven SDLC_PHASE reference data (FR-29);
+  // any active value is selectable (the column is a plain code now). Falls back
+  // to the built-in codes only until that request resolves.
   const { data } = useReferenceValues('SDLC_PHASE');
-  const valid = SDLC_PHASES as readonly string[];
   const fromApi = (data ?? [])
-    .filter((r) => r.isActive && valid.includes(r.code))
-    .map((r) => ({ code: r.code as SdlcPhase, label: r.displayName }));
+    .filter((r) => r.isActive)
+    .map((r) => ({ code: r.code, label: r.displayName }));
   const options = fromApi.length ? fromApi : SDLC_PHASES.map((p) => ({ code: p, label: p }));
   return (
     <select
       value={value}
-      onChange={(e) => onChange(e.target.value as SdlcPhase | '')}
+      onChange={(e) => onChange(e.target.value)}
       className="border border-slate-300 rounded px-2 py-1 text-sm"
       title="SDLC phase"
     >
@@ -389,7 +381,7 @@ function LaborSection({
   const [units, setUnits] = useState('1');
   const [quantity, setQuantity] = useState('1');
   const [period, setPeriod] = useState<BillingPeriod>('ONE_TIME');
-  const [phase, setPhase] = useState<SdlcPhase | ''>('');
+  const [phase, setPhase] = useState<string>('');
   const [resourceName, setResourceName] = useState('');
   const [allocation, setAllocation] = useState('100');
   const [startDate, setStartDate] = useState('');
@@ -540,7 +532,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<BillingPeriod>('ONE_TIME');
-  const [phase, setPhase] = useState<SdlcPhase | ''>('');
+  const [phase, setPhase] = useState<string>('');
 
   function add() {
     if (!category.trim() || !amount) return;
@@ -629,7 +621,7 @@ function CloudSection({
   const [priceId, setPriceId] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [hours, setHours] = useState('730');
-  const [phase, setPhase] = useState<SdlcPhase | ''>('');
+  const [phase, setPhase] = useState<string>('');
 
   function add() {
     if (!priceId) return;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BillingPeriod, Currency, EstimateStatus, Money, Percent, SdlcPhase } from './common';
+import { BillingPeriod, Currency, EstimateStatus, Money, Percent } from './common';
 
 // ── Estimation-engine I/O (the shared contract the pure engine implements) ───
 
@@ -15,8 +15,8 @@ export const EngineLine = z.object({
   billingPeriod: BillingPeriod,
   /** Per-line upcharge override; null → estimate's global upcharge applies (FR-22). */
   upchargePercentOverride: Percent.nullable().default(null),
-  /** SDLC phase this line rolls up under; null → "Unassigned" (FR-28). */
-  sdlcPhase: SdlcPhase.nullable().default(null),
+  /** SDLC phase code this line rolls up under; null → "Unassigned" (FR-28, data-driven FR-29). */
+  sdlcPhase: z.string().nullable().default(null),
 });
 export type EngineLine = z.infer<typeof EngineLine>;
 

@@ -290,4 +290,17 @@ Merged Sprint 10 (PR #12, all CI green) and built **Sprint 11 — the reference-
 - Verified: full pipeline green in a clean container (format/lint/typecheck/**test 43**/build); live API smoke (16 types, nested values, CRUD round-trip, built-in delete→400, web 200). Updated CHANGELOG + living files.
 - Next: commit → PR → CI-green → merge; then finish FE-54 (remaining enum→reference column migration).
 
+---
+### [2026-06-12 22:45 UTC] — USER
+Continue / How many more features are left? / Continue / Don't stop to ask anymore questions -- just do it.
+
+### [2026-06-12 22:45 UTC] — AGENT
+Reported feature status (54 total; ~38 done, ~16 left), then — per "just do it" — built **FE-54 part 1: SDLC phase fully data-driven** and stopped ending turns with questions.
+**Actions taken:**
+- Updated `standing-permission` memory: don't pause to ask which feature next; pick the highest-value item and build it.
+- Dropped the `SdlcPhase` Prisma/Zod enum; `sdlc_phase` columns → TEXT via data-preserving migration `20260612160000_sdlc_phase_data_driven` (verified: 4-migration fresh deploy + no drift; existing values preserved).
+- Added cached `ReferenceService.assertActiveCode`; estimate line writes validate `sdlcPhase` against active `SDLC_PHASE` reference values (deny-by-default). Editor dropdowns offer any active phase.
+- Pipeline green (test 43). Live smoke: admin-added phase **DISCOVERY** usable end-to-end + in breakdown; invalid → 400.
+- Updated CHANGELOG + living files. Next: commit → PR → CI → merge; then FE-54 part 2.
+
 <!-- Append new turns below this line -->

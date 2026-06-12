@@ -17,6 +17,7 @@ import type {
 } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
+import { ReferenceService } from '../reference/reference.service';
 import { buildEngineInput, MappableEstimate } from './engine-mapping';
 import { CsvLine, toCsv } from './estimate-csv';
 
@@ -54,7 +55,13 @@ export class EstimatesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly reference: ReferenceService,
   ) {}
+
+  /** Validate an optional SDLC phase against the active reference values (FR-29). */
+  private async checkSdlcPhase(code: string | null | undefined): Promise<void> {
+    if (code) await this.reference.assertActiveCode('SDLC_PHASE', code);
+  }
 
   // ── CRUD ───────────────────────────────────────────────────────────────────
 
@@ -270,6 +277,7 @@ export class EstimatesService {
 
   async addLabor(estimateId: string, dto: LaborLineInput, actorId: string) {
     await this.ensure(estimateId);
+    await this.checkSdlcPhase(dto.sdlcPhase);
     let rate = dto.rateSnapshot;
     if (!rate) {
       if (!dto.rateCardRoleId)
@@ -323,6 +331,7 @@ export class EstimatesService {
 
   async addNonLabor(estimateId: string, dto: NonLaborLineInput, actorId: string) {
     await this.ensure(estimateId);
+    await this.checkSdlcPhase(dto.sdlcPhase);
     await this.prisma.nonLaborLineItem.create({
       data: {
         estimateId,
@@ -343,6 +352,7 @@ export class EstimatesService {
 
   async addCloud(estimateId: string, dto: CloudLineInput, actorId: string) {
     await this.ensure(estimateId);
+    await this.checkSdlcPhase(dto.sdlcPhase);
     const price = await this.prisma.cloudPrice.findUnique({ where: { id: dto.cloudPriceId } });
     if (!price) throw new NotFoundException('Cloud price not found');
     const snapshot = price.unitPrice.toString();

@@ -8,19 +8,17 @@ export type Role = z.infer<typeof Role>;
 export const BillingPeriod = z.enum(['ONE_TIME', 'MONTHLY', 'YEARLY']);
 export type BillingPeriod = z.infer<typeof BillingPeriod>;
 
-/** SDLC phase a line item belongs to, for cost-per-phase breakdown (FR-28). */
-export const SdlcPhase = z.enum([
-  'PLANNING',
-  'DESIGN',
-  'DEVELOPMENT',
-  'TESTING',
-  'DEPLOYMENT',
-  'MAINTENANCE',
-]);
-export type SdlcPhase = z.infer<typeof SdlcPhase>;
-
-/** Canonical SDLC ordering; lines without a phase roll up under this label, shown last (FR-28). */
-export const SDLC_PHASE_ORDER: SdlcPhase[] = [
+/**
+ * SDLC phase is **data-driven** (FR-29): the set of phases lives in the
+ * `SDLC_PHASE` reference table and is validated server-side against the active
+ * values — line-item `sdlcPhase` is a plain code string, not a fixed enum.
+ *
+ * `SDLC_PHASE_ORDER` is only an **ordering hint** for the pure engine (which
+ * can't query the DB): known phases render in this lifecycle order, any other
+ * (admin-added) phase sorts after them, and un-phased lines roll up under
+ * `UNASSIGNED_PHASE` last. It is intentionally NOT a validation list.
+ */
+export const SDLC_PHASE_ORDER: string[] = [
   'PLANNING',
   'DESIGN',
   'DEVELOPMENT',

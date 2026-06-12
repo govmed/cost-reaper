@@ -1,4 +1,4 @@
-import type { BillingPeriod, EngineInput, EngineLine, SdlcPhase } from '@cost-reaper/types';
+import type { BillingPeriod, EngineInput, EngineLine } from '@cost-reaper/types';
 
 export interface MappableLabor {
   id: string;
@@ -8,7 +8,7 @@ export interface MappableLabor {
   units: number;
   billingPeriod: BillingPeriod;
   upchargePercentOverride: number | null;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
 }
 export interface MappableNonLabor {
   id: string;
@@ -17,7 +17,7 @@ export interface MappableNonLabor {
   periods: number;
   billingPeriod: BillingPeriod;
   upchargePercentOverride: number | null;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
 }
 export interface MappableCloud {
   id: string;
@@ -27,7 +27,7 @@ export interface MappableCloud {
   usageHoursPerMonth: number;
   billingPeriod: BillingPeriod;
   upchargePercentOverride: number | null;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
 }
 export interface MappableEstimate {
   globalUpchargePercent: number;

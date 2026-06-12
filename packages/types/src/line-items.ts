@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { BillingPeriod, Money, Percent, SdlcPhase } from './common';
+import { BillingPeriod, Money, Percent } from './common';
+
+/** An SDLC-phase code, validated server-side against active SDLC_PHASE reference values (FR-29). */
+const SdlcPhaseCode = z.string().max(80);
 
 export const NonLaborType = z.enum(['FIXED', 'RECURRING']);
 export type NonLaborType = z.infer<typeof NonLaborType>;
@@ -19,7 +22,7 @@ export const LaborLineInput = z
     rateSnapshot: Money.optional(),
     upchargePercentOverride: Percent.nullable().optional(),
     billingPeriod: BillingPeriod.default('ONE_TIME'),
-    sdlcPhase: SdlcPhase.nullable().optional(),
+    sdlcPhase: SdlcPhaseCode.nullable().optional(),
     /** Resource scheduling (FR-27): who, what share of their 100%/day, over which dates. */
     resourceName: z.string().max(200).optional(),
     allocationPercent: Percent.default(100),
@@ -44,7 +47,7 @@ export const NonLaborLineInput = z.object({
   upchargePercentOverride: Percent.nullable().optional(),
   billingPeriod: BillingPeriod.default('ONE_TIME'),
   periods: z.number().int().min(1).default(1),
-  sdlcPhase: SdlcPhase.nullable().optional(),
+  sdlcPhase: SdlcPhaseCode.nullable().optional(),
 });
 export type NonLaborLineInput = z.infer<typeof NonLaborLineInput>;
 
@@ -54,7 +57,7 @@ export const CloudLineInput = z.object({
   usageHoursPerMonth: z.number().nonnegative().default(730),
   upchargePercentOverride: Percent.nullable().optional(),
   billingPeriod: BillingPeriod.default('MONTHLY'),
-  sdlcPhase: SdlcPhase.nullable().optional(),
+  sdlcPhase: SdlcPhaseCode.nullable().optional(),
 });
 export type CloudLineInput = z.infer<typeof CloudLineInput>;
 
@@ -73,7 +76,7 @@ export interface LaborLineDto {
   rateSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
   resourceName: string | null;
   allocationPercent: number;
   startDate: string | null;
@@ -90,7 +93,7 @@ export interface NonLaborLineDto {
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
   periods: number;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
   lineTotal: string;
 }
 
@@ -106,7 +109,7 @@ export interface CloudLineDto {
   unitPriceSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;
-  sdlcPhase: SdlcPhase | null;
+  sdlcPhase: string | null;
   lineTotal: string;
 }
 
