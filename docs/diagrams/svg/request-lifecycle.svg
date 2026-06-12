@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1008" height="358" viewBox="0 0 1008 358" font-family="Inter, system-ui, -apple-system, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(-16,-36)">
+<line x1="170.0" y1="205.0" x2="210.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="380.0" y1="205.0" x2="420.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="580.0" y1="205.0" x2="620.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="780.0" y1="205.0" x2="820.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="915.8" y1="230.0" x2="931.9" y2="300.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="700.0" y1="180.0" x2="700.0" y2="110.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="683.0" y="136.0" width="34.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="700.0" y="148.0" font-size="10.5" fill="#475569" text-anchor="middle">uses</text>
+<line x1="700.0" y1="230.0" x2="700.0" y2="300.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="662.0" y="256.0" width="76.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="700.0" y="268.0" font-size="10.5" fill="#475569" text-anchor="middle">per request</text>
+<line x1="500.0" y1="180.0" x2="500.0" y2="110.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="471.0" y="136.0" width="58.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="500.0" y="148.0" font-size="10.5" fill="#475569" text-anchor="middle">on error</text>
+<rect x="40.0" y="180.0" width="130.0" height="50.0" rx="10" fill="#e6fffb" stroke="#0f766e" stroke-width="1.5"/>
+<text x="105.0" y="208.8" font-size="12" fill="#0f172a" text-anchor="middle">HTTP request</text>
+<rect x="210.0" y="180.0" width="170.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="295.0" y="208.8" font-size="12" fill="#0f172a" text-anchor="middle">CorrelationId middleware</text>
+<rect x="420.0" y="180.0" width="160.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="500.0" y="201.5" font-size="12" fill="#0f172a" text-anchor="middle">Controller</text>
+<text x="500.0" y="216.0" font-size="12" fill="#0f172a" text-anchor="middle">Zod validation</text>
+<rect x="620.0" y="180.0" width="160.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="700.0" y="201.5" font-size="12" fill="#0f172a" text-anchor="middle">Service</text>
+<text x="700.0" y="216.0" font-size="12" fill="#0f172a" text-anchor="middle">business logic</text>
+<rect x="820.0" y="180.0" width="180.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="910.0" y="201.5" font-size="12" fill="#0f172a" text-anchor="middle">Repository</text>
+<text x="910.0" y="216.0" font-size="12" fill="#0f172a" text-anchor="middle">Prisma (parameterized)</text>
+<path d="M 880.0 309.0 L 880.0 361.0 A 60.0 9 0 0 0 1000.0 361.0 L 1000.0 309.0 A 60.0 9 0 0 1 880.0 309.0 Z" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+<path d="M 880.0 309.0 A 60.0 9 0 0 0 1000.0 309.0" fill="none" stroke="#4338ca" stroke-width="1.5"/>
+<text x="940.0" y="338.8" font-size="12" fill="#0f172a" text-anchor="middle">PostgreSQL</text>
+<rect x="630.0" y="60.0" width="140.0" height="50.0" rx="4" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+<line x1="638.0" y1="60.0" x2="638.0" y2="110.0" stroke="#15803d" stroke-width="1"/>
+<line x1="762.0" y1="60.0" x2="762.0" y2="110.0" stroke="#15803d" stroke-width="1"/>
+<text x="700.0" y="81.5" font-size="12" fill="#0f172a" text-anchor="middle">engine</text>
+<text x="700.0" y="96.0" font-size="12" fill="#0f172a" text-anchor="middle">money math</text>
+<rect x="620.0" y="300.0" width="160.0" height="50.0" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+<text x="700.0" y="321.5" font-size="12" fill="#0f172a" text-anchor="middle">LoggingInterceptor</text>
+<text x="700.0" y="336.0" font-size="12" fill="#0f172a" text-anchor="middle">JSON log line</text>
+<rect x="420.0" y="60.0" width="160.0" height="50.0" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="500.0" y="81.5" font-size="12" fill="#0f172a" text-anchor="middle">ProblemDetailsFilter</text>
+<text x="500.0" y="96.0" font-size="12" fill="#0f172a" text-anchor="middle">RFC 7807 on error</text>
+</g>
+</svg>
