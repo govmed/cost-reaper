@@ -264,4 +264,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Pipeline green (format/lint/typecheck/**test 47**/build; fixed a test-helper bug where `null ?? 'DRAFT'` masked the no-stage case). Live smoke: `/dashboard` → 3 estimates, USD 22340.0000, by-stage + recent populated; web 200.
 - **Next:** commit → PR → CI-green → merge; then FE-54 part 2 / governed cost categories.
 
+### 2026-06-12 — FE-23 Printable estimate summary (FR-10)
+- **Action:** Merged FE-27 dashboard (PR #15). Built a **printable summary**: `PrintSummaryPage` at `/estimates/:id/print` rendering a clean read-only document (meta, labor/non-labor/cloud tables, totals, per-phase + per-category breakdowns, assumptions) with a **Print** button (`window.print()`); app header gets `print:hidden`. Added a "Printable summary" link in the estimate editor + the route. Reuses the existing detail payload — no API/migration. Extended Playwright e2e.
+- **Why:** FR-10 / FE-23 — clean, self-contained, visible win; closes the printable-summary gap.
+- **Files touched:** `apps/web/src/{pages/PrintSummaryPage.tsx, App.tsx, pages/EstimateEditorPage.tsx, e2e/smoke.spec.ts}`, CHANGELOG.
+- **Result:** Pipeline green (format/lint/typecheck/**test 47**/build). Web-only, so validated by build + the e2e (CI exercises the print view).
+- **Next:** commit → PR → CI-green → merge; then FE-54 part 2 / governed cost categories.
+
 <!-- Append new entries below this line -->

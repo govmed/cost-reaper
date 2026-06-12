@@ -26,6 +26,12 @@ test('login → create estimate → add a line → see totals', async ({ page })
 
   // The governance checklist panel renders (FR-25)
   await expect(page.getByRole('heading', { name: 'Smart checklist' })).toBeVisible();
+
+  // Printable summary (FE-23): opens a print-ready view with the estimate + Print button.
+  await page.getByRole('link', { name: 'Printable summary' }).click();
+  await expect(page.getByRole('button', { name: 'Print' })).toBeVisible();
+  await expect(page.getByRole('heading', { name })).toBeVisible();
+  await expect(page.getByText('Grand total')).toBeVisible();
 });
 
 async function login(page: import('@playwright/test').Page) {

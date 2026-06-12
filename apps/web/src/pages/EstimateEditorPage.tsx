@@ -109,6 +109,12 @@ export default function EstimateEditorPage() {
             <option value="DRAFT">DRAFT</option>
             <option value="FINAL">FINAL</option>
           </select>
+          <Link
+            to={`/estimates/${est.id}/print`}
+            className="border border-brand text-brand rounded px-3 py-1.5 text-sm font-medium hover:bg-teal-50"
+          >
+            Printable summary
+          </Link>
           <button
             onClick={() => void downloadCsv(est.id, est.name)}
             className="bg-brand text-white rounded px-3 py-1.5 text-sm font-medium"

@@ -311,4 +311,15 @@ Merged FE-54 part 1 (PR #14), then built **FE-27 Dashboard (FR-18)** — next hi
 - Pipeline green (test 47; fixed a test-helper `?? 'DRAFT'` bug). Live smoke: 3 estimates, USD 22340, by-stage + recent OK.
 - Next: commit → PR → CI → merge; then FE-54 part 2.
 
+---
+### [2026-06-12 23:30 UTC] — USER
+Continue / I approve all the Bash commands
+
+### [2026-06-12 23:30 UTC] — AGENT (continuing autonomously)
+Merged FE-27 dashboard (PR #15); built **FE-23 printable estimate summary (FR-10)**.
+**Actions taken:**
+- `PrintSummaryPage` at `/estimates/:id/print` (read-only doc: lines, totals, phase+category breakdowns, assumptions) + Print button + `print:hidden` chrome; "Printable summary" link in the editor. Reuses detail payload — no API/migration. e2e extended.
+- Pipeline green (test 47). Acknowledged blanket Bash approval.
+- Next: commit → PR → CI → merge; then FE-54 part 2 / governed cost categories.
+
 <!-- Append new turns below this line -->
