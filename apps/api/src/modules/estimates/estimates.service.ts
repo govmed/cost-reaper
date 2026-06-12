@@ -332,6 +332,8 @@ export class EstimatesService {
   async addNonLabor(estimateId: string, dto: NonLaborLineInput, actorId: string) {
     await this.ensure(estimateId);
     await this.checkSdlcPhase(dto.sdlcPhase);
+    // Cost category is governed by the COST_CATEGORY reference list (FR-29, FE-11).
+    await this.reference.assertActiveDisplayName('COST_CATEGORY', dto.category);
     await this.prisma.nonLaborLineItem.create({
       data: {
         estimateId,

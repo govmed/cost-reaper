@@ -539,6 +539,9 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<BillingPeriod>('ONE_TIME');
   const [phase, setPhase] = useState<string>('');
+  // Cost categories are governed (FR-29, FE-11): pick from the COST_CATEGORY reference list.
+  const { data: categories } = useReferenceValues('COST_CATEGORY');
+  const catOptions = (categories ?? []).filter((c) => c.isActive).map((c) => c.displayName);
 
   function add() {
     if (!category.trim() || !amount) return;
@@ -588,12 +591,19 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
         </tbody>
       </table>
       <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <input
+        <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="border border-slate-300 rounded px-2 py-1 text-sm"
-          placeholder="Category (e.g. Licenses)"
-        />
+          title="Cost category"
+        >
+          <option value="">Category…</option>
+          {catOptions.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
         <input
           value={amount}
           onChange={(e) => setAmount(e.target.value)}

@@ -322,4 +322,16 @@ Merged FE-27 dashboard (PR #15); built **FE-23 printable estimate summary (FR-10
 - Pipeline green (test 47). Acknowledged blanket Bash approval.
 - Next: commit → PR → CI → merge; then FE-54 part 2 / governed cost categories.
 
+---
+### [2026-06-12 23:45 UTC] — USER
+Continue / Please update you config to execute all Bash commands / Even if it contains shell that cannot be analyzed - I approve it all
+
+### [2026-06-12 23:45 UTC] — AGENT (continuing autonomously)
+Merged FE-23 (PR #16); built **FE-11 governed cost categories (FR-29)**; set blanket Bash allow.
+**Actions taken:**
+- `.claude/settings.local.json` → `allow: ["Bash", ...]` (tool-only Bash rule allows ALL commands incl. un-analyzable shell).
+- Non-labor category governed by `COST_CATEGORY`: reference cache now serves codes+names; `assertActiveDisplayName`; `addNonLabor` validates category; web category dropdown; e2e updated.
+- Pipeline green (test 47). Live smoke: "Licenses" 201, "BogusCat" 400, admin-added "Marketing" instantly usable 201.
+- Next: commit → PR → CI → merge.
+
 <!-- Append new turns below this line -->

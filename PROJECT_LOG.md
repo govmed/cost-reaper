@@ -271,4 +271,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Pipeline green (format/lint/typecheck/**test 47**/build). Web-only, so validated by build + the e2e (CI exercises the print view).
 - **Next:** commit → PR → CI-green → merge; then FE-54 part 2 / governed cost categories.
 
+### 2026-06-12 — FE-11 Governed cost categories (FR-29) + config
+- **Action:** Merged FE-23 (PR #16). Made non-labor **category governed** by `COST_CATEGORY`: refactored the reference cache to serve both codes + display names; added `assertActiveDisplayName`; `addNonLabor` validates `category` against active COST_CATEGORY display names; web non-labor form now a category **dropdown**; updated e2e to select governed categories. Also set `.claude/settings.local.json` to a blanket `Bash` allow (user approved all Bash, incl. un-analyzable shell).
+- **Why:** FR-29 / FE-11 — governed, admin-extensible cost categories (no free-text).
+- **Files touched:** `apps/api/src/modules/reference/reference.service.ts`, `apps/api/src/modules/estimates/estimates.service.ts`, `apps/web/src/pages/EstimateEditorPage.tsx`, `apps/web/e2e/smoke.spec.ts`, `.claude/settings.local.json`, CHANGELOG.
+- **Result:** Pipeline green (test 47). Live smoke: "Licenses" → 201; "BogusCat" → 400 "not an active COST_CATEGORY value"; admin adds "Marketing" → instantly usable (201). No migration (category column already text).
+- **Next:** commit → PR → CI-green → merge; then continue FE-54 (estimate status) / remaining cluster.
+
 <!-- Append new entries below this line -->

@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Governed cost categories (FE-11, FR-29)
+
+#### Changed
+- **Non-labor `category` is now governed by the `COST_CATEGORY` reference list** instead of free text. The estimate editor presents a category **dropdown** (from the reference data), and the API **validates** the submitted category against the active `COST_CATEGORY` values (deny-by-default). An admin can add a category in **Reference data** and it's immediately selectable — verified live ("Marketing" added → usable; "BogusCat" → 400). Reuses the cached reference-validation layer (new `assertActiveDisplayName`). No migration (the column was already text).
+
 ### Printable estimate summary (FE-23, FR-10)
 
 #### Added

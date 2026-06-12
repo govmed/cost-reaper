@@ -23,14 +23,16 @@ export class ReferenceService {
     private readonly audit: AuditService,
   ) {}
 
-  /** Short-lived cache of active codes per type, so validation isn't a per-request query (NFR-1). */
-  private readonly codeCache = new Map<string, { codes: Set<string>; at: number }>();
+  /** Short-lived cache of active codes/names per type, so validation isn't a per-request query (NFR-1). */
+  private readonly cache = new Map<
+    string,
+    { codes: Set<string>; names: Set<string>; at: number }
+  >();
   private static readonly CACHE_TTL_MS = 60_000;
 
-  /** The active value codes for a reference type (cached). Empty set if the type is unknown. */
-  async getActiveCodes(typeCode: string): Promise<Set<string>> {
-    const hit = this.codeCache.get(typeCode);
-    if (hit && Date.now() - hit.at < ReferenceService.CACHE_TTL_MS) return hit.codes;
+  private async loadActive(typeCode: string): Promise<{ codes: Set<string>; names: Set<string> }> {
+    const hit = this.cache.get(typeCode);
+    if (hit && Date.now() - hit.at < ReferenceService.CACHE_TTL_MS) return hit;
     const type = await this.prisma.referenceType.findUnique({
       where: { code: typeCode },
       select: { id: true },
@@ -38,19 +40,39 @@ export class ReferenceService {
     const rows = type
       ? await this.prisma.referenceValue.findMany({
           where: { referenceTypeId: type.id, isActive: true },
-          select: { code: true },
+          select: { code: true, displayName: true },
         })
       : [];
-    const codes = new Set(rows.map((r) => r.code));
-    this.codeCache.set(typeCode, { codes, at: Date.now() });
-    return codes;
+    const entry = {
+      codes: new Set(rows.map((r) => r.code)),
+      names: new Set(rows.map((r) => r.displayName)),
+      at: Date.now(),
+    };
+    this.cache.set(typeCode, entry);
+    return entry;
+  }
+
+  /** The active value codes for a reference type (cached). Empty set if the type is unknown. */
+  async getActiveCodes(typeCode: string): Promise<Set<string>> {
+    return (await this.loadActive(typeCode)).codes;
+  }
+
+  /** The active value display names for a reference type (cached). */
+  async getActiveDisplayNames(typeCode: string): Promise<Set<string>> {
+    return (await this.loadActive(typeCode)).names;
   }
 
   /** Throw unless `code` is an active value of `typeCode` — deny-by-default validation (FR-29). */
   async assertActiveCode(typeCode: string, code: string): Promise<void> {
-    const codes = await this.getActiveCodes(typeCode);
-    if (!codes.has(code)) {
+    if (!(await this.getActiveCodes(typeCode)).has(code)) {
       throw new BadRequestException(`'${code}' is not an active ${typeCode} value`);
+    }
+  }
+
+  /** Throw unless `name` is an active display name of `typeCode` (used for governed labels, FR-29). */
+  async assertActiveDisplayName(typeCode: string, name: string): Promise<void> {
+    if (!(await this.getActiveDisplayNames(typeCode)).has(name)) {
+      throw new BadRequestException(`'${name}' is not an active ${typeCode} value`);
     }
   }
 
@@ -136,7 +158,7 @@ export class ReferenceService {
       },
     });
     await this.audit.record('ReferenceValue', v.id, 'CREATE', actorId);
-    this.codeCache.clear();
+    this.cache.clear();
     return toReferenceValueDto(v);
   }
 
@@ -169,7 +191,7 @@ export class ReferenceService {
       },
     });
     await this.audit.record('ReferenceValue', v.id, 'UPDATE', actorId);
-    this.codeCache.clear();
+    this.cache.clear();
     return toReferenceValueDto(v);
   }
 
@@ -185,7 +207,7 @@ export class ReferenceService {
     }
     await this.prisma.referenceValue.delete({ where: { id } });
     await this.audit.record('ReferenceValue', id, 'DELETE', actorId);
-    this.codeCache.clear();
+    this.cache.clear();
   }
 
   // ── internals ───────────────────────────────────────────────────────────────
