@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Admin UI — Part 3: Cloud Prices browse (FE-38 frontend)
+
+#### Added
+- **Cloud prices** page (nav link): browse the seeded AWS/GCP/Azure catalog with a provider filter + free-text search (region/service/instance). Read-only. Completes the admin/reference-data section (Rate Cards · Users · Cloud Prices).
+
 ### Admin UI — Part 2: Users (FE-45 frontend)
 
 #### Added
