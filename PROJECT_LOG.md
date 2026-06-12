@@ -175,4 +175,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** CI green; merged **PR #7** (`d2f7dd1`). `setup.sh`/`migrate.sh` now use `migrate deploy` (they switch automatically once migrations exist).
 - **Next:** Await direction — PDF/Excel, dashboard, scenarios, PERT, live cloud sync, or hardening. (Also: added `Bash(docker *)` to settings.local.json per user approval.)
 
+### 2026-06-12 08:25 UTC — Hardening: blocking gates + Playwright e2e + CI image build (PR #8)
+- **Action:** With Docker up, ran the whole toolchain in a container: `pnpm format` repo-wide, fixed the lone ESLint error (ignore `**/*.cjs`), removed unused `eslint-disable` directives; **prettier-ignored the living docs** to protect exact-anchor editing. Removed `continue-on-error` from CI `format:check`+`lint` (now **blocking**). Verified all 5 gates pass in-container. Added **Playwright** (`apps/web/e2e/smoke.spec.ts` + config + dep) and a CI **`e2e` job** (`docker compose up --build` → migrate → seed → `playwright test`). **Verified the full stack locally e2e**: built images, ran stack, login→create→add line→totals returned correct engine math (monthly 1155 / yearly 13860 for $1000/mo @ +10%/+5%), web+Swagger 200.
+- **Why:** NFR-6 hardening; close the two standing gaps (advisory gates; Docker image build not in CI).
+- **Files touched:** ~29 prettier-formatted files, `.github/workflows/ci.yml`, `.prettierignore`, `eslint.config.mjs`, `apps/api/prisma/seed.ts`, `apps/web/{playwright.config.ts,e2e/smoke.spec.ts,package.json}`, `CHANGELOG.md`, `pnpm-lock.yaml` (now committed).
+- **Result:** CI **build + e2e + security all green** (e2e ran the browser against the real Docker stack, 1m55s). Merged **PR #8** (`ad4a369`). All earlier non-blocking follow-ups now resolved.
+- **Next:** Await direction — PDF/Excel, dashboard, scenarios, PERT, live cloud sync.
+
 <!-- Append new entries below this line -->

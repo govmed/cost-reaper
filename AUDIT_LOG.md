@@ -211,4 +211,16 @@ Generated, verified, and merged the first Prisma migration; broadened the Docker
 - Settings: added `Bash(docker *)` to `.claude/settings.local.json` allow list (the harness keeps the granular list; bare-`Bash` didn't persist).
 - Synced living files (Current State, PROJECT_LOG).
 
+---
+### [2026-06-12 08:10 UTC] — USER
+Harden it - flip lint/format to blocking and add Playwright e2e
+
+### [2026-06-12 08:25 UTC] — AGENT
+Hardened the project; CI is now fully blocking with a browser e2e job. (Docker now up — verified everything locally.)
+**Actions taken:**
+- Ran `pnpm format` + `pnpm lint` in a container: formatted repo, fixed ESLint `.cjs` error, removed unused disables, prettier-ignored living docs. Flipped CI `format:check`+`lint` to **blocking**; verified all 5 gates pass.
+- Added Playwright e2e smoke + a CI `e2e` job (docker compose up --build → migrate → seed → playwright), which also exercises the Docker image build. Verified the full stack locally end-to-end (login→create→add line→correct totals; web/Swagger 200).
+- PR #8 → CI build+e2e+security all green → merged into `main` (`ad4a369`). `pnpm-lock.yaml` now committed. Added `Bash(docker *)` allow rule earlier.
+- Synced living files (Current State, PROJECT_LOG Chapter 4 cont.).
+
 <!-- Append new turns below this line -->
