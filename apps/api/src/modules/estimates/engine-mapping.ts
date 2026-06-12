@@ -1,4 +1,4 @@
-import type { BillingPeriod, EngineInput, EngineLine } from '@cost-reaper/types';
+import type { BillingPeriod, EngineInput, EngineLine, SdlcPhase } from '@cost-reaper/types';
 
 export interface MappableLabor {
   id: string;
@@ -8,6 +8,7 @@ export interface MappableLabor {
   units: number;
   billingPeriod: BillingPeriod;
   upchargePercentOverride: number | null;
+  sdlcPhase: SdlcPhase | null;
 }
 export interface MappableNonLabor {
   id: string;
@@ -16,6 +17,7 @@ export interface MappableNonLabor {
   periods: number;
   billingPeriod: BillingPeriod;
   upchargePercentOverride: number | null;
+  sdlcPhase: SdlcPhase | null;
 }
 export interface MappableCloud {
   id: string;
@@ -25,6 +27,7 @@ export interface MappableCloud {
   usageHoursPerMonth: number;
   billingPeriod: BillingPeriod;
   upchargePercentOverride: number | null;
+  sdlcPhase: SdlcPhase | null;
 }
 export interface MappableEstimate {
   globalUpchargePercent: number;
@@ -49,6 +52,7 @@ export function buildEngineInput(e: MappableEstimate): EngineInput {
       quantity: l.quantity * l.units,
       billingPeriod: l.billingPeriod,
       upchargePercentOverride: l.upchargePercentOverride,
+      sdlcPhase: l.sdlcPhase,
     });
   }
   for (const n of e.nonLabor) {
@@ -59,6 +63,7 @@ export function buildEngineInput(e: MappableEstimate): EngineInput {
       quantity: n.periods,
       billingPeriod: n.billingPeriod,
       upchargePercentOverride: n.upchargePercentOverride,
+      sdlcPhase: n.sdlcPhase,
     });
   }
   for (const c of e.cloud) {
@@ -69,6 +74,7 @@ export function buildEngineInput(e: MappableEstimate): EngineInput {
       quantity: c.quantity * c.usageHoursPerMonth,
       billingPeriod: c.billingPeriod,
       upchargePercentOverride: c.upchargePercentOverride,
+      sdlcPhase: c.sdlcPhase,
     });
   }
   return {

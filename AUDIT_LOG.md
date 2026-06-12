@@ -260,4 +260,18 @@ Completed the admin UI (Parts 2 & 3) and rebuilt the local stack.
 - Part 2 Users (UsersPage + UserDto + hooks; admin nav link) → PR #10 → CI green → merged. Part 3 Cloud Prices browse (CloudPricesPage + nav/route) → PR #11 → CI green → merged. Both verified all 5 gates locally.
 - `main` @ `d9165bf`; rebuilt local stack (`docker compose up -d --build`) — users/cloud-prices/rate-cards APIs + web all 200. Admin/reference-data UI section complete (Rate Cards · Users · Cloud Prices).
 
+---
+### [2026-06-12 21:55 UTC] — USER
+Yes, keep going with FR-27 and FR-28. (mid-build) Also add stage gates and don't forget end to end testing. (mid-build) I approve you executing stuff in Docker. (mid-build) Update CLAUDE.md to allow AWS/GCP/Azure pricing to pull new data from the pricing websites and add a small "last pulled" table (AWS/GCP/AZURE — MM/DD/CCYY). (mid-build) Add to CLAUDE.md: refactor so ALL reference values are database-driven, not hard-coded — proper reference tables (id, code, display_name, description, display_order, is_active, created_by/date, updated_by/date), parent-child for grouped values, dynamic retrieval everywhere, + seed scripts.
+
+### [2026-06-12 21:55 UTC] — AGENT
+Built **Sprint 10** (FR-27 + FR-28 + stage gates + e2e) and folded the spec additions into CLAUDE.md.
+**Actions taken:**
+- **FR-28 (SDLC phase):** `SdlcPhase` enum + `sdlc_phase` on all line items; engine emits per-phase subtotals (`phases`); detail card "Cost by SDLC phase" + CSV column/summary.
+- **FR-27 (resource capacity):** labor `resource_name`/`allocation_percent`/`start_date`/`end_date`; pure `findCapacityViolations` (sweep-line); **save-time 400 guard** + **`resource_capacity` BLOCKER checklist rule** (seeded) → gates workflow transitions = the **stage gate**. Web editor: resource/alloc/date/phase inputs + over-allocation banner.
+- **Migration** `20260612120000_resource_capacity_sdlc_phase` generated via `prisma migrate diff` and verified (fresh-DB deploy + no-drift `--exit-code`).
+- **E2E:** extended Playwright (phase breakdown + capacity rejection + gated transition). Full pipeline green in a clean container (format/lint/typecheck/**test 40**/build); live API smoke confirmed capacity 400, phase totals, persisted fields, rule.
+- **Spec:** FR-21a enriched + **FR-21b** (per-provider "last pulled") + freshness table; **FR-29/NFR-17/EP-13 + ADR 0007** (DB-driven reference data, generic `reference_type`/`reference_value` + parent-child); roadmap Sprint 11 for the reference-data refactor (incl. migrating the interim `SdlcPhase` enum). Updated living files.
+- Next: commit → PR → CI-green → merge.
+
 <!-- Append new turns below this line -->

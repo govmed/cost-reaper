@@ -27,3 +27,54 @@ test('login → create estimate → add a line → see totals', async ({ page })
   // The governance checklist panel renders (FR-25)
   await expect(page.getByRole('heading', { name: 'Smart checklist' })).toBeVisible();
 });
+
+async function login(page: import('@playwright/test').Page) {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(ADMIN_EMAIL);
+  await page.getByLabel('Password').fill(ADMIN_PASSWORD);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByRole('heading', { name: 'Estimates' })).toBeVisible();
+}
+
+test('SDLC phase breakdown (FR-28), resource capacity guard (FR-27) + stage gate', async ({
+  page,
+}) => {
+  await login(page);
+
+  const name = `E2E Phase/Cap ${Date.now()}`;
+  await page.getByPlaceholder('Q3 Platform build').fill(name);
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByRole('heading', { name })).toBeVisible();
+
+  // FR-28: tag a non-labor line with an SDLC phase → per-phase breakdown appears.
+  await page.getByPlaceholder('Category (e.g. Licenses)').fill('Build server');
+  await page.getByPlaceholder('amount').fill('500');
+  await page.locator('select:has(option:has-text("Phase…"))').nth(1).selectOption('DEVELOPMENT');
+  await page.getByRole('button', { name: 'Add non-labor' }).click();
+  await expect(page.getByRole('heading', { name: 'Cost by SDLC phase' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'DEVELOPMENT' }).first()).toBeVisible();
+
+  // Stage gate (FR-24/25): with no rate card selected, a BLOCKER fails so the
+  // "Submit for review" transition is gated (button disabled).
+  await expect(page.getByRole('button', { name: 'Submit for review' })).toBeDisabled();
+
+  // FR-27: book a resource at 60% for July…
+  const roleSelect = page.locator('select:has(option:has-text("Select role"))');
+  const dates = page.locator('input[type="date"]');
+  await roleSelect.selectOption({ index: 1 });
+  await page.getByPlaceholder('resource (optional)').fill('CapTester');
+  await page.getByPlaceholder('alloc %').fill('60');
+  await dates.nth(0).fill('2026-07-01');
+  await dates.nth(1).fill('2026-07-31');
+  await page.getByRole('button', { name: 'Add labor' }).click();
+  await expect(page.getByRole('cell', { name: 'CapTester' })).toBeVisible();
+
+  // …a second overlapping 60% booking would exceed 100% → save is rejected.
+  await roleSelect.selectOption({ index: 1 });
+  await page.getByPlaceholder('resource (optional)').fill('CapTester');
+  await page.getByPlaceholder('alloc %').fill('60');
+  await dates.nth(0).fill('2026-07-15');
+  await dates.nth(1).fill('2026-08-15');
+  await page.getByRole('button', { name: 'Add labor' }).click();
+  await expect(page.getByText(/over-allocated/i)).toBeVisible();
+});

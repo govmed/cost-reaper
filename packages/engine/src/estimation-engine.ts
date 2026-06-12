@@ -1,5 +1,12 @@
 import Decimal from 'decimal.js';
-import type { CategorySubtotal, EngineInput, EngineLine, EngineResult } from '@cost-reaper/types';
+import type {
+  CategorySubtotal,
+  EngineInput,
+  EngineLine,
+  EngineResult,
+  PhaseSubtotal,
+} from '@cost-reaper/types';
+import { SDLC_PHASE_ORDER, UNASSIGNED_PHASE } from '@cost-reaper/types';
 
 // Exact decimal money math — never floats (NFR-5).
 Decimal.set({ rounding: Decimal.ROUND_HALF_UP, precision: 40 });
@@ -29,6 +36,7 @@ interface LineComputation {
   upcharge: Decimal;
   billingPeriod: EngineLine['billingPeriod'];
   category: string;
+  phase: string;
 }
 
 function computeLine(line: EngineLine, globalUpchargePercent: number): LineComputation {
@@ -41,7 +49,14 @@ function computeLine(line: EngineLine, globalUpchargePercent: number): LineCompu
     upcharge: markedUp.minus(base),
     billingPeriod: line.billingPeriod,
     category: line.category,
+    phase: line.sdlcPhase ?? UNASSIGNED_PHASE,
   };
+}
+
+/** Stable SDLC ordering: canonical phases first in lifecycle order, "Unassigned" last (FR-28). */
+function phaseRank(phase: string): number {
+  const i = (SDLC_PHASE_ORDER as readonly string[]).indexOf(phase);
+  return i === -1 ? SDLC_PHASE_ORDER.length : i;
 }
 
 /**
@@ -67,34 +82,48 @@ export function computeEstimate(input: EngineInput): EngineResult {
   let yearly = new Decimal(0);
   let upchargeTotal = new Decimal(0);
 
-  const catMap = new Map<string, { oneTime: Decimal; monthly: Decimal; yearly: Decimal }>();
+  type Bucket = { oneTime: Decimal; monthly: Decimal; yearly: Decimal };
+  const newBucket = (): Bucket => ({
+    oneTime: new Decimal(0),
+    monthly: new Decimal(0),
+    yearly: new Decimal(0),
+  });
+  const accrue = (b: Bucket, billingPeriod: LineComputation['billingPeriod'], amount: Decimal) => {
+    if (billingPeriod === 'ONE_TIME') {
+      b.oneTime = b.oneTime.plus(amount);
+    } else if (billingPeriod === 'MONTHLY') {
+      b.monthly = b.monthly.plus(amount);
+      b.yearly = b.yearly.plus(amount.times(TWELVE));
+    } else {
+      b.monthly = b.monthly.plus(amount.div(TWELVE));
+      b.yearly = b.yearly.plus(amount);
+    }
+  };
+
+  const catMap = new Map<string, Bucket>();
+  const phaseMap = new Map<string, Bucket>();
 
   for (const line of input.lines) {
     const c = computeLine(line, globalUp);
     upchargeTotal = upchargeTotal.plus(c.upcharge);
 
-    const cat = catMap.get(c.category) ?? {
-      oneTime: new Decimal(0),
-      monthly: new Decimal(0),
-      yearly: new Decimal(0),
-    };
-
     if (c.billingPeriod === 'ONE_TIME') {
       oneTime = oneTime.plus(c.markedUp);
-      cat.oneTime = cat.oneTime.plus(c.markedUp);
     } else if (c.billingPeriod === 'MONTHLY') {
       monthly = monthly.plus(c.markedUp);
       yearly = yearly.plus(c.markedUp.times(TWELVE));
-      cat.monthly = cat.monthly.plus(c.markedUp);
-      cat.yearly = cat.yearly.plus(c.markedUp.times(TWELVE));
     } else {
-      // YEARLY
       monthly = monthly.plus(c.markedUp.div(TWELVE));
       yearly = yearly.plus(c.markedUp);
-      cat.monthly = cat.monthly.plus(c.markedUp.div(TWELVE));
-      cat.yearly = cat.yearly.plus(c.markedUp);
     }
+
+    const cat = catMap.get(c.category) ?? newBucket();
+    accrue(cat, c.billingPeriod, c.markedUp);
     catMap.set(c.category, cat);
+
+    const ph = phaseMap.get(c.phase) ?? newBucket();
+    accrue(ph, c.billingPeriod, c.markedUp);
+    phaseMap.set(c.phase, ph);
   }
 
   const factor = new Decimal(1).plus(contingency);
@@ -113,6 +142,15 @@ export function computeEstimate(input: EngineInput): EngineResult {
       yearly: v.yearly.toFixed(scale),
     }));
 
+  const phases: PhaseSubtotal[] = [...phaseMap.entries()]
+    .sort(([a], [b]) => phaseRank(a) - phaseRank(b) || a.localeCompare(b))
+    .map(([phase, v]) => ({
+      phase,
+      oneTime: v.oneTime.toFixed(scale),
+      monthly: v.monthly.toFixed(scale),
+      yearly: v.yearly.toFixed(scale),
+    }));
+
   return {
     oneTimeSubtotal: oneTime.toFixed(scale),
     monthlySubtotal: monthly.toFixed(scale),
@@ -124,5 +162,6 @@ export function computeEstimate(input: EngineInput): EngineResult {
     yearlyTotal: yearlyTotal.toFixed(scale),
     grandTotal: grand.toFixed(scale),
     categories,
+    phases,
   };
 }

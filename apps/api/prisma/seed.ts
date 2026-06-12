@@ -286,6 +286,12 @@ const CHECKLIST_RULES = [
     scope: ChecklistScope.ESTIMATE,
   },
   {
+    key: 'resource_capacity',
+    description: 'No resource is allocated over 100% on any date',
+    severity: ChecklistSeverity.BLOCKER,
+    scope: ChecklistScope.RESOURCE,
+  },
+  {
     key: 'upcharge_set',
     description: 'An upcharge percentage is set (or explicitly zero)',
     severity: ChecklistSeverity.WARNING,

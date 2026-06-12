@@ -16,6 +16,7 @@ describe('buildEngineInput + computeEstimate', () => {
           units: 10,
           billingPeriod: 'ONE_TIME',
           upchargePercentOverride: null,
+          sdlcPhase: null,
         },
       ],
       nonLabor: [],
@@ -28,6 +29,7 @@ describe('buildEngineInput + computeEstimate', () => {
           usageHoursPerMonth: 730,
           billingPeriod: 'MONTHLY',
           upchargePercentOverride: null,
+          sdlcPhase: null,
         },
       ],
     });
@@ -54,6 +56,7 @@ describe('buildEngineInput + computeEstimate', () => {
             units: 1,
             billingPeriod: 'ONE_TIME',
             upchargePercentOverride: 25,
+            sdlcPhase: null,
           },
         ],
         nonLabor: [],
