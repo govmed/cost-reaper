@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import EstimatesPage from './pages/EstimatesPage';
 import EstimateEditorPage from './pages/EstimateEditorPage';
 import RateCardsPage from './pages/RateCardsPage';
+import UsersPage from './pages/UsersPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -30,6 +31,11 @@ export default function App() {
               <Link to="/rate-cards" className="hover:underline">
                 Rate cards
               </Link>
+              {user.role === 'ADMIN' && (
+                <Link to="/users" className="hover:underline">
+                  Users
+                </Link>
+              )}
             </nav>
           )}
         </div>
@@ -68,6 +74,14 @@ export default function App() {
             element={
               <Protected>
                 <RateCardsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <Protected>
+                <UsersPage />
               </Protected>
             }
           />
