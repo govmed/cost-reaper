@@ -31,6 +31,7 @@ export interface ChecklistEstimate {
     usageHoursPerMonth: number;
     region: string;
     skuOrInstance: string;
+    billingPeriod: string;
   }[];
 }
 

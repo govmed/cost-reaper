@@ -39,6 +39,7 @@ export class ChecklistService {
         usageHoursPerMonth: Number(c.usageHoursPerMonth),
         region: c.region,
         skuOrInstance: c.skuOrInstance,
+        billingPeriod: c.billingPeriod,
       })),
     };
     return evaluateChecklist(
