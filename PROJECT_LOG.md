@@ -102,4 +102,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** draw.io embeds verified present (5) + viewer script; no Mermaid left in `docs/`. CI fixes pushed will re-trigger the pipeline; expect format/lint advisory, watching typecheck/test/build.
 - **Next:** Commit + push; read CI; fix any typecheck/test/build failures; then merge PR #1.
 
+### 2026-06-12 05:30 UTC — CI GREEN on PR #1
+- **Action:** Two more self-heal fixes after the pnpm-version fix: removed `cache: pnpm` from `setup-node` (it requires a committed `pnpm-lock.yaml`, which we don't have without local Node). CI then ran the full pipeline.
+- **Why:** Get the meaningful quality gates green (Section 0.1 self-heal); CI is the only verification oracle (no host Node; Docker daemon down locally).
+- **Files touched:** `.github/workflows/ci.yml` (commits `2ba10c5`, `a8e7080`, + cache fix).
+- **Result:** **Both jobs PASS.** `install → prisma generate → format(advisory) → lint(advisory) → typecheck → test → build` all ✓. The estimation-engine Vitest suite passes; types/engine/api/web build. Confirms the foundation builds clean + tests green. Advisory annotations only: Prettier formatting + one ESLint `module`-in-`.cjs` nit (non-blocking).
+- **Next:** Human to merge PR #1 (merging `main` is human-gated). Then Sprint 1 (EP-2 auth, EP-3 rate cards) + generate the first real Prisma migration + flip format/lint to blocking after a `pnpm format` pass.
+
 <!-- Append new entries below this line -->
