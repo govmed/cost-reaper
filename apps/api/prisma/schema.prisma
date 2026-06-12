@@ -1,0 +1,347 @@
+// cost-reaper data model (CLAUDE.md Section 10). Monetary values are exact
+// decimals — never floats (NFR-5). All timestamps UTC.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  ESTIMATOR
+  VIEWER
+}
+
+enum RateUnit {
+  HOUR
+  DAY
+}
+
+enum EstimateStatus {
+  DRAFT
+  FINAL
+}
+
+enum BillingPeriod {
+  ONE_TIME
+  MONTHLY
+  YEARLY
+}
+
+enum CloudProvider {
+  AWS
+  GCP
+  AZURE
+}
+
+enum CloudPriceUnit {
+  HOUR
+  MONTH
+  GB_MONTH
+  REQUEST
+}
+
+enum CloudPriceSource {
+  CATALOG_SEED
+  AWS_API
+  AZURE_API
+  GCP_API
+}
+
+enum NonLaborType {
+  FIXED
+  RECURRING
+}
+
+enum ChecklistSeverity {
+  BLOCKER
+  WARNING
+  INFO
+}
+
+enum ChecklistScope {
+  ESTIMATE
+  LABOR
+  NONLABOR
+  CLOUD
+  RESOURCE
+}
+
+// ─── Identity (FR-1, FR-2, FR-26, NFR-16) ────────────────────────────────────
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  role         Role      @default(ESTIMATOR)
+  displayName  String?   @map("display_name")
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  rateCards        RateCard[]
+  estimates        Estimate[]
+  workflowDefs     WorkflowDefinition[]
+  transitionEvents WorkflowTransitionEvent[]
+  auditEvents      AuditEvent[]
+
+  @@map("users")
+}
+
+// ─── Reference data: rate cards (FR-3) ───────────────────────────────────────
+
+model RateCard {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  currency    String   @db.Char(3)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdById String?  @map("created_by") @db.Uuid
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  roles     RateCardRole[]
+  estimates Estimate[]
+
+  @@map("rate_cards")
+}
+
+model RateCardRole {
+  id         String   @id @default(uuid()) @db.Uuid
+  rateCardId String   @map("rate_card_id") @db.Uuid
+  rateCard   RateCard @relation(fields: [rateCardId], references: [id], onDelete: Cascade)
+  roleName   String   @map("role_name")
+  unit       RateUnit
+  rate       Decimal  @db.Decimal(18, 4)
+
+  laborLines LaborLineItem[]
+
+  @@map("rate_card_roles")
+}
+
+// ─── Cloud price catalog (FR-21, NFR-14) ─────────────────────────────────────
+
+model CloudPrice {
+  id            String           @id @default(uuid()) @db.Uuid
+  provider      CloudProvider
+  region        String
+  service       String
+  skuOrInstance String           @map("sku_or_instance")
+  unit          CloudPriceUnit
+  unitPrice     Decimal          @map("unit_price") @db.Decimal(18, 6)
+  currency      String           @db.Char(3)
+  source        CloudPriceSource @default(CATALOG_SEED)
+  effectiveDate DateTime         @default(now()) @map("effective_date")
+  fetchedAt     DateTime         @default(now()) @map("fetched_at")
+
+  cloudItems CloudComputeLineItem[]
+
+  @@unique([provider, region, service, skuOrInstance, unit])
+  @@index([provider, region])
+  @@map("cloud_prices")
+}
+
+// ─── Estimates (FR-4..FR-8, FR-22, FR-23) ────────────────────────────────────
+
+model Estimate {
+  id                    String              @id @default(uuid()) @db.Uuid
+  name                  String
+  description           String?
+  status                EstimateStatus      @default(DRAFT)
+  currency              String              @db.Char(3)
+  globalUpchargePercent Decimal             @default(0) @map("global_upcharge_percent") @db.Decimal(5, 2)
+  contingencyPercent    Decimal             @default(0) @map("contingency_percent") @db.Decimal(5, 2)
+  rateCardId            String?             @map("rate_card_id") @db.Uuid
+  rateCard              RateCard?           @relation(fields: [rateCardId], references: [id])
+  ownerId               String              @map("owner_id") @db.Uuid
+  owner                 User                @relation(fields: [ownerId], references: [id])
+  workflowDefinitionId  String?             @map("workflow_definition_id") @db.Uuid
+  workflowDefinition    WorkflowDefinition? @relation(fields: [workflowDefinitionId], references: [id])
+  currentStageId        String?             @map("current_stage_id") @db.Uuid
+  currentStage          WorkflowStage?      @relation(fields: [currentStageId], references: [id])
+  createdAt             DateTime            @default(now()) @map("created_at")
+  updatedAt             DateTime            @updatedAt @map("updated_at")
+
+  laborItems       LaborLineItem[]
+  nonLaborItems    NonLaborLineItem[]
+  cloudItems       CloudComputeLineItem[]
+  assumptions      Assumption[]
+  transitionEvents WorkflowTransitionEvent[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("estimates")
+}
+
+model LaborLineItem {
+  id                      String        @id @default(uuid()) @db.Uuid
+  estimateId              String        @map("estimate_id") @db.Uuid
+  estimate                Estimate      @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  rateCardRoleId          String?       @map("rate_card_role_id") @db.Uuid
+  rateCardRole            RateCardRole? @relation(fields: [rateCardRoleId], references: [id])
+  description             String?
+  quantity                Decimal       @default(1) @db.Decimal(18, 4)
+  units                   Decimal       @db.Decimal(18, 4)
+  rateSnapshot            Decimal       @map("rate_snapshot") @db.Decimal(18, 4)
+  upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
+  billingPeriod           BillingPeriod @default(ONE_TIME) @map("billing_period")
+  lineTotal               Decimal       @map("line_total") @db.Decimal(18, 4)
+
+  @@index([estimateId])
+  @@map("labor_line_items")
+}
+
+model NonLaborLineItem {
+  id                      String        @id @default(uuid()) @db.Uuid
+  estimateId              String        @map("estimate_id") @db.Uuid
+  estimate                Estimate      @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  category                String
+  description             String?
+  type                    NonLaborType  @default(FIXED)
+  amount                  Decimal       @db.Decimal(18, 4)
+  upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
+  billingPeriod           BillingPeriod @default(ONE_TIME) @map("billing_period")
+  periods                 Int           @default(1)
+  lineTotal               Decimal       @map("line_total") @db.Decimal(18, 4)
+
+  @@index([estimateId])
+  @@map("non_labor_line_items")
+}
+
+model CloudComputeLineItem {
+  id                      String        @id @default(uuid()) @db.Uuid
+  estimateId              String        @map("estimate_id") @db.Uuid
+  estimate                Estimate      @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  cloudPriceId            String?       @map("cloud_price_id") @db.Uuid
+  cloudPrice              CloudPrice?   @relation(fields: [cloudPriceId], references: [id])
+  provider                CloudProvider
+  region                  String
+  service                 String
+  skuOrInstance           String        @map("sku_or_instance")
+  quantity                Decimal       @default(1) @db.Decimal(18, 4)
+  usageHoursPerMonth      Decimal       @default(730) @map("usage_hours_per_month") @db.Decimal(18, 4)
+  unitPriceSnapshot       Decimal       @map("unit_price_snapshot") @db.Decimal(18, 6)
+  upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
+  billingPeriod           BillingPeriod @default(MONTHLY) @map("billing_period")
+  lineTotal               Decimal       @map("line_total") @db.Decimal(18, 4)
+
+  @@index([estimateId])
+  @@map("cloud_compute_line_items")
+}
+
+model Assumption {
+  id         String   @id @default(uuid()) @db.Uuid
+  estimateId String   @map("estimate_id") @db.Uuid
+  estimate   Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  text       String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([estimateId])
+  @@map("assumptions")
+}
+
+// ─── Governance: workflow (FR-24) + checklist (FR-25) ────────────────────────
+
+model WorkflowDefinition {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  isDefault   Boolean  @default(false) @map("is_default")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdById String?  @map("created_by") @db.Uuid
+  createdBy   User?    @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  stages      WorkflowStage[]
+  transitions WorkflowTransition[]
+  estimates   Estimate[]
+
+  @@map("workflow_definitions")
+}
+
+model WorkflowStage {
+  id                   String             @id @default(uuid()) @db.Uuid
+  workflowDefinitionId String             @map("workflow_definition_id") @db.Uuid
+  workflowDefinition   WorkflowDefinition @relation(fields: [workflowDefinitionId], references: [id], onDelete: Cascade)
+  key                  String
+  label                String
+  sortOrder            Int                @map("sort_order")
+  isInitial            Boolean            @default(false) @map("is_initial")
+  isTerminal           Boolean            @default(false) @map("is_terminal")
+
+  fromTransitions WorkflowTransition[]      @relation("FromStage")
+  toTransitions   WorkflowTransition[]      @relation("ToStage")
+  estimatesHere   Estimate[]
+  eventsFrom      WorkflowTransitionEvent[] @relation("EventFrom")
+  eventsTo        WorkflowTransitionEvent[] @relation("EventTo")
+
+  @@unique([workflowDefinitionId, key])
+  @@map("workflow_stages")
+}
+
+model WorkflowTransition {
+  id                    String             @id @default(uuid()) @db.Uuid
+  workflowDefinitionId  String             @map("workflow_definition_id") @db.Uuid
+  workflowDefinition    WorkflowDefinition @relation(fields: [workflowDefinitionId], references: [id], onDelete: Cascade)
+  fromStageId           String             @map("from_stage_id") @db.Uuid
+  fromStage             WorkflowStage      @relation("FromStage", fields: [fromStageId], references: [id], onDelete: Cascade)
+  toStageId             String             @map("to_stage_id") @db.Uuid
+  toStage               WorkflowStage      @relation("ToStage", fields: [toStageId], references: [id], onDelete: Cascade)
+  allowedRole           Role               @map("allowed_role")
+  label                 String
+  requiresChecklistPass Boolean            @default(true) @map("requires_checklist_pass")
+
+  @@map("workflow_transitions")
+}
+
+model WorkflowTransitionEvent {
+  id          String         @id @default(uuid()) @db.Uuid
+  estimateId  String         @map("estimate_id") @db.Uuid
+  estimate    Estimate       @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  fromStageId String?        @map("from_stage_id") @db.Uuid
+  fromStage   WorkflowStage? @relation("EventFrom", fields: [fromStageId], references: [id])
+  toStageId   String         @map("to_stage_id") @db.Uuid
+  toStage     WorkflowStage  @relation("EventTo", fields: [toStageId], references: [id])
+  actorId     String         @map("actor_id") @db.Uuid
+  actor       User           @relation(fields: [actorId], references: [id])
+  note        String?
+  occurredAt  DateTime       @default(now()) @map("occurred_at")
+
+  @@index([estimateId])
+  @@map("workflow_transition_events")
+}
+
+model ChecklistRule {
+  id          String            @id @default(uuid()) @db.Uuid
+  key         String            @unique
+  description String
+  severity    ChecklistSeverity @default(BLOCKER)
+  scope       ChecklistScope    @default(ESTIMATE)
+  isActive    Boolean           @default(true) @map("is_active")
+  isBuiltin   Boolean           @default(true) @map("is_builtin")
+  configJson  Json?             @map("config_json")
+
+  @@map("checklist_rules")
+}
+
+// ─── Audit trail (FR-11) ─────────────────────────────────────────────────────
+
+model AuditEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  action     String
+  actorId    String?  @map("actor_id") @db.Uuid
+  actor      User?    @relation(fields: [actorId], references: [id])
+  occurredAt DateTime @default(now()) @map("occurred_at")
+
+  @@index([entityType, entityId])
+  @@map("audit_events")
+}

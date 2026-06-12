@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/build
+**/.turbo
+**/coverage
+**/*.tsbuildinfo
+.git
+.github
+.env
+.env.*
+!.env.example
+**/*.log
+.claude
+docs
+*.md
+!README.md
