@@ -1,6 +1,12 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { type AuthUser, CreateRateCardRequest, UpdateRateCardRequest } from '@cost-reaper/types';
+import {
+  type AuthUser,
+  CreateRateCardRequest,
+  RateCardRoleInput,
+  UpdateRateCardRequest,
+  UpdateRateCardRoleRequest,
+} from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -47,5 +53,36 @@ export class RateCardsController {
   @HttpCode(204)
   remove(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     return this.rateCards.remove(id, actor.id);
+  }
+
+  @Post(':id/roles')
+  @Roles('ADMIN')
+  addRole(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(RateCardRoleInput)) dto: RateCardRoleInput,
+    @CurrentUser() actor: AuthUser,
+  ) {
+    return this.rateCards.addRole(id, dto, actor.id);
+  }
+
+  @Patch(':id/roles/:roleId')
+  @Roles('ADMIN')
+  updateRole(
+    @Param('id') id: string,
+    @Param('roleId') roleId: string,
+    @Body(new ZodValidationPipe(UpdateRateCardRoleRequest)) dto: UpdateRateCardRoleRequest,
+    @CurrentUser() actor: AuthUser,
+  ) {
+    return this.rateCards.updateRole(id, roleId, dto, actor.id);
+  }
+
+  @Delete(':id/roles/:roleId')
+  @Roles('ADMIN')
+  deleteRole(
+    @Param('id') id: string,
+    @Param('roleId') roleId: string,
+    @CurrentUser() actor: AuthUser,
+  ) {
+    return this.rateCards.deleteRole(id, roleId, actor.id);
   }
 }

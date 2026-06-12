@@ -1,5 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { CreateRateCardRequest, RateCardDto, UpdateRateCardRequest } from '@cost-reaper/types';
+import type {
+  CreateRateCardRequest,
+  RateCardDto,
+  RateCardRoleInput,
+  UpdateRateCardRequest,
+  UpdateRateCardRoleRequest,
+} from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 
@@ -55,6 +61,39 @@ export class RateCardsService {
     await this.getEntityOrThrow(id);
     await this.prisma.rateCard.delete({ where: { id } });
     await this.audit.record('RateCard', id, 'DELETE', actorId);
+  }
+
+  async addRole(cardId: string, dto: RateCardRoleInput, actorId: string): Promise<RateCardDto> {
+    await this.getEntityOrThrow(cardId);
+    await this.prisma.rateCardRole.create({
+      data: { rateCardId: cardId, roleName: dto.roleName, unit: dto.unit, rate: dto.rate },
+    });
+    await this.audit.record('RateCard', cardId, 'ADD_ROLE', actorId);
+    return this.get(cardId);
+  }
+
+  async updateRole(
+    cardId: string,
+    roleId: string,
+    dto: UpdateRateCardRoleRequest,
+    actorId: string,
+  ): Promise<RateCardDto> {
+    const role = await this.prisma.rateCardRole.findFirst({
+      where: { id: roleId, rateCardId: cardId },
+    });
+    if (!role) throw new NotFoundException('Rate-card role not found');
+    await this.prisma.rateCardRole.update({
+      where: { id: roleId },
+      data: { roleName: dto.roleName, unit: dto.unit, rate: dto.rate },
+    });
+    await this.audit.record('RateCard', cardId, 'UPDATE_ROLE', actorId);
+    return this.get(cardId);
+  }
+
+  async deleteRole(cardId: string, roleId: string, actorId: string): Promise<RateCardDto> {
+    await this.prisma.rateCardRole.deleteMany({ where: { id: roleId, rateCardId: cardId } });
+    await this.audit.record('RateCard', cardId, 'DELETE_ROLE', actorId);
+    return this.get(cardId);
   }
 
   private async getEntityOrThrow(id: string) {

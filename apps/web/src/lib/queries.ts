@@ -32,6 +32,49 @@ export function useRateCards() {
   return useQuery({ queryKey: ['rate-cards'], queryFn: () => api<RateCard[]>('/rate-cards') });
 }
 
+export function useCreateRateCard() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: unknown) =>
+      api<RateCard>('/rate-cards', { method: 'POST', body: JSON.stringify(body) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rate-cards'] }),
+  });
+}
+
+export function useRateCardMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => qc.invalidateQueries({ queryKey: ['rate-cards'] });
+  return {
+    update: useMutation({
+      mutationFn: (v: { id: string; body: unknown }) =>
+        api(`/rate-cards/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => api(`/rate-cards/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+    addRole: useMutation({
+      mutationFn: (v: { id: string; body: unknown }) =>
+        api(`/rate-cards/${v.id}/roles`, { method: 'POST', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    updateRole: useMutation({
+      mutationFn: (v: { id: string; roleId: string; body: unknown }) =>
+        api(`/rate-cards/${v.id}/roles/${v.roleId}`, {
+          method: 'PATCH',
+          body: JSON.stringify(v.body),
+        }),
+      onSuccess,
+    }),
+    deleteRole: useMutation({
+      mutationFn: (v: { id: string; roleId: string }) =>
+        api(`/rate-cards/${v.id}/roles/${v.roleId}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
+}
+
 export function useWorkflow(id: string | undefined) {
   return useQuery({
     queryKey: ['workflow', id],

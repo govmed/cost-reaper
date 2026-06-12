@@ -26,6 +26,13 @@ export const UpdateRateCardRequest = z.object({
 });
 export type UpdateRateCardRequest = z.infer<typeof UpdateRateCardRequest>;
 
+export const UpdateRateCardRoleRequest = z.object({
+  roleName: z.string().min(1).max(120).optional(),
+  unit: RateUnit.optional(),
+  rate: Money.optional(),
+});
+export type UpdateRateCardRoleRequest = z.infer<typeof UpdateRateCardRoleRequest>;
+
 export const RateCardDto = z.object({
   id: z.string().uuid(),
   name: z.string(),

@@ -4,6 +4,7 @@ import { useAuth } from './lib/auth';
 import LoginPage from './pages/LoginPage';
 import EstimatesPage from './pages/EstimatesPage';
 import EstimateEditorPage from './pages/EstimateEditorPage';
+import RateCardsPage from './pages/RateCardsPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -17,9 +18,21 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       <header className="bg-brand text-white px-5 py-3 flex items-center justify-between">
-        <Link to="/" className="font-semibold text-lg">
-          cost-reaper
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link to="/" className="font-semibold text-lg">
+            cost-reaper
+          </Link>
+          {user && (
+            <nav className="flex items-center gap-4 text-sm">
+              <Link to="/" className="hover:underline">
+                Estimates
+              </Link>
+              <Link to="/rate-cards" className="hover:underline">
+                Rate cards
+              </Link>
+            </nav>
+          )}
+        </div>
         {user && (
           <div className="flex items-center gap-4 text-sm">
             <span className="opacity-90">
@@ -47,6 +60,14 @@ export default function App() {
             element={
               <Protected>
                 <EstimateEditorPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/rate-cards"
+            element={
+              <Protected>
+                <RateCardsPage />
               </Protected>
             }
           />
