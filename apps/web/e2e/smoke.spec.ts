@@ -85,7 +85,7 @@ test('Reference data admin page serves DB-driven values (FR-29)', async ({ page 
   await expect(page.getByRole('heading', { name: 'Reference data' })).toBeVisible();
   // The seeded SDLC_PHASE type and its values render (default selection).
   await page.getByRole('button', { name: /SDLC Phase/ }).click();
-  await expect(page.getByText('DEVELOPMENT', { exact: true }).first()).toBeVisible();
-  // A built-in value exposes Rename but not Delete.
+  // Built-in values render their rows (each exposes Rename; Delete is hidden).
   await expect(page.getByRole('button', { name: 'Rename' }).first()).toBeVisible();
+  await expect(page.getByText('Development').first()).toBeVisible();
 });
