@@ -1,0 +1,28 @@
+# Changelog
+
+All notable changes to **cost-reaper** are documented here. Format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses semantic versioning once
+it ships a first release.
+
+## [Unreleased]
+
+### Sprint 0 — Foundation (EP-1)
+
+#### Added
+- pnpm + Turborepo monorepo scaffold: `apps/web`, `apps/api`, `packages/types`, `packages/engine`,
+  `packages/config`. (NFR-6, NFR-15)
+- Docker stack (`docker-compose.yml`): `db` (PostgreSQL 16) / `api` (NestJS) / `web` (Vite build via
+  nginx), with health checks. (FE-2, NFR-7)
+- Cross-platform scripts (`setup`, `start`, `stop`, `test`, `migrate`, `seed`, `logs` — `.sh` + `.ps1`)
+  and a `Makefile`. (FE-1)
+- Config & secrets handling: `.env.example`, env-only configuration, nothing secret in source. (FE-4, NFR-10)
+- API health & readiness endpoints (`/health`, `/ready`) + structured logging. (FE-5, NFR-9)
+- Shared contract package `@cost-reaper/types` (Zod schemas + TS types).
+- Pure estimation engine `@cost-reaper/engine` with unit tests (upcharge → contingency, monthly/yearly
+  rollups, rounding). (FR-7, FR-22, FR-23)
+- Full MVP Prisma schema + initial migration covering rate cards, estimates, labor/non-labor/cloud
+  line items, cloud price catalog, workflow, checklist rules, audit. (Section 10)
+- GitHub Actions CI: format → lint → typecheck → test → build + dependency audit. (FE-3)
+- Documentation: `README` quickstart, `docs/ARCHITECTURE.md`, and ADRs 0001–0006.
+
+[Unreleased]: https://github.com/govmed/cost-reaper/commits/main

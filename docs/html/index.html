@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cost-reaper — Documentation</title>
+    <style>
+      :root { --brand: #0f766e; --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --bg: #f8fafc; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: Inter, system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
+      header { background: var(--brand); color: #fff; padding: 2.5rem 1.5rem; }
+      header h1 { margin: 0 0 .25rem; font-size: 1.8rem; }
+      header p { margin: 0; opacity: .92; max-width: 60ch; }
+      nav { position: sticky; top: 0; background: #fff; border-bottom: 1px solid var(--line); padding: .75rem 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; font-size: .9rem; }
+      nav a { color: var(--brand); text-decoration: none; }
+      nav a:hover { text-decoration: underline; }
+      main { max-width: 980px; margin: 0 auto; padding: 1.5rem; }
+      section { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+      section h2 { margin-top: 0; color: var(--brand); font-size: 1.2rem; }
+      table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+      th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+      th { color: var(--muted); font-weight: 600; }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .75rem; }
+      .card { border: 1px solid var(--line); border-radius: 10px; padding: .85rem 1rem; }
+      .card h3 { margin: 0 0 .25rem; font-size: .95rem; }
+      .card p { margin: 0; color: var(--muted); font-size: .85rem; }
+      a.btn { display: inline-block; background: var(--brand); color: #fff; text-decoration: none; padding: .5rem .9rem; border-radius: 8px; font-size: .9rem; }
+      code { background: #f1f5f9; padding: .1rem .35rem; border-radius: 4px; font-size: .85em; }
+      ul.adr { columns: 2; font-size: .9rem; }
+      footer { color: var(--muted); font-size: .8rem; text-align: center; padding: 2rem 1rem; }
+      @media (max-width: 640px) { ul.adr { columns: 1; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>cost-reaper — Documentation</h1>
+      <p>Technology Project Cost Estimator. Consistent, auditable cost estimates from a governed
+        rate card and AWS / GCP / Azure compute pricing — with monthly &amp; yearly totals, a
+        customizable approval workflow, and an automated completeness checklist.</p>
+    </header>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#modules">Modules</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="flowcharts.html">Flowcharts</a>
+      <a href="#adrs">ADRs</a>
+      <a href="#run">Run it</a>
+    </nav>
+    <main>
+      <section id="overview">
+        <h2>Overview</h2>
+        <p>End-to-end <strong>TypeScript</strong>, two tiers over PostgreSQL, in a pnpm + Turborepo
+          monorepo. The web SPA talks to a standalone, documented NestJS REST API; all money math
+          lives in a pure, exhaustively tested estimation engine; the shared Zod contract is the
+          single source of truth across the wire.</p>
+        <p style="margin-top:1rem"><a class="btn" href="flowcharts.html">View the flowchart designs →</a></p>
+      </section>
+
+      <section id="modules">
+        <h2>Monorepo modules <span style="color:var(--muted);font-weight:400">(NFR-15)</span></h2>
+        <table>
+          <thead><tr><th>Package</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>apps/web</code></td><td>React + Vite SPA (Tailwind).</td></tr>
+            <tr><td><code>apps/api</code></td><td>NestJS REST API; feature modules under <code>src/modules/*</code>.</td></tr>
+            <tr><td><code>packages/types</code></td><td>Shared Zod contract (+ inferred TS types).</td></tr>
+            <tr><td><code>packages/engine</code></td><td>Pure estimation engine — no I/O; decimal-exact.</td></tr>
+            <tr><td><code>packages/config</code></td><td>Shared Tailwind / tsconfig presets.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="capabilities">
+        <h2>Key capabilities</h2>
+        <div class="cards">
+          <div class="card"><h3>Multi-cloud pricing</h3><p>AWS / GCP / Azure compute from a seeded catalog, unit price snapshotted (FR-21, NFR-14).</p></div>
+          <div class="card"><h3>Upcharge %</h3><p>Global default + per-line override; override wins (FR-22).</p></div>
+          <div class="card"><h3>Monthly &amp; yearly</h3><p>One-time / monthly / annualized rollups (FR-23).</p></div>
+          <div class="card"><h3>Customizable workflow</h3><p>Configurable, role-gated approval stages (FR-24).</p></div>
+          <div class="card"><h3>Smart checklist</h3><p>Rule-based completeness gate on resource / pricing / costing (FR-25).</p></div>
+          <div class="card"><h3>Identity &amp; RBAC</h3><p>Deny-by-default, server-side, audited (FR-26, NFR-16).</p></div>
+        </div>
+      </section>
+
+      <section id="adrs">
+        <h2>Architecture Decision Records</h2>
+        <ul class="adr">
+          <li><a href="../adr/0001-end-to-end-typescript.md">0001 — End-to-end TypeScript</a></li>
+          <li><a href="../adr/0002-money-as-decimal.md">0002 — Money as decimals</a></li>
+          <li><a href="../adr/0003-autonomous-operation.md">0003 — Autonomous operation</a></li>
+          <li><a href="../adr/0004-modularity-and-trunk-based-git.md">0004 — Modularity &amp; trunk-based git</a></li>
+          <li><a href="../adr/0005-workflow-and-checklist-engines.md">0005 — Workflow &amp; checklist engines</a></li>
+          <li><a href="../adr/0006-identity-and-rbac.md">0006 — Identity &amp; RBAC</a></li>
+        </ul>
+        <p style="color:var(--muted);font-size:.85rem">Full system detail: <a href="../ARCHITECTURE.md">ARCHITECTURE.md</a>. Product brief &amp; living memory: <a href="../../CLAUDE.md">CLAUDE.md</a>.</p>
+      </section>
+
+      <section id="run">
+        <h2>Run it</h2>
+        <p>Only Docker is required (no host Node).</p>
+        <p><code>./scripts/setup.sh &amp;&amp; ./scripts/start.sh</code> &nbsp;(Linux/macOS) &nbsp;·&nbsp; <code>./scripts/setup.ps1; ./scripts/start.ps1</code> (Windows)</p>
+        <p style="color:var(--muted);font-size:.85rem">Web <code>:5173</code> · API <code>:8000/api/v1</code> · Swagger <code>/docs</code></p>
+      </section>
+    </main>
+    <footer>cost-reaper · HTML documentation hub (FE-47) · kept in sync with the Markdown sources</footer>
+  </body>
+</html>

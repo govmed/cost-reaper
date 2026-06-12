@@ -1,0 +1,27 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="API Request Lifecycle" id="request-lifecycle">
+    <mxGraphModel dx="1000" dy="500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1080" pageHeight="420" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="req" value="HTTP request" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fffb;strokeColor=#0f766e;" vertex="1" parent="1"><mxGeometry x="40" y="180" width="130" height="50" as="geometry" /></mxCell>
+        <mxCell id="cid" value="CorrelationId middleware" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="210" y="180" width="170" height="50" as="geometry" /></mxCell>
+        <mxCell id="ctrl" value="Controller&#10;Zod validation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#0e7490;" vertex="1" parent="1"><mxGeometry x="420" y="180" width="160" height="50" as="geometry" /></mxCell>
+        <mxCell id="svc" value="Service&#10;business logic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#0e7490;" vertex="1" parent="1"><mxGeometry x="620" y="180" width="160" height="50" as="geometry" /></mxCell>
+        <mxCell id="repo" value="Repository&#10;Prisma (parameterized)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="820" y="180" width="180" height="50" as="geometry" /></mxCell>
+        <mxCell id="db" value="PostgreSQL" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#eef2ff;strokeColor=#4338ca;" vertex="1" parent="1"><mxGeometry x="880" y="300" width="120" height="70" as="geometry" /></mxCell>
+        <mxCell id="eng" value="engine&#10;money math" style="shape=process;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#15803d;" vertex="1" parent="1"><mxGeometry x="630" y="60" width="140" height="50" as="geometry" /></mxCell>
+        <mxCell id="log" value="LoggingInterceptor&#10;JSON log line" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#64748b;" vertex="1" parent="1"><mxGeometry x="620" y="300" width="160" height="50" as="geometry" /></mxCell>
+        <mxCell id="err" value="ProblemDetailsFilter&#10;RFC 7807 on error" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#b91c1c;" vertex="1" parent="1"><mxGeometry x="420" y="60" width="160" height="50" as="geometry" /></mxCell>
+        <mxCell id="r1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="req" target="cid"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="cid" target="ctrl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="ctrl" target="svc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="svc" target="repo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="repo" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r6" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;" edge="1" parent="1" source="svc" target="eng"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r7" value="per request" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;" edge="1" parent="1" source="svc" target="log"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r8" value="on error" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;" edge="1" parent="1" source="ctrl" target="err"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
