@@ -1,1 +1,1 @@
-export { computeEstimate, effectiveUpcharge } from './estimation-engine';
+export { computeEstimate, effectiveUpcharge, lineTotal } from './estimation-engine';

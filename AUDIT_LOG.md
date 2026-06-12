@@ -139,4 +139,34 @@ Fixed the commit author, merged PR #1, and built Sprint 1 (EP-2 + EP-3).
 - Built EP-2: auth (register/login/refresh/logout/me, argon2 + JWT access/refresh), deny-by-default RBAC (`JwtAuthGuard`+`RolesGuard`, `@Roles`/`@Public`/`@CurrentUser`), `ZodValidationPipe`, admin user-management. EP-3: rate-card CRUD. Audit trail for users + rate cards. Wired into `AppModule`; `/health` made `@Public`. Unit tests for AuthService + ZodValidationPipe.
 - Updated CHANGELOG, docs/API.md, and the living files. Next: commit, push, open PR #2, watch CI.
 
+---
+### [2026-06-12 06:00 UTC] — USER
+When you get a chance, create a folder for the drawio files and an svg folder for the svg files. I am not able to open the drawio files. So lets create them in SVG. Worst case, visio format and PNG and HTML too. All have their own file folders. update CLAUDE.md with this.
+
+### [2026-06-12 06:05 UTC] — AGENT
+Reorganized diagrams into per-format folders and rendered SVG/PNG/HTML (since `.drawio` wouldn't open).
+**Actions taken:**
+- `docs/diagrams/{drawio,svg,png,html,visio}/`; moved `.drawio` into `drawio/`; wrote `scripts/render-diagrams.py` (mxGraph→SVG, rsvg-convert→PNG); generated 5 SVGs + 5 PNGs + HTML pages; visually verified PNGs. `visio/README.md` explains VSDX export. `docs/html/flowcharts.html` now uses `<img>` SVGs. CLAUDE.md §14 + FE-47 updated. Opened PR #3.
+
+---
+### [2026-06-12 06:06 UTC] — USER
+Do 1 and then 2
+
+### [2026-06-12 06:08 UTC] — AGENT
+Merged PR #2 (Sprint 1) and PR #3 (diagrams) into `main`, then started Sprint 2.
+**Actions taken:**
+- `gh pr merge 2` and `gh pr merge 3` (--merge --delete-branch); synced `main` (`894387c`). Branched `feature/sprint2-estimates`; updated living files.
+
+---
+### [2026-06-12 06:09 UTC] — USER
+Yes, you have my permission. Don't need to ask me everytime.
+
+### [2026-06-12 06:12 UTC] — USER
+I approve you running the Bash commands. Don't ask me again.
+
+### [2026-06-12 06:12 UTC] — AGENT
+Recorded standing permission and stopped Bash prompts.
+**Actions taken:**
+- Saved memory `standing-permission.md` (proceed autonomously: merge/push/sprints without asking). Set `.claude/settings.local.json` permissions.allow to `Bash(*)` (blanket Bash allow). Proceeding to build Sprint 2.
+
 <!-- Append new turns below this line -->

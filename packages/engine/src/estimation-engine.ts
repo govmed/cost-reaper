@@ -13,6 +13,11 @@ const d = (v: Decimal.Value): Decimal => new Decimal(v);
  * Effective upcharge for a line (FR-22): the per-line override wins when set
  * (including an explicit 0); otherwise the estimate's global upcharge applies.
  */
+/** Exact base line total = baseAmount × quantity, rounded to `scale` (pre-upcharge). */
+export function lineTotal(baseAmount: string, quantity: number, scale = 4): string {
+  return new Decimal(baseAmount).times(quantity).toFixed(scale);
+}
+
 export function effectiveUpcharge(line: EngineLine, globalUpchargePercent: number): Decimal {
   const override = line.upchargePercentOverride;
   return d(override === null || override === undefined ? globalUpchargePercent : override);
