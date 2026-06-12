@@ -127,4 +127,16 @@ Asked which professional tool; user chose **draw.io / diagrams.net**. Rebuilt th
 - Replaced Mermaid: authored editable `docs/diagrams/*.drawio` (architecture, workflow, calculation, checklist, request-lifecycle); regenerated `docs/html/flowcharts.html` to embed them via the official diagrams.net viewer (Python encoder). Updated CLAUDE.md Mermaid→draw.io. Saved memory `diagram-tooling.md`.
 - Diagnosed first CI failure (pnpm version clash) and fixed `ci.yml`; fixed `composite`/`--noEmit` clash; made format/lint advisory (no local Node/Docker to autofix). Synced living files.
 
+---
+### [2026-06-12 05:40 UTC] — USER
+Merge PR #1 and start Sprint 1 and fix that one gmail-authored commit.
+
+### [2026-06-12 05:55 UTC] — AGENT
+Fixed the commit author, merged PR #1, and built Sprint 1 (EP-2 + EP-3).
+**Actions taken:**
+- Rewrote the gmail-authored commit `148809c` to `tito.morales@govmedai.com` (git filter-branch), force-pushed `feature/ep1-foundation` (authorized).
+- Merged PR #1 into `main` (`gh pr merge --merge --delete-branch`, merge `d1bb05d`); synced local `main`; created `feature/sprint1-auth-ratecards`.
+- Built EP-2: auth (register/login/refresh/logout/me, argon2 + JWT access/refresh), deny-by-default RBAC (`JwtAuthGuard`+`RolesGuard`, `@Roles`/`@Public`/`@CurrentUser`), `ZodValidationPipe`, admin user-management. EP-3: rate-card CRUD. Audit trail for users + rate cards. Wired into `AppModule`; `/health` made `@Public`. Unit tests for AuthService + ZodValidationPipe.
+- Updated CHANGELOG, docs/API.md, and the living files. Next: commit, push, open PR #2, watch CI.
+
 <!-- Append new turns below this line -->

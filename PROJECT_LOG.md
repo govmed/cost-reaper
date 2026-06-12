@@ -109,4 +109,21 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** **Both jobs PASS.** `install → prisma generate → format(advisory) → lint(advisory) → typecheck → test → build` all ✓. The estimation-engine Vitest suite passes; types/engine/api/web build. Confirms the foundation builds clean + tests green. Advisory annotations only: Prettier formatting + one ESLint `module`-in-`.cjs` nit (non-blocking).
 - **Next:** Human to merge PR #1 (merging `main` is human-gated). Then Sprint 1 (EP-2 auth, EP-3 rate cards) + generate the first real Prisma migration + flip format/lint to blocking after a `pnpm format` pass.
 
+## Chapter 1 — Sprint 1: Identity & Reference Data (started 2026-06-12)
+**Goal:** EP-2 (auth + RBAC + user management) and EP-3 (rate-card CRUD), with the audit trail. Covers FR-1, FR-2, FR-3, FR-11, FR-26, NFR-16; FE-6/7/8/9/10/30/45/46.
+
+### 2026-06-12 05:45 UTC — Merged PR #1; fixed author; began Sprint 1
+- **Action:** Per user: rewrote the one gmail-authored commit to `tito.morales@govmedai.com` (git filter-branch + force-push, authorized), **merged PR #1 into `main`** (`d1bb05d`, branch deleted), synced local `main`, and started Sprint 1 on `feature/sprint1-auth-ratecards`.
+- **Why:** Complete the foundation increment on trunk; honor the commit-identity correction; begin MVP feature work.
+- **Files touched:** git history (force-push), `main` (merge).
+- **Result:** `main` now carries EP-1 with consistent authorship; only `main` exists remotely.
+- **Next:** Build EP-2 + EP-3.
+
+### 2026-06-12 05:55 UTC — EP-2 (auth/RBAC) + EP-3 (rate cards) + audit built
+- **Action:** Added `@nestjs/jwt`; built common auth infra (`ZodValidationPipe`, `@Public`/`@Roles`/`@CurrentUser`, `JwtAuthGuard`, `RolesGuard`); **auth module** (register/login/refresh/logout/me — argon2 hashing, JWT access 15m + refresh 7d); **users module** (admin CRUD); **rate-cards module** (read for all authenticated, write admin-only); **audit module** (records create/modify on users + rate cards). Wired app-wide deny-by-default guards into `AppModule` (JwtAuthGuard → RolesGuard); marked `/health`+`/ready` `@Public`. Unit tests: `AuthService` (hash/verify + token roundtrip via mocked Prisma), `ZodValidationPipe`. Updated `CHANGELOG`, `docs/API.md`, Current State.
+- **Why:** FR-1, FR-2, FR-3, FR-11, FR-26, NFR-16; FE-6/7/8/9/10/30/45/46.
+- **Files touched:** `apps/api/src/common/{decorators,guards,pipes,audit}/*`, `apps/api/src/modules/{auth,users,rate-cards}/*`, `app.module.ts`, `health.controller.ts`, `apps/api/package.json`, `vitest.{config,setup}.ts`, `CHANGELOG.md`, `docs/API.md`.
+- **Result:** Stateless logout (client-discards) noted as an assumption; refresh is stateless JWT (denylist post-MVP). Pending CI verification on PR #2 (CI is the only oracle — no local Node/Docker).
+- **Next:** Commit, push, open PR #2, watch CI, fix any failures.
+
 <!-- Append new entries below this line -->
