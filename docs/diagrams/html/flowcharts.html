@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>cost-reaper — Flowcharts (HTML)</title><style>
+      :root{--brand:#0f766e;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f8fafc}
+      *{box-sizing:border-box}
+      body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg)}
+      header{background:var(--brand);color:#fff;padding:2rem 1.5rem}
+      header h1{margin:0 0 .25rem;font-size:1.6rem}header p{margin:0;opacity:.9}
+      nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:.75rem 1.5rem;display:flex;gap:1rem;flex-wrap:wrap;font-size:.9rem}
+      nav a{color:var(--brand);text-decoration:none}nav a:hover{text-decoration:underline}
+      main{max-width:1080px;margin:0 auto;padding:1.5rem}
+      section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.25rem 1.5rem;margin:1.25rem 0}
+      section h2{margin-top:0;font-size:1.2rem;color:var(--brand)}
+      p.req{color:var(--muted);font-size:.85rem;margin-top:-.25rem}
+      p.src{color:var(--muted);font-size:.78rem;margin-bottom:0}
+      .diagram{overflow-x:auto}.diagram svg,.diagram img{max-width:100%;height:auto;display:block}
+      code{background:#f1f5f9;padding:.1rem .35rem;border-radius:4px;font-size:.85em}
+      footer{color:var(--muted);font-size:.8rem;text-align:center;padding:2rem 1rem}
+</style></head>
+<body><header><h1>cost-reaper — Flowchart Designs</h1>
+<p>Self-contained HTML (SVG embedded inline — opens in any browser, no plugin). Sources: <code>docs/diagrams/drawio/*.drawio</code>.</p></header>
+<nav><a href="#architecture">System architecture</a> <a href="#workflow">Estimate approval workflow</a> <a href="#calculation">Estimation calculation flow</a> <a href="#checklist">Smart-checklist gating</a> <a href="#request-lifecycle">API request lifecycle</a></nav><main>
+      <section id="architecture">
+        <h2>System architecture</h2>
+        <p class="req">FR-12, NFR-2, NFR-15</p>
+        <div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="808" height="418" viewBox="0 0 808 418" font-family="Inter, system-ui, -apple-system, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(-16,-26)">
+<line x1="190.0" y1="235.0" x2="330.0" y2="235.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="189.0" y="226.0" width="142.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="260.0" y="238.0" font-size="10.5" fill="#475569" text-anchor="middle">HTTPS / JSON · /api/v1</text>
+<line x1="550.0" y1="235.0" x2="680.0" y2="235.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="559.0" y="226.0" width="112.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="615.0" y="238.0" font-size="10.5" fill="#475569" text-anchor="middle">parameterized SQL</text>
+<line x1="440.0" y1="190.0" x2="440.0" y2="110.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="423.0" y="141.0" width="34.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="440.0" y="153.0" font-size="10.5" fill="#475569" text-anchor="middle">uses</text>
+<line x1="440.0" y1="280.0" x2="440.0" y2="360.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="417.0" y="311.0" width="46.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="440.0" y="323.0" font-size="10.5" fill="#475569" text-anchor="middle">shares</text>
+<line x1="188.4" y1="270.0" x2="377.1" y2="360.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="259.7" y="306.0" width="46.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="282.7" y="318.0" font-size="10.5" fill="#475569" text-anchor="middle">shares</text>
+<line x1="440.0" y1="110.0" x2="440.0" y2="360.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="405.0" y="226.0" width="70.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="440.0" y="238.0" font-size="10.5" fill="#475569" text-anchor="middle">depends on</text>
+<rect x="40.0" y="200.0" width="150.0" height="70.0" rx="10" fill="#e6fffb" stroke="#0f766e" stroke-width="1.5"/>
+<text x="115.0" y="231.5" font-size="12" fill="#0f172a" text-anchor="middle">Web SPA</text>
+<text x="115.0" y="246.0" font-size="12" fill="#0f172a" text-anchor="middle">React + Vite</text>
+<rect x="330.0" y="190.0" width="220.0" height="90.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="440.0" y="224.2" font-size="12" fill="#0f172a" text-anchor="middle">NestJS REST API</text>
+<text x="440.0" y="238.8" font-size="12" fill="#0f172a" text-anchor="middle">controllers → services →</text>
+<text x="440.0" y="253.2" font-size="12" fill="#0f172a" text-anchor="middle">repositories</text>
+<rect x="350.0" y="50.0" width="180.0" height="60.0" rx="4" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+<line x1="358.0" y1="50.0" x2="358.0" y2="110.0" stroke="#15803d" stroke-width="1"/>
+<line x1="522.0" y1="50.0" x2="522.0" y2="110.0" stroke="#15803d" stroke-width="1"/>
+<text x="440.0" y="76.5" font-size="12" fill="#0f172a" text-anchor="middle">packages/engine</text>
+<text x="440.0" y="91.0" font-size="12" fill="#0f172a" text-anchor="middle">pure estimation engine</text>
+<rect x="350.0" y="360.0" width="180.0" height="60.0" rx="4" fill="#fef9c3" stroke="#a16207" stroke-width="1.5"/>
+<line x1="358.0" y1="360.0" x2="358.0" y2="420.0" stroke="#a16207" stroke-width="1"/>
+<line x1="522.0" y1="360.0" x2="522.0" y2="420.0" stroke="#a16207" stroke-width="1"/>
+<text x="440.0" y="386.5" font-size="12" fill="#0f172a" text-anchor="middle">packages/types</text>
+<text x="440.0" y="401.0" font-size="12" fill="#0f172a" text-anchor="middle">shared Zod contract</text>
+<path d="M 680.0 204.0 L 680.0 266.0 A 60.0 9 0 0 0 800.0 266.0 L 800.0 204.0 A 60.0 9 0 0 1 680.0 204.0 Z" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+<path d="M 680.0 204.0 A 60.0 9 0 0 0 800.0 204.0" fill="none" stroke="#4338ca" stroke-width="1.5"/>
+<text x="740.0" y="231.5" font-size="12" fill="#0f172a" text-anchor="middle">PostgreSQL 16</text>
+<text x="740.0" y="246.0" font-size="12" fill="#0f172a" text-anchor="middle">Prisma · NUMERIC</text>
+</g>
+</svg>
+</div>
+        <p class="src">Formats: <code>../svg/architecture.svg</code> · <code>../png/architecture.png</code> · <code>../drawio/architecture.drawio</code> (editable)</p>
+      </section>
+      <section id="workflow">
+        <h2>Estimate approval workflow</h2>
+        <p class="req">FR-24 — customizable; seeded default. Transitions role-gated; ✓ = requires checklist pass.</p>
+        <div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1148" height="98" viewBox="0 0 1148 98" font-family="Inter, system-ui, -apple-system, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(-16,-126)">
+<line x1="160.0" y1="175.0" x2="290.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="160.0" y="166.0" width="130.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="225.0" y="178.0" font-size="10.5" fill="#475569" text-anchor="middle">Submit · Estimator ✓</text>
+<line x1="290.0" y1="175.0" x2="160.0" y2="175.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="166.0" y="166.0" width="118.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="225.0" y="178.0" font-size="10.5" fill="#475569" text-anchor="middle">Return · Estimator</text>
+<line x1="410.0" y1="175.0" x2="540.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="419.0" y="166.0" width="112.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="475.0" y="178.0" font-size="10.5" fill="#475569" text-anchor="middle">Approve · Admin ✓</text>
+<line x1="660.0" y1="175.0" x2="790.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="666.0" y="166.0" width="118.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="725.0" y="178.0" font-size="10.5" fill="#475569" text-anchor="middle">Finalize · Admin ✓</text>
+<line x1="910.0" y1="175.0" x2="1020.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="915.0" y="166.0" width="100.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="965.0" y="178.0" font-size="10.5" fill="#475569" text-anchor="middle">Archive · Admin</text>
+<rect x="40.0" y="150.0" width="120.0" height="50.0" rx="25.0" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>
+<text x="100.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">Draft</text>
+<rect x="290.0" y="150.0" width="120.0" height="50.0" rx="25.0" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
+<text x="350.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">In Review</text>
+<rect x="540.0" y="150.0" width="120.0" height="50.0" rx="25.0" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+<text x="600.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">Approved</text>
+<rect x="790.0" y="150.0" width="120.0" height="50.0" rx="25.0" fill="#bbf7d0" stroke="#166534" stroke-width="1.5"/>
+<text x="850.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">Final</text>
+<rect x="1020.0" y="150.0" width="120.0" height="50.0" rx="25.0" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="1080.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">Archived</text>
+</g>
+</svg>
+</div>
+        <p class="src">Formats: <code>../svg/workflow.svg</code> · <code>../png/workflow.png</code> · <code>../drawio/workflow.drawio</code> (editable)</p>
+      </section>
+      <section id="calculation">
+        <h2>Estimation calculation flow</h2>
+        <p class="req">FR-7, FR-22, FR-23 — upcharge before contingency; monthly &amp; yearly rollups.</p>
+        <div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="788" height="758" viewBox="0 0 788 758" font-family="Inter, system-ui, -apple-system, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(4,4)">
+<line x1="390.0" y1="70.0" x2="390.0" y2="100.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="300.0" y1="140.0" x2="240.0" y2="140.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="256.0" y="131.0" width="28.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="270.0" y="143.0" font-size="10.5" fill="#475569" text-anchor="middle">yes</text>
+<line x1="480.0" y1="140.0" x2="540.0" y2="140.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="499.0" y="131.0" width="22.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="510.0" y="143.0" font-size="10.5" fill="#475569" text-anchor="middle">no</text>
+<line x1="191.9" y1="165.0" x2="328.1" y2="220.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="588.1" y1="165.0" x2="451.9" y2="220.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390.0" y1="270.0" x2="390.0" y2="300.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="310.0" y1="340.0" x2="220.0" y2="340.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390.0" y1="380.0" x2="390.0" y2="420.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="470.0" y1="340.0" x2="560.0" y2="340.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="154.6" y1="365.0" x2="355.4" y2="510.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390.0" y1="470.0" x2="390.0" y2="510.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="625.4" y1="365.0" x2="424.6" y2="510.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390.0" y1="560.0" x2="390.0" y2="590.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="390.0" y1="640.0" x2="390.0" y2="670.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="280.0" y="20.0" width="220.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="390.0" y="41.5" font-size="12" fill="#0f172a" text-anchor="middle">Line base = baseAmount ×</text>
+<text x="390.0" y="56.0" font-size="12" fill="#0f172a" text-anchor="middle">quantity</text>
+<polygon points="390.0,100.0 480.0,140.0 390.0,180.0 300.0,140.0" fill="#fef9c3" stroke="#a16207" stroke-width="1.5"/>
+<text x="390.0" y="136.5" font-size="12" fill="#0f172a" text-anchor="middle">Per-line upcharge</text>
+<text x="390.0" y="151.0" font-size="12" fill="#0f172a" text-anchor="middle">override set?</text>
+<rect x="20.0" y="115.0" width="220.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="130.0" y="143.8" font-size="12" fill="#0f172a" text-anchor="middle">effective upcharge = override</text>
+<rect x="540.0" y="115.0" width="220.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="650.0" y="143.8" font-size="12" fill="#0f172a" text-anchor="middle">effective upcharge = global</text>
+<rect x="270.0" y="220.0" width="240.0" height="50.0" rx="10" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+<text x="390.0" y="248.8" font-size="12" fill="#0f172a" text-anchor="middle">marked-up = base × (1 + up%)</text>
+<polygon points="390.0,300.0 470.0,340.0 390.0,380.0 310.0,340.0" fill="#fef9c3" stroke="#a16207" stroke-width="1.5"/>
+<text x="390.0" y="336.5" font-size="12" fill="#0f172a" text-anchor="middle">Billing</text>
+<text x="390.0" y="351.0" font-size="12" fill="#0f172a" text-anchor="middle">period?</text>
+<rect x="20.0" y="315.0" width="200.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="120.0" y="336.5" font-size="12" fill="#0f172a" text-anchor="middle">ONE_TIME</text>
+<text x="120.0" y="351.0" font-size="12" fill="#0f172a" text-anchor="middle">→ one-time bucket</text>
+<rect x="290.0" y="420.0" width="200.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="390.0" y="441.5" font-size="12" fill="#0f172a" text-anchor="middle">MONTHLY</text>
+<text x="390.0" y="456.0" font-size="12" fill="#0f172a" text-anchor="middle">→ monthly · ×12 → yearly</text>
+<rect x="560.0" y="315.0" width="200.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="660.0" y="336.5" font-size="12" fill="#0f172a" text-anchor="middle">YEARLY</text>
+<text x="660.0" y="351.0" font-size="12" fill="#0f172a" text-anchor="middle">→ yearly · ÷12 → monthly</text>
+<rect x="270.0" y="510.0" width="240.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="390.0" y="538.8" font-size="12" fill="#0f172a" text-anchor="middle">Category subtotals (post-upcharge)</text>
+<rect x="250.0" y="590.0" width="280.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="390.0" y="611.5" font-size="12" fill="#0f172a" text-anchor="middle">Apply contingency on the upcharged</text>
+<text x="390.0" y="626.0" font-size="12" fill="#0f172a" text-anchor="middle">subtotal</text>
+<rect x="240.0" y="670.0" width="300.0" height="60.0" rx="10" fill="#dcfce7" stroke="#166534" stroke-width="1.5"/>
+<text x="390.0" y="703.8" font-size="12" fill="#0f172a" text-anchor="middle">grandTotal = one-time + annualized (yearly)</text>
+</g>
+</svg>
+</div>
+        <p class="src">Formats: <code>../svg/calculation.svg</code> · <code>../png/calculation.png</code> · <code>../drawio/calculation.drawio</code> (editable)</p>
+      </section>
+      <section id="checklist">
+        <h2>Smart-checklist gating</h2>
+        <p class="req">FR-25 — a failing BLOCKER blocks any transition that requires a checklist pass.</p>
+        <div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="928" height="358" viewBox="0 0 928 358" font-family="Inter, system-ui, -apple-system, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(-16,4)">
+<line x1="200.0" y1="175.0" x2="260.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="413.8" y1="215.0" x2="533.8" y2="280.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="462.8" y="238.5" width="22.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="473.8" y="250.5" font-size="10.5" fill="#475569" text-anchor="middle">no</text>
+<line x1="420.0" y1="175.0" x2="480.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="436.0" y="166.0" width="28.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="450.0" y="178.0" font-size="10.5" fill="#475569" text-anchor="middle">yes</text>
+<line x1="680.0" y1="175.0" x2="730.0" y2="175.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="816.2" y1="135.0" x2="826.2" y2="70.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="807.2" y="93.5" width="28.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="821.2" y="105.5" font-size="10.5" fill="#475569" text-anchor="middle">yes</text>
+<line x1="739.2" y1="215.0" x2="624.2" y2="280.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="670.7" y="238.5" width="22.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="681.7" y="250.5" font-size="10.5" fill="#475569" text-anchor="middle">no</text>
+<rect x="40.0" y="150.0" width="160.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="120.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">Requested transition</text>
+<polygon points="340.0,135.0 420.0,175.0 340.0,215.0 260.0,175.0" fill="#fef9c3" stroke="#a16207" stroke-width="1.5"/>
+<text x="340.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">requiresChecklistPass?</text>
+<rect x="480.0" y="150.0" width="200.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="580.0" y="171.5" font-size="12" fill="#0f172a" text-anchor="middle">ChecklistEngine evaluates</text>
+<text x="580.0" y="186.0" font-size="12" fill="#0f172a" text-anchor="middle">active rules</text>
+<polygon points="810.0,135.0 890.0,175.0 810.0,215.0 730.0,175.0" fill="#fef9c3" stroke="#a16207" stroke-width="1.5"/>
+<text x="810.0" y="178.8" font-size="12" fill="#0f172a" text-anchor="middle">Any BLOCKER failed?</text>
+<rect x="500.0" y="280.0" width="160.0" height="50.0" rx="10" fill="#dcfce7" stroke="#166534" stroke-width="1.5"/>
+<text x="580.0" y="308.8" font-size="12" fill="#0f172a" text-anchor="middle">Allow transition</text>
+<rect x="740.0" y="20.0" width="180.0" height="50.0" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="830.0" y="41.5" font-size="12" fill="#0f172a" text-anchor="middle">Block · return failing</text>
+<text x="830.0" y="56.0" font-size="12" fill="#0f172a" text-anchor="middle">items</text>
+</g>
+</svg>
+</div>
+        <p class="src">Formats: <code>../svg/checklist.svg</code> · <code>../png/checklist.png</code> · <code>../drawio/checklist.drawio</code> (editable)</p>
+      </section>
+      <section id="request-lifecycle">
+        <h2>API request lifecycle</h2>
+        <p class="req">NFR-9 — correlation ids, structured logs, RFC 7807 errors.</p>
+        <div class="diagram"><svg xmlns="http://www.w3.org/2000/svg" width="1008" height="358" viewBox="0 0 1008 358" font-family="Inter, system-ui, -apple-system, sans-serif">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<g transform="translate(-16,-36)">
+<line x1="170.0" y1="205.0" x2="210.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="380.0" y1="205.0" x2="420.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="580.0" y1="205.0" x2="620.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="780.0" y1="205.0" x2="820.0" y2="205.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="915.8" y1="230.0" x2="931.9" y2="300.0" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<line x1="700.0" y1="180.0" x2="700.0" y2="110.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="683.0" y="136.0" width="34.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="700.0" y="148.0" font-size="10.5" fill="#475569" text-anchor="middle">uses</text>
+<line x1="700.0" y1="230.0" x2="700.0" y2="300.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="662.0" y="256.0" width="76.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="700.0" y="268.0" font-size="10.5" fill="#475569" text-anchor="middle">per request</text>
+<line x1="500.0" y1="180.0" x2="500.0" y2="110.0" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<rect x="471.0" y="136.0" width="58.0" height="16" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="500.0" y="148.0" font-size="10.5" fill="#475569" text-anchor="middle">on error</text>
+<rect x="40.0" y="180.0" width="130.0" height="50.0" rx="10" fill="#e6fffb" stroke="#0f766e" stroke-width="1.5"/>
+<text x="105.0" y="208.8" font-size="12" fill="#0f172a" text-anchor="middle">HTTP request</text>
+<rect x="210.0" y="180.0" width="170.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="295.0" y="208.8" font-size="12" fill="#0f172a" text-anchor="middle">CorrelationId middleware</text>
+<rect x="420.0" y="180.0" width="160.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="500.0" y="201.5" font-size="12" fill="#0f172a" text-anchor="middle">Controller</text>
+<text x="500.0" y="216.0" font-size="12" fill="#0f172a" text-anchor="middle">Zod validation</text>
+<rect x="620.0" y="180.0" width="160.0" height="50.0" rx="10" fill="#ecfeff" stroke="#0e7490" stroke-width="1.5"/>
+<text x="700.0" y="201.5" font-size="12" fill="#0f172a" text-anchor="middle">Service</text>
+<text x="700.0" y="216.0" font-size="12" fill="#0f172a" text-anchor="middle">business logic</text>
+<rect x="820.0" y="180.0" width="180.0" height="50.0" rx="10" fill="#ffffff" stroke="#475569" stroke-width="1.5"/>
+<text x="910.0" y="201.5" font-size="12" fill="#0f172a" text-anchor="middle">Repository</text>
+<text x="910.0" y="216.0" font-size="12" fill="#0f172a" text-anchor="middle">Prisma (parameterized)</text>
+<path d="M 880.0 309.0 L 880.0 361.0 A 60.0 9 0 0 0 1000.0 361.0 L 1000.0 309.0 A 60.0 9 0 0 1 880.0 309.0 Z" fill="#eef2ff" stroke="#4338ca" stroke-width="1.5"/>
+<path d="M 880.0 309.0 A 60.0 9 0 0 0 1000.0 309.0" fill="none" stroke="#4338ca" stroke-width="1.5"/>
+<text x="940.0" y="338.8" font-size="12" fill="#0f172a" text-anchor="middle">PostgreSQL</text>
+<rect x="630.0" y="60.0" width="140.0" height="50.0" rx="4" fill="#f0fdf4" stroke="#15803d" stroke-width="1.5"/>
+<line x1="638.0" y1="60.0" x2="638.0" y2="110.0" stroke="#15803d" stroke-width="1"/>
+<line x1="762.0" y1="60.0" x2="762.0" y2="110.0" stroke="#15803d" stroke-width="1"/>
+<text x="700.0" y="81.5" font-size="12" fill="#0f172a" text-anchor="middle">engine</text>
+<text x="700.0" y="96.0" font-size="12" fill="#0f172a" text-anchor="middle">money math</text>
+<rect x="620.0" y="300.0" width="160.0" height="50.0" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+<text x="700.0" y="321.5" font-size="12" fill="#0f172a" text-anchor="middle">LoggingInterceptor</text>
+<text x="700.0" y="336.0" font-size="12" fill="#0f172a" text-anchor="middle">JSON log line</text>
+<rect x="420.0" y="60.0" width="160.0" height="50.0" rx="10" fill="#fee2e2" stroke="#b91c1c" stroke-width="1.5"/>
+<text x="500.0" y="81.5" font-size="12" fill="#0f172a" text-anchor="middle">ProblemDetailsFilter</text>
+<text x="500.0" y="96.0" font-size="12" fill="#0f172a" text-anchor="middle">RFC 7807 on error</text>
+</g>
+</svg>
+</div>
+        <p class="src">Formats: <code>../svg/request-lifecycle.svg</code> · <code>../png/request-lifecycle.png</code> · <code>../drawio/request-lifecycle.drawio</code> (editable)</p>
+      </section>
+    </main><footer>cost-reaper · HTML flowcharts (FE-47) · regenerate with <code>python3 scripts/render-diagrams.py</code></footer></body></html>

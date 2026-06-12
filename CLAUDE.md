@@ -249,7 +249,7 @@
 | **EP-7 Scenario & Version Mgmt** | Compare & baseline. | FE-24 Scenarios *(post-MVP)* · FE-25 Versioning/baselines + diff *(post-MVP)* |
 | **EP-8 Dashboard, Search & Collaboration** | Find & work together. | FE-26 List/search/filter (MVP) · FE-27 Dashboard *(post-MVP)* · FE-28 Comments/sharing *(post-MVP)* |
 | **EP-9 Observability, Security & Compliance** | Run safely. | FE-29 Structured logging + correlation IDs · FE-30 Audit trail · FE-31 Security hardening/OWASP · FE-32 Backup/restore |
-| **EP-10 Documentation & Onboarding** | Make it usable. | FE-33 README/quickstart · FE-34 Architecture + ADRs · FE-35 API docs (OpenAPI/Swagger UI) · FE-36 User guide · FE-37 Runbook/deploy guide · FE-47 **HTML documentation site + HTML flowchart designs** (draw.io: architecture, workflow, calculation flow, checklist) |
+| **EP-10 Documentation & Onboarding** | Make it usable. | FE-33 README/quickstart · FE-34 Architecture + ADRs · FE-35 API docs (OpenAPI/Swagger UI) · FE-36 User guide · FE-37 Runbook/deploy guide · FE-47 **HTML documentation site + flowchart designs** (draw.io sources → SVG/PNG/HTML/Visio per-format folders: architecture, workflow, calculation flow, checklist, request lifecycle) |
 | **EP-11 Cloud Pricing & Provider Integration** | Price compute from AWS, GCP, Azure. | FE-38 Provider price catalog (AWS/GCP/Azure: regions, services, instances, units) · FE-39 Cloud compute line items (provider/region/instance/usage → cost) · FE-40 Live price sync via provider pricing APIs *(post-MVP)* |
 | **EP-12 Estimate Governance: Workflow & Smart Validation** | Customizable lifecycle + automated completeness. | FE-43 Customizable estimate **workflow** (configurable stages/transitions, role-gated, transition history) · FE-44 Automated **smart checklist** (rule-driven validation of resource assignment + pricing + costing; gates workflow transitions) |
 
@@ -517,7 +517,7 @@ All scripts must succeed on a clean checkout with only Docker installed, and fai
 | `docs/RUNBOOK.md` / `docs/DEPLOYMENT.md` | Environments, config, deploy steps, health checks, rollback, backup/restore. |
 | `docs/PRODUCT_BRIEF.md` | This document (requirements, epics, traceability) kept current. |
 | `docs/html/` | **HTML documentation site** — the docs rendered as a styled, navigable, offline-openable HTML hub, kept in sync with the Markdown sources. |
-| `docs/html/flowcharts.html` (+ `docs/diagrams/*.drawio`) | **HTML flowchart designs** — **draw.io / diagrams.net** flowcharts (editable `.drawio` source rendered via the official viewer): system architecture, estimate **approval workflow** (FR-24), **estimation calculation flow** (upcharge→contingency→monthly/yearly), **smart-checklist gating** (FR-25), and the API request lifecycle. |
+| `docs/diagrams/` | **Flowchart designs** authored in **draw.io / diagrams.net**, exported per-format into their own folders: `drawio/` (editable source), `svg/` (vector — opens anywhere), `png/` (raster 2×), `html/` (self-contained inline-SVG), `visio/` (export how-to). Diagrams: architecture, estimate **approval workflow** (FR-24), **calculation flow** (FR-7/22/23), **smart-checklist gating** (FR-25), request lifecycle (NFR-9). Rendered at `docs/html/flowcharts.html`; regenerate via `scripts/render-diagrams.py` (`.drawio` → SVG + PNG). |
 | `CONTRIBUTING.md` | Branching, commits referencing FR/FE IDs, code style, test expectations. |
 | `CHANGELOG.md` | Per-increment summary of what shipped. |
 
