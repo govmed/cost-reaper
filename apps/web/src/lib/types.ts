@@ -7,6 +7,17 @@ export interface AuthUser {
   role: Role;
   displayName: string | null;
 }
+
+export interface UserDto {
+  id: string;
+  email: string;
+  role: Role;
+  displayName: string | null;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface LoginResponse {
   user: AuthUser;
   accessToken: string;

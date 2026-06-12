@@ -8,6 +8,7 @@ import type {
   EstimateWorkflow,
   Paginated,
   RateCard,
+  UserDto,
 } from './types';
 
 export function useEstimates(params: { q?: string; status?: string }) {
@@ -96,6 +97,30 @@ export function useCloudPrices() {
     queryKey: ['cloud-prices'],
     queryFn: () => api<CloudPrice[]>('/cloud-prices'),
   });
+}
+
+export function useUsers() {
+  return useQuery({ queryKey: ['users'], queryFn: () => api<UserDto[]>('/users') });
+}
+
+export function useUserMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => qc.invalidateQueries({ queryKey: ['users'] });
+  return {
+    create: useMutation({
+      mutationFn: (body: unknown) => api('/users', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    update: useMutation({
+      mutationFn: (v: { id: string; body: unknown }) =>
+        api(`/users/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => api(`/users/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
 }
 
 export function useCreateEstimate() {

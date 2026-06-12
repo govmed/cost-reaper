@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Admin UI — Part 2: Users (FE-45 frontend)
+
+#### Added
+- **Users** admin page (nav link visible to admins): list users, **create** (email/password/role/name), **change role** and **activate/deactivate** inline, and **delete**. Backed by the existing admin-only `/users` API.
+
 ### Admin UI — Part 1: Rate Cards (FE-10 frontend)
 
 #### Added
