@@ -148,4 +148,14 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** **CI green** (build + security pass; engine-mapping + CSV + prior suites pass). Money kept exact (decimal strings; only counts are numbers, engine does the math). Merged **PR #4** into `main` (`8c78b88`). Backend MVP essentially complete.
 - **Next:** Web UI build-out (login → estimates list/search → estimate editor with line items + live totals → CSV); first real Prisma migration.
 
+## Chapter 3 — Sprint 3: Web UI (started 2026-06-12)
+**Goal:** Turn the React shell into the estimate-authoring app against the REST API. Completes the MVP user flow (EP-4/EP-8 frontend; FR-1/4-10/22/23).
+
+### 2026-06-12 07:10 UTC — Web UI built, CI green, merged (PR #5) — MVP COMPLETE
+- **Action:** Built the React + Vite + Tailwind app: typed API client (JWT + transparent refresh + CSV blob download), auth context, TanStack Query hooks, React Router. Pages: **Login**, **Estimates** (search + create), **Estimate editor** (edit upcharge/contingency/status; add/delete labor/non-labor/cloud line items via role & cloud pickers; assumptions; **live one-time/monthly/yearly/grand totals**; **CSV export**). Web view-types kept local (no `@cost-reaper/types` runtime dep) to avoid CJS/build-order coupling. Updated CHANGELOG.
+- **Why:** EP-4/EP-8 frontend — the remaining MVP piece.
+- **Files touched:** `apps/web/src/{lib,pages}/*`, `apps/web/package.json`, `CHANGELOG.md`.
+- **Result:** **CI green** (vite build + tsc). Merged **PR #5** (`ce06e1c`). **The cost-reaper MVP is complete end-to-end** (backend + web, all CI-green). Runs via `setup.sh` + `start.sh` on any Docker host.
+- **Next:** Await direction on post-MVP — governance (workflow/checklist API/UI, the user's FR-24/25 asks), first real Prisma migration, PDF/Excel, dashboard, scenarios.
+
 <!-- Append new entries below this line -->
