@@ -49,7 +49,10 @@ export function useChecklist(id: string | undefined) {
 }
 
 export function useCloudPrices() {
-  return useQuery({ queryKey: ['cloud-prices'], queryFn: () => api<CloudPrice[]>('/cloud-prices') });
+  return useQuery({
+    queryKey: ['cloud-prices'],
+    queryFn: () => api<CloudPrice[]>('/cloud-prices'),
+  });
 }
 
 export function useCreateEstimate() {

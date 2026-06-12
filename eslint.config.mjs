@@ -12,6 +12,7 @@ export default tseslint.config(
       '**/generated/**',
       '**/node_modules/**',
       '**/*.config.{js,cjs,mjs,ts}',
+      '**/*.cjs',
       '**/vite.config.ts',
     ],
   },

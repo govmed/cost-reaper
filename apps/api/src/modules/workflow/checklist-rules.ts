@@ -84,7 +84,9 @@ const EVALUATORS: Record<string, Evaluator> = {
     const bad = all.filter((x) => !x.billingPeriod);
     return {
       passed: bad.length === 0,
-      message: bad.length ? `${bad.length} line(s) missing a billing period.` : 'All lines have a billing period.',
+      message: bad.length
+        ? `${bad.length} line(s) missing a billing period.`
+        : 'All lines have a billing period.',
     };
   },
   upcharge_set: (e) => ({
@@ -104,7 +106,10 @@ const EVALUATORS: Record<string, Evaluator> = {
   },
 };
 
-export function evaluateChecklist(rules: ChecklistRuleDef[], e: ChecklistEstimate): ChecklistResult {
+export function evaluateChecklist(
+  rules: ChecklistRuleDef[],
+  e: ChecklistEstimate,
+): ChecklistResult {
   const items: ChecklistItemResult[] = rules.map((r) => {
     const evaluator = EVALUATORS[r.key];
     const res = evaluator ? evaluator(e) : { passed: true, message: r.description };

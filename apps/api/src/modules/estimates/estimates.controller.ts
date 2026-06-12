@@ -117,7 +117,11 @@ export class EstimatesController {
 
   @Delete(':id/non-labor-items/:itemId')
   @Roles('ADMIN', 'ESTIMATOR')
-  delNonLabor(@Param('id') id: string, @Param('itemId') itemId: string, @CurrentUser() u: AuthUser) {
+  delNonLabor(
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+    @CurrentUser() u: AuthUser,
+  ) {
     return this.estimates.deleteNonLabor(id, itemId, u.id);
   }
 
@@ -149,7 +153,11 @@ export class EstimatesController {
 
   @Delete(':id/assumptions/:itemId')
   @Roles('ADMIN', 'ESTIMATOR')
-  delAssumption(@Param('id') id: string, @Param('itemId') itemId: string, @CurrentUser() u: AuthUser) {
+  delAssumption(
+    @Param('id') id: string,
+    @Param('itemId') itemId: string,
+    @CurrentUser() u: AuthUser,
+  ) {
     return this.estimates.deleteAssumption(id, itemId, u.id);
   }
 }

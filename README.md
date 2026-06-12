@@ -38,26 +38,26 @@ do **not** need Node, pnpm, or PostgreSQL installed on the host.
 
 Then open:
 
-| Service | URL |
-|---|---|
-| Web app | http://localhost:5173 |
-| API | http://localhost:8000/api/v1 |
-| API health | http://localhost:8000/health |
-| Swagger / OpenAPI | http://localhost:8000/docs |
+| Service           | URL                          |
+| ----------------- | ---------------------------- |
+| Web app           | http://localhost:5173        |
+| API               | http://localhost:8000/api/v1 |
+| API health        | http://localhost:8000/health |
+| Swagger / OpenAPI | http://localhost:8000/docs   |
 
 A seeded **Admin** is created from `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in your `.env`.
 
 ## Common commands
 
-| Task | Linux/macOS | Windows |
-|---|---|---|
-| Set up from scratch | `./scripts/setup.sh` | `./scripts/setup.ps1` |
-| Start the stack | `./scripts/start.sh` | `./scripts/start.ps1` |
-| Stop the stack | `./scripts/stop.sh` | `./scripts/stop.ps1` |
-| Run tests | `./scripts/test.sh` | `./scripts/test.ps1` |
-| Run migrations | `./scripts/migrate.sh` | `./scripts/migrate.ps1` |
-| (Re)seed data | `./scripts/seed.sh` | `./scripts/seed.ps1` |
-| Tail logs | `./scripts/logs.sh` | `./scripts/logs.ps1` |
+| Task                | Linux/macOS            | Windows                 |
+| ------------------- | ---------------------- | ----------------------- |
+| Set up from scratch | `./scripts/setup.sh`   | `./scripts/setup.ps1`   |
+| Start the stack     | `./scripts/start.sh`   | `./scripts/start.ps1`   |
+| Stop the stack      | `./scripts/stop.sh`    | `./scripts/stop.ps1`    |
+| Run tests           | `./scripts/test.sh`    | `./scripts/test.ps1`    |
+| Run migrations      | `./scripts/migrate.sh` | `./scripts/migrate.ps1` |
+| (Re)seed data       | `./scripts/seed.sh`    | `./scripts/seed.ps1`    |
+| Tail logs           | `./scripts/logs.sh`    | `./scripts/logs.ps1`    |
 
 (Linux/macOS users can also use the `Makefile`: `make setup`, `make up`, `make down`, `make test`.)
 

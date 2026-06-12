@@ -23,13 +23,13 @@ This document is kept current each increment (NFR-12).
 
 ## Monorepo modules (NFR-15)
 
-| Package | Role |
-|---|---|
-| `apps/web` | React + Vite SPA. Tailwind; (TanStack Table/Query + RHF/Zod arrive with the estimate UI). |
-| `apps/api` | NestJS REST API. Feature modules under `src/modules/*`: `health` now; `auth`, `users`, `rate-cards`, `estimates`, `cloud-pricing`, `workflow`, `checklist`, `export`, `audit` per roadmap. |
-| `packages/types` | The shared **Zod** contract (+ inferred TS types) used by both tiers — the single source of truth across the wire. |
-| `packages/engine` | The **pure** estimation engine (no I/O): upcharge → contingency order, monthly/yearly rollups, category subtotals. Exhaustively unit-tested. |
-| `packages/config` | Shared Tailwind / tsconfig presets. (ESLint is a single root flat config.) |
+| Package           | Role                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `apps/web`        | React + Vite SPA. Tailwind; (TanStack Table/Query + RHF/Zod arrive with the estimate UI).                                                                                                  |
+| `apps/api`        | NestJS REST API. Feature modules under `src/modules/*`: `health` now; `auth`, `users`, `rate-cards`, `estimates`, `cloud-pricing`, `workflow`, `checklist`, `export`, `audit` per roadmap. |
+| `packages/types`  | The shared **Zod** contract (+ inferred TS types) used by both tiers — the single source of truth across the wire.                                                                         |
+| `packages/engine` | The **pure** estimation engine (no I/O): upcharge → contingency order, monthly/yearly rollups, category subtotals. Exhaustively unit-tested.                                               |
+| `packages/config` | Shared Tailwind / tsconfig presets. (ESLint is a single root flat config.)                                                                                                                 |
 
 **Dependency direction points inward toward the domain.** `engine` depends only on `types`; the API depends on `engine` + `types`; the web depends on `types`. No circular dependencies. Pluggable concerns sit behind strategy interfaces (`PricingProvider`, `Exporter`, `WorkflowEngine`, `ChecklistEngine`).
 
@@ -51,18 +51,18 @@ This document is kept current each increment (NFR-12).
 
 ## How the NFRs are met (foundation)
 
-| NFR | Where |
-|---|---|
-| NFR-1 Performance | Pure in-memory engine; indexed FKs; pooled DB. |
-| NFR-2 Scalability | Stateless API; container-replicable. |
-| NFR-3 Reliability | `/health` + `/ready`; healthchecks in compose; idempotent setup/migrate. |
-| NFR-4 Security | Secrets via env only; argon2 for the seeded admin; RBAC guards (per roadmap); `pnpm audit` in CI. |
-| NFR-5 Data integrity | Decimal money; migrations; FKs; snapshots. |
-| NFR-6 Maintainability | Layered modules; ESLint + Prettier + tsc; ≥80% engine coverage. |
-| NFR-7 Portability | Docker; `.sh` + `.ps1` scripts; Node-free host. |
-| NFR-9 Observability | Correlation ids; structured JSON logs; problem+json errors. |
-| NFR-10 Configurability | `.env.example`; all config from env. |
-| NFR-15 Modularity | Monorepo packages + feature modules + strategy seams. |
-| NFR-16 Access control | Deny-by-default RBAC, server-side (identity module, per roadmap). |
+| NFR                    | Where                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------- |
+| NFR-1 Performance      | Pure in-memory engine; indexed FKs; pooled DB.                                                    |
+| NFR-2 Scalability      | Stateless API; container-replicable.                                                              |
+| NFR-3 Reliability      | `/health` + `/ready`; healthchecks in compose; idempotent setup/migrate.                          |
+| NFR-4 Security         | Secrets via env only; argon2 for the seeded admin; RBAC guards (per roadmap); `pnpm audit` in CI. |
+| NFR-5 Data integrity   | Decimal money; migrations; FKs; snapshots.                                                        |
+| NFR-6 Maintainability  | Layered modules; ESLint + Prettier + tsc; ≥80% engine coverage.                                   |
+| NFR-7 Portability      | Docker; `.sh` + `.ps1` scripts; Node-free host.                                                   |
+| NFR-9 Observability    | Correlation ids; structured JSON logs; problem+json errors.                                       |
+| NFR-10 Configurability | `.env.example`; all config from env.                                                              |
+| NFR-15 Modularity      | Monorepo packages + feature modules + strategy seams.                                             |
+| NFR-16 Access control  | Deny-by-default RBAC, server-side (identity module, per roadmap).                                 |
 
 See [`adr/`](adr/) for the decisions behind these choices.

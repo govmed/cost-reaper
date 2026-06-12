@@ -6,6 +6,14 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Hardening (NFR-6)
+
+#### Changed
+- **CI quality gates are now blocking**: `format:check` + `lint` no longer `continue-on-error`. Ran Prettier across the repo; fixed the one ESLint error (`.cjs` config files are ignored) and removed unused `eslint-disable` directives. The append-heavy living docs (`CLAUDE.md`, `PROJECT_LOG.md`, `AUDIT_LOG.md`) are prettier-ignored.
+
+#### Added
+- **Playwright e2e** smoke test (`apps/web/e2e/smoke.spec.ts`): login → create estimate → add a line → see totals + checklist. New CI **`e2e` job** builds the Docker images, runs the full stack, migrates + seeds, and drives the browser — which also **exercises the Docker image build** (previously only the Node pipeline ran in CI). Verified the stack + critical path locally end-to-end.
+
 ### Database — first real Prisma migration (NFR-5)
 
 #### Added

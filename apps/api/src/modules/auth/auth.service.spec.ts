@@ -12,7 +12,13 @@ function makeService(users: any[]) {
       findUnique: async ({ where }: any) =>
         users.find((u) => (where.email ? u.email === where.email : u.id === where.id)) ?? null,
       create: async ({ data }: any) => {
-        const u = { id: `u${users.length + 1}`, role: 'ESTIMATOR', isActive: true, displayName: null, ...data };
+        const u = {
+          id: `u${users.length + 1}`,
+          role: 'ESTIMATOR',
+          isActive: true,
+          displayName: null,
+          ...data,
+        };
         users.push(u);
         return u;
       },
@@ -37,7 +43,14 @@ describe('AuthService', () => {
 
   it('rejects a duplicate email', async () => {
     const svc = makeService([
-      { id: 'u1', email: 'dup@x.com', passwordHash: 'x', role: 'ESTIMATOR', isActive: true, displayName: null },
+      {
+        id: 'u1',
+        email: 'dup@x.com',
+        passwordHash: 'x',
+        role: 'ESTIMATOR',
+        isActive: true,
+        displayName: null,
+      },
     ]);
     await expect(svc.register({ email: 'dup@x.com', password: 'password123' })).rejects.toThrow();
   });
@@ -45,7 +58,14 @@ describe('AuthService', () => {
   it('logs in with the correct password and rejects a wrong one', async () => {
     const passwordHash = await argon2.hash('password123');
     const svc = makeService([
-      { id: 'u1', email: 'a@x.com', passwordHash, role: 'ADMIN', isActive: true, displayName: null },
+      {
+        id: 'u1',
+        email: 'a@x.com',
+        passwordHash,
+        role: 'ADMIN',
+        isActive: true,
+        displayName: null,
+      },
     ]);
     const ok = await svc.login({ email: 'a@x.com', password: 'password123' });
     expect(ok.user.role).toBe('ADMIN');
@@ -56,7 +76,14 @@ describe('AuthService', () => {
   it('issues fresh tokens from a valid refresh token', async () => {
     const passwordHash = await argon2.hash('password123');
     const svc = makeService([
-      { id: 'u1', email: 'a@x.com', passwordHash, role: 'ESTIMATOR', isActive: true, displayName: null },
+      {
+        id: 'u1',
+        email: 'a@x.com',
+        passwordHash,
+        role: 'ESTIMATOR',
+        isActive: true,
+        displayName: null,
+      },
     ]);
     const { refreshToken } = await svc.login({ email: 'a@x.com', password: 'password123' });
     const pair = await svc.refresh(refreshToken);

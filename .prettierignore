@@ -7,3 +7,9 @@ pnpm-lock.yaml
 **/*.tsbuildinfo
 apps/web/dist
 CHANGELOG.md
+
+# Living docs are append-heavy and edited with exact-string anchors — leave them as-is.
+CLAUDE.md
+PROJECT_LOG.md
+AUDIT_LOG.md
+cost-estimator-build-prompt.md
