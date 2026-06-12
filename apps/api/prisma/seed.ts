@@ -327,12 +327,311 @@ async function seedChecklistRules() {
   }
 }
 
+// ─── Reference data (FR-29, NFR-17) ──────────────────────────────────────────
+// Baseline DB-driven reference/lookup values. Built-ins (is_builtin) may be
+// deactivated/renamed/re-sequenced by admins but not deleted. Idempotent.
+
+interface RefVal {
+  code: string;
+  name: string;
+  children?: { code: string; name: string }[];
+}
+interface RefType {
+  code: string;
+  name: string;
+  desc?: string;
+  values: RefVal[];
+}
+
+const REFERENCE_DATA: RefType[] = [
+  {
+    code: 'SDLC_PHASE',
+    name: 'SDLC Phase',
+    desc: 'Software delivery lifecycle phases and their tasks',
+    values: [
+      {
+        code: 'PLANNING',
+        name: 'Planning',
+        children: [
+          { code: 'REQUIREMENTS', name: 'Requirements' },
+          { code: 'ESTIMATION', name: 'Estimation' },
+        ],
+      },
+      {
+        code: 'DESIGN',
+        name: 'Design',
+        children: [
+          { code: 'ARCHITECTURE', name: 'Architecture' },
+          { code: 'UX_DESIGN', name: 'UX Design' },
+        ],
+      },
+      {
+        code: 'DEVELOPMENT',
+        name: 'Development',
+        children: [
+          { code: 'CODING', name: 'Coding' },
+          { code: 'CODE_REVIEW', name: 'Code Review' },
+        ],
+      },
+      {
+        code: 'TESTING',
+        name: 'Testing',
+        children: [
+          { code: 'UNIT_TESTING', name: 'Unit Testing' },
+          { code: 'INTEGRATION_TESTING', name: 'Integration Testing' },
+          { code: 'UAT', name: 'User Acceptance Testing' },
+        ],
+      },
+      {
+        code: 'DEPLOYMENT',
+        name: 'Deployment',
+        children: [
+          { code: 'RELEASE', name: 'Release' },
+          { code: 'CUTOVER', name: 'Cutover' },
+        ],
+      },
+      {
+        code: 'MAINTENANCE',
+        name: 'Maintenance',
+        children: [
+          { code: 'SUPPORT', name: 'Support' },
+          { code: 'ENHANCEMENTS', name: 'Enhancements' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'ESTIMATE_STATUS',
+    name: 'Estimate Status',
+    values: [
+      { code: 'DRAFT', name: 'Draft' },
+      { code: 'FINAL', name: 'Final' },
+    ],
+  },
+  {
+    code: 'BILLING_PERIOD',
+    name: 'Billing Period',
+    values: [
+      { code: 'ONE_TIME', name: 'One-time' },
+      { code: 'MONTHLY', name: 'Monthly' },
+      { code: 'YEARLY', name: 'Yearly' },
+    ],
+  },
+  {
+    code: 'RATE_UNIT',
+    name: 'Rate Unit',
+    values: [
+      { code: 'HOUR', name: 'Hour' },
+      { code: 'DAY', name: 'Day' },
+    ],
+  },
+  {
+    code: 'CLOUD_PROVIDER',
+    name: 'Cloud Provider',
+    values: [
+      { code: 'AWS', name: 'Amazon Web Services' },
+      { code: 'GCP', name: 'Google Cloud' },
+      { code: 'AZURE', name: 'Microsoft Azure' },
+    ],
+  },
+  {
+    code: 'CLOUD_PRICE_UNIT',
+    name: 'Cloud Price Unit',
+    values: [
+      { code: 'HOUR', name: 'Hour' },
+      { code: 'MONTH', name: 'Month' },
+      { code: 'GB_MONTH', name: 'GB-month' },
+      { code: 'REQUEST', name: 'Request' },
+    ],
+  },
+  {
+    code: 'NON_LABOR_TYPE',
+    name: 'Non-Labor Type',
+    values: [
+      { code: 'FIXED', name: 'Fixed' },
+      { code: 'RECURRING', name: 'Recurring' },
+    ],
+  },
+  {
+    code: 'ROLE',
+    name: 'User Role',
+    values: [
+      { code: 'ADMIN', name: 'Administrator' },
+      { code: 'ESTIMATOR', name: 'Estimator' },
+      { code: 'VIEWER', name: 'Viewer' },
+    ],
+  },
+  {
+    code: 'COST_CATEGORY',
+    name: 'Cost Category',
+    values: [
+      { code: 'LABOR', name: 'Labor' },
+      { code: 'LICENSES', name: 'Licenses' },
+      { code: 'INFRASTRUCTURE', name: 'Infrastructure' },
+      { code: 'THIRD_PARTY', name: 'Third-party Services' },
+      { code: 'TRAVEL', name: 'Travel' },
+      { code: 'OTHER', name: 'Other' },
+    ],
+  },
+  {
+    code: 'CHECKLIST_SEVERITY',
+    name: 'Checklist Severity',
+    values: [
+      { code: 'BLOCKER', name: 'Blocker' },
+      { code: 'WARNING', name: 'Warning' },
+      { code: 'INFO', name: 'Info' },
+    ],
+  },
+  {
+    code: 'CHECKLIST_SCOPE',
+    name: 'Checklist Scope',
+    values: [
+      { code: 'ESTIMATE', name: 'Estimate' },
+      { code: 'LABOR', name: 'Labor' },
+      { code: 'NONLABOR', name: 'Non-labor' },
+      { code: 'CLOUD', name: 'Cloud' },
+      { code: 'RESOURCE', name: 'Resource' },
+    ],
+  },
+  {
+    code: 'WORKFLOW_STAGE',
+    name: 'Workflow Stage',
+    values: [
+      { code: 'DRAFT', name: 'Draft' },
+      { code: 'IN_REVIEW', name: 'In Review' },
+      { code: 'APPROVED', name: 'Approved' },
+      { code: 'FINAL', name: 'Final' },
+      { code: 'ARCHIVED', name: 'Archived' },
+    ],
+  },
+  {
+    code: 'PRIORITY',
+    name: 'Priority',
+    values: [
+      { code: 'LOW', name: 'Low' },
+      { code: 'MEDIUM', name: 'Medium' },
+      { code: 'HIGH', name: 'High' },
+      { code: 'CRITICAL', name: 'Critical' },
+    ],
+  },
+  {
+    code: 'RESOURCE_TYPE',
+    name: 'Resource Type',
+    values: [
+      { code: 'EMPLOYEE', name: 'Employee' },
+      { code: 'CONTRACTOR', name: 'Contractor' },
+      { code: 'VENDOR', name: 'Vendor' },
+    ],
+  },
+  {
+    code: 'TESTING_PHASE',
+    name: 'Testing Phase',
+    desc: 'Testing phases and their testing types',
+    values: [
+      { code: 'UNIT', name: 'Unit', children: [{ code: 'COMPONENT', name: 'Component' }] },
+      {
+        code: 'INTEGRATION',
+        name: 'Integration',
+        children: [
+          { code: 'API_TESTING', name: 'API Testing' },
+          { code: 'CONTRACT_TESTING', name: 'Contract Testing' },
+        ],
+      },
+      {
+        code: 'SYSTEM',
+        name: 'System',
+        children: [
+          { code: 'E2E', name: 'End-to-end' },
+          { code: 'REGRESSION', name: 'Regression' },
+        ],
+      },
+      {
+        code: 'ACCEPTANCE',
+        name: 'Acceptance',
+        children: [
+          { code: 'UAT', name: 'User Acceptance' },
+          { code: 'PERFORMANCE', name: 'Performance' },
+          { code: 'SECURITY', name: 'Security' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'DOCUMENT_TYPE',
+    name: 'Document Type',
+    values: [
+      { code: 'SOW', name: 'Statement of Work' },
+      { code: 'PROPOSAL', name: 'Proposal' },
+      { code: 'ESTIMATE_SUMMARY', name: 'Estimate Summary' },
+      { code: 'ARCHITECTURE', name: 'Architecture Document' },
+    ],
+  },
+];
+
+async function seedReferenceData(adminId: string): Promise<void> {
+  for (let ti = 0; ti < REFERENCE_DATA.length; ti++) {
+    const t = REFERENCE_DATA[ti];
+    const type = await prisma.referenceType.upsert({
+      where: { code: t.code },
+      update: { displayName: t.name, description: t.desc ?? null, displayOrder: ti + 1 },
+      create: {
+        code: t.code,
+        displayName: t.name,
+        description: t.desc ?? null,
+        displayOrder: ti + 1,
+        createdById: adminId,
+        updatedById: adminId,
+      },
+    });
+    for (let vi = 0; vi < t.values.length; vi++) {
+      const v = t.values[vi];
+      const parent = await prisma.referenceValue.upsert({
+        where: { referenceTypeId_code: { referenceTypeId: type.id, code: v.code } },
+        update: { displayName: v.name, displayOrder: vi + 1, parentId: null, isBuiltin: true },
+        create: {
+          referenceTypeId: type.id,
+          code: v.code,
+          displayName: v.name,
+          displayOrder: vi + 1,
+          isBuiltin: true,
+          createdById: adminId,
+          updatedById: adminId,
+        },
+      });
+      const children = v.children ?? [];
+      for (let ci = 0; ci < children.length; ci++) {
+        const c = children[ci];
+        await prisma.referenceValue.upsert({
+          where: { referenceTypeId_code: { referenceTypeId: type.id, code: c.code } },
+          update: {
+            displayName: c.name,
+            displayOrder: ci + 1,
+            parentId: parent.id,
+            isBuiltin: true,
+          },
+          create: {
+            referenceTypeId: type.id,
+            parentId: parent.id,
+            code: c.code,
+            displayName: c.name,
+            displayOrder: ci + 1,
+            isBuiltin: true,
+            createdById: adminId,
+            updatedById: adminId,
+          },
+        });
+      }
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const admin = await seedAdmin();
   await seedRateCard(admin.id);
   await seedCloudPrices();
   await seedDefaultWorkflow(admin.id);
   await seedChecklistRules();
+  await seedReferenceData(admin.id);
   console.log(`Seed complete. Admin: ${admin.email}`);
 }
 

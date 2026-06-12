@@ -8,6 +8,8 @@ import type {
   EstimateWorkflow,
   Paginated,
   RateCard,
+  ReferenceType,
+  ReferenceValue,
   UserDto,
 } from './types';
 
@@ -161,5 +163,45 @@ export function useEstimateMutations(id: string) {
     delNonLabor: useMutation({ mutationFn: del('/non-labor-items'), onSuccess }),
     delCloud: useMutation({ mutationFn: del('/cloud-items'), onSuccess }),
     delAssumption: useMutation({ mutationFn: del('/assumptions'), onSuccess }),
+  };
+}
+
+// ── Reference data (FR-29) ────────────────────────────────────────────────────
+export function useReferenceTypes() {
+  return useQuery({
+    queryKey: ['reference-types'],
+    queryFn: () => api<ReferenceType[]>('/reference/types'),
+  });
+}
+
+export function useReferenceValues(typeCode: string | undefined, includeInactive = false) {
+  return useQuery({
+    queryKey: ['reference-values', typeCode, includeInactive],
+    queryFn: () =>
+      api<ReferenceValue[]>(
+        `/reference/types/${typeCode}/values${includeInactive ? '?all=true' : ''}`,
+      ),
+    enabled: Boolean(typeCode),
+  });
+}
+
+export function useReferenceMutations(typeCode: string | undefined) {
+  const qc = useQueryClient();
+  const onSuccess = () => qc.invalidateQueries({ queryKey: ['reference-values', typeCode] });
+  return {
+    createValue: useMutation({
+      mutationFn: (body: unknown) =>
+        api(`/reference/types/${typeCode}/values`, { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    updateValue: useMutation({
+      mutationFn: (v: { id: string; body: unknown }) =>
+        api(`/reference/values/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    deleteValue: useMutation({
+      mutationFn: (id: string) => api(`/reference/values/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
   };
 }

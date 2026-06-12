@@ -274,4 +274,20 @@ Built **Sprint 10** (FR-27 + FR-28 + stage gates + e2e) and folded the spec addi
 - **Spec:** FR-21a enriched + **FR-21b** (per-provider "last pulled") + freshness table; **FR-29/NFR-17/EP-13 + ADR 0007** (DB-driven reference data, generic `reference_type`/`reference_value` + parent-child); roadmap Sprint 11 for the reference-data refactor (incl. migrating the interim `SdlcPhase` enum). Updated living files.
 - Next: commit → PR → CI-green → merge.
 
+---
+### [2026-06-12 22:30 UTC] — USER
+Continue
+
+### [2026-06-12 22:30 UTC] — AGENT
+Merged Sprint 10 (PR #12, all CI green) and built **Sprint 11 — the reference-data platform (FR-29)**.
+**Actions taken:**
+- Merged PR #12; cleaned a corrupt macOS `Icon\r` git ref; synced `main` to `af1b30f`. Saved memory `reference-data-driven.md`.
+- **FE-50:** `ReferenceType`/`ReferenceValue` Prisma models (standard columns + parent-child self-FK) + migration `20260612140000_reference_data_platform` (verified: 3-migration fresh deploy + no drift).
+- **FE-51:** `ReferenceModule` — list types/values (nested, ordered, active/all) + admin-only audited CRUD; built-ins undeletable; pure `buildReferenceTree` + unit tests.
+- **FE-52:** seed of 16 baseline reference types (SDLC_PHASE→tasks, TESTING_PHASE→types, statuses, roles, categories, units, providers, severities, etc.), idempotent.
+- **FE-53:** **Reference data** admin web page (type list → value tree, add/rename/reorder/activate-deactivate/delete) + nav/route + query hooks + shared `reference.ts` contract.
+- **FE-54 start:** estimate editor SDLC-phase dropdowns now load labels/order from the reference API (fallback to codes).
+- Verified: full pipeline green in a clean container (format/lint/typecheck/**test 43**/build); live API smoke (16 types, nested values, CRUD round-trip, built-in delete→400, web 200). Updated CHANGELOG + living files.
+- Next: commit → PR → CI-green → merge; then finish FE-54 (remaining enum→reference column migration).
+
 <!-- Append new turns below this line -->
