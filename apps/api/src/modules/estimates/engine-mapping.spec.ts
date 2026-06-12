@@ -8,11 +8,27 @@ describe('buildEngineInput + computeEstimate', () => {
       globalUpchargePercent: 10,
       contingencyPercent: 0,
       labor: [
-        { id: 'l1', roleName: 'Engineer', rateSnapshot: '100', quantity: 2, units: 10, billingPeriod: 'ONE_TIME', upchargePercentOverride: null },
+        {
+          id: 'l1',
+          roleName: 'Engineer',
+          rateSnapshot: '100',
+          quantity: 2,
+          units: 10,
+          billingPeriod: 'ONE_TIME',
+          upchargePercentOverride: null,
+        },
       ],
       nonLabor: [],
       cloud: [
-        { id: 'c1', provider: 'AWS', unitPriceSnapshot: '0.10', quantity: 1, usageHoursPerMonth: 730, billingPeriod: 'MONTHLY', upchargePercentOverride: null },
+        {
+          id: 'c1',
+          provider: 'AWS',
+          unitPriceSnapshot: '0.10',
+          quantity: 1,
+          usageHoursPerMonth: 730,
+          billingPeriod: 'MONTHLY',
+          upchargePercentOverride: null,
+        },
       ],
     });
     const r = computeEstimate(input);
@@ -30,7 +46,15 @@ describe('buildEngineInput + computeEstimate', () => {
         globalUpchargePercent: 10,
         contingencyPercent: 0,
         labor: [
-          { id: 'l1', roleName: null, rateSnapshot: '1000', quantity: 1, units: 1, billingPeriod: 'ONE_TIME', upchargePercentOverride: 25 },
+          {
+            id: 'l1',
+            roleName: null,
+            rateSnapshot: '1000',
+            quantity: 1,
+            units: 1,
+            billingPeriod: 'ONE_TIME',
+            upchargePercentOverride: 25,
+          },
         ],
         nonLabor: [],
         cloud: [],

@@ -43,7 +43,12 @@ export class ChecklistService {
       })),
     };
     return evaluateChecklist(
-      rules.map((r) => ({ key: r.key, description: r.description, severity: r.severity, scope: r.scope })),
+      rules.map((r) => ({
+        key: r.key,
+        description: r.description,
+        severity: r.severity,
+        scope: r.scope,
+      })),
       e,
     );
   }

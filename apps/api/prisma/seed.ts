@@ -62,18 +62,88 @@ async function seedRateCard(adminId: string) {
 
 const CLOUD_PRICES = [
   // AWS — us-east-1
-  { provider: CloudProvider.AWS, region: 'us-east-1', service: 'EC2', skuOrInstance: 't3.medium', unit: CloudPriceUnit.HOUR, unitPrice: '0.041600' },
-  { provider: CloudProvider.AWS, region: 'us-east-1', service: 'EC2', skuOrInstance: 'm5.large', unit: CloudPriceUnit.HOUR, unitPrice: '0.096000' },
-  { provider: CloudProvider.AWS, region: 'us-east-1', service: 'EC2', skuOrInstance: 'c5.xlarge', unit: CloudPriceUnit.HOUR, unitPrice: '0.170000' },
-  { provider: CloudProvider.AWS, region: 'us-east-1', service: 'S3', skuOrInstance: 'Standard Storage', unit: CloudPriceUnit.GB_MONTH, unitPrice: '0.023000' },
+  {
+    provider: CloudProvider.AWS,
+    region: 'us-east-1',
+    service: 'EC2',
+    skuOrInstance: 't3.medium',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.041600',
+  },
+  {
+    provider: CloudProvider.AWS,
+    region: 'us-east-1',
+    service: 'EC2',
+    skuOrInstance: 'm5.large',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.096000',
+  },
+  {
+    provider: CloudProvider.AWS,
+    region: 'us-east-1',
+    service: 'EC2',
+    skuOrInstance: 'c5.xlarge',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.170000',
+  },
+  {
+    provider: CloudProvider.AWS,
+    region: 'us-east-1',
+    service: 'S3',
+    skuOrInstance: 'Standard Storage',
+    unit: CloudPriceUnit.GB_MONTH,
+    unitPrice: '0.023000',
+  },
   // GCP — us-central1
-  { provider: CloudProvider.GCP, region: 'us-central1', service: 'Compute Engine', skuOrInstance: 'e2-standard-2', unit: CloudPriceUnit.HOUR, unitPrice: '0.067006' },
-  { provider: CloudProvider.GCP, region: 'us-central1', service: 'Compute Engine', skuOrInstance: 'n2-standard-4', unit: CloudPriceUnit.HOUR, unitPrice: '0.194240' },
-  { provider: CloudProvider.GCP, region: 'us-central1', service: 'Cloud Storage', skuOrInstance: 'Standard Storage', unit: CloudPriceUnit.GB_MONTH, unitPrice: '0.020000' },
+  {
+    provider: CloudProvider.GCP,
+    region: 'us-central1',
+    service: 'Compute Engine',
+    skuOrInstance: 'e2-standard-2',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.067006',
+  },
+  {
+    provider: CloudProvider.GCP,
+    region: 'us-central1',
+    service: 'Compute Engine',
+    skuOrInstance: 'n2-standard-4',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.194240',
+  },
+  {
+    provider: CloudProvider.GCP,
+    region: 'us-central1',
+    service: 'Cloud Storage',
+    skuOrInstance: 'Standard Storage',
+    unit: CloudPriceUnit.GB_MONTH,
+    unitPrice: '0.020000',
+  },
   // Azure — eastus
-  { provider: CloudProvider.AZURE, region: 'eastus', service: 'Virtual Machines', skuOrInstance: 'B2ms', unit: CloudPriceUnit.HOUR, unitPrice: '0.083200' },
-  { provider: CloudProvider.AZURE, region: 'eastus', service: 'Virtual Machines', skuOrInstance: 'D2s_v5', unit: CloudPriceUnit.HOUR, unitPrice: '0.096000' },
-  { provider: CloudProvider.AZURE, region: 'eastus', service: 'Blob Storage', skuOrInstance: 'Hot LRS', unit: CloudPriceUnit.GB_MONTH, unitPrice: '0.018400' },
+  {
+    provider: CloudProvider.AZURE,
+    region: 'eastus',
+    service: 'Virtual Machines',
+    skuOrInstance: 'B2ms',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.083200',
+  },
+  {
+    provider: CloudProvider.AZURE,
+    region: 'eastus',
+    service: 'Virtual Machines',
+    skuOrInstance: 'D2s_v5',
+    unit: CloudPriceUnit.HOUR,
+    unitPrice: '0.096000',
+  },
+  {
+    provider: CloudProvider.AZURE,
+    region: 'eastus',
+    service: 'Blob Storage',
+    skuOrInstance: 'Hot LRS',
+    unit: CloudPriceUnit.GB_MONTH,
+    unitPrice: '0.018400',
+  },
 ];
 
 async function seedCloudPrices() {
@@ -108,7 +178,12 @@ async function seedDefaultWorkflow(adminId: string) {
   if (existing) return existing;
 
   const def = await prisma.workflowDefinition.create({
-    data: { name: 'Default Approval Workflow', isDefault: true, isActive: true, createdById: adminId },
+    data: {
+      name: 'Default Approval Workflow',
+      isDefault: true,
+      isActive: true,
+      createdById: adminId,
+    },
   });
 
   const stagesData = [
@@ -127,11 +202,41 @@ async function seedDefaultWorkflow(adminId: string) {
   }
 
   const transitions = [
-    { from: 'DRAFT', to: 'IN_REVIEW', allowedRole: Role.ESTIMATOR, label: 'Submit for review', requiresChecklistPass: true },
-    { from: 'IN_REVIEW', to: 'DRAFT', allowedRole: Role.ESTIMATOR, label: 'Return to draft', requiresChecklistPass: false },
-    { from: 'IN_REVIEW', to: 'APPROVED', allowedRole: Role.ADMIN, label: 'Approve', requiresChecklistPass: true },
-    { from: 'APPROVED', to: 'FINAL', allowedRole: Role.ADMIN, label: 'Finalize', requiresChecklistPass: true },
-    { from: 'FINAL', to: 'ARCHIVED', allowedRole: Role.ADMIN, label: 'Archive', requiresChecklistPass: false },
+    {
+      from: 'DRAFT',
+      to: 'IN_REVIEW',
+      allowedRole: Role.ESTIMATOR,
+      label: 'Submit for review',
+      requiresChecklistPass: true,
+    },
+    {
+      from: 'IN_REVIEW',
+      to: 'DRAFT',
+      allowedRole: Role.ESTIMATOR,
+      label: 'Return to draft',
+      requiresChecklistPass: false,
+    },
+    {
+      from: 'IN_REVIEW',
+      to: 'APPROVED',
+      allowedRole: Role.ADMIN,
+      label: 'Approve',
+      requiresChecklistPass: true,
+    },
+    {
+      from: 'APPROVED',
+      to: 'FINAL',
+      allowedRole: Role.ADMIN,
+      label: 'Finalize',
+      requiresChecklistPass: true,
+    },
+    {
+      from: 'FINAL',
+      to: 'ARCHIVED',
+      allowedRole: Role.ADMIN,
+      label: 'Archive',
+      requiresChecklistPass: false,
+    },
   ];
   for (const t of transitions) {
     await prisma.workflowTransition.create({
@@ -149,14 +254,55 @@ async function seedDefaultWorkflow(adminId: string) {
 }
 
 const CHECKLIST_RULES = [
-  { key: 'rate_card_selected', description: 'A rate card is selected for the estimate', severity: ChecklistSeverity.BLOCKER, scope: ChecklistScope.ESTIMATE },
-  { key: 'labor_role_assigned', description: 'Every labor line has a role/resource assigned with quantity and units', severity: ChecklistSeverity.BLOCKER, scope: ChecklistScope.LABOR },
-  { key: 'cloud_line_complete', description: 'Every cloud line has provider, region, instance, usage and a snapshotted unit price', severity: ChecklistSeverity.BLOCKER, scope: ChecklistScope.CLOUD },
-  { key: 'nonlabor_amount_period', description: 'Every non-labor line has an amount and a billing period', severity: ChecklistSeverity.BLOCKER, scope: ChecklistScope.NONLABOR },
-  { key: 'billing_period_set', description: 'No recurring line is missing a billing period', severity: ChecklistSeverity.BLOCKER, scope: ChecklistScope.ESTIMATE },
-  { key: 'upcharge_set', description: 'An upcharge percentage is set (or explicitly zero)', severity: ChecklistSeverity.WARNING, scope: ChecklistScope.ESTIMATE },
-  { key: 'contingency_set', description: 'A contingency percentage is set (or explicitly zero)', severity: ChecklistSeverity.WARNING, scope: ChecklistScope.ESTIMATE },
-  { key: 'totals_reconcile', description: 'One-time, monthly and yearly totals reconcile', severity: ChecklistSeverity.INFO, scope: ChecklistScope.ESTIMATE },
+  {
+    key: 'rate_card_selected',
+    description: 'A rate card is selected for the estimate',
+    severity: ChecklistSeverity.BLOCKER,
+    scope: ChecklistScope.ESTIMATE,
+  },
+  {
+    key: 'labor_role_assigned',
+    description: 'Every labor line has a role/resource assigned with quantity and units',
+    severity: ChecklistSeverity.BLOCKER,
+    scope: ChecklistScope.LABOR,
+  },
+  {
+    key: 'cloud_line_complete',
+    description:
+      'Every cloud line has provider, region, instance, usage and a snapshotted unit price',
+    severity: ChecklistSeverity.BLOCKER,
+    scope: ChecklistScope.CLOUD,
+  },
+  {
+    key: 'nonlabor_amount_period',
+    description: 'Every non-labor line has an amount and a billing period',
+    severity: ChecklistSeverity.BLOCKER,
+    scope: ChecklistScope.NONLABOR,
+  },
+  {
+    key: 'billing_period_set',
+    description: 'No recurring line is missing a billing period',
+    severity: ChecklistSeverity.BLOCKER,
+    scope: ChecklistScope.ESTIMATE,
+  },
+  {
+    key: 'upcharge_set',
+    description: 'An upcharge percentage is set (or explicitly zero)',
+    severity: ChecklistSeverity.WARNING,
+    scope: ChecklistScope.ESTIMATE,
+  },
+  {
+    key: 'contingency_set',
+    description: 'A contingency percentage is set (or explicitly zero)',
+    severity: ChecklistSeverity.WARNING,
+    scope: ChecklistScope.ESTIMATE,
+  },
+  {
+    key: 'totals_reconcile',
+    description: 'One-time, monthly and yearly totals reconcile',
+    severity: ChecklistSeverity.INFO,
+    scope: ChecklistScope.ESTIMATE,
+  },
 ];
 
 async function seedChecklistRules() {
@@ -164,7 +310,13 @@ async function seedChecklistRules() {
     await prisma.checklistRule.upsert({
       where: { key: r.key },
       update: { description: r.description, severity: r.severity, scope: r.scope },
-      create: { key: r.key, description: r.description, severity: r.severity, scope: r.scope, isBuiltin: true },
+      create: {
+        key: r.key,
+        description: r.description,
+        severity: r.severity,
+        scope: r.scope,
+        isBuiltin: true,
+      },
     });
   }
 }
@@ -175,13 +327,11 @@ async function main(): Promise<void> {
   await seedCloudPrices();
   await seedDefaultWorkflow(admin.id);
   await seedChecklistRules();
-  // eslint-disable-next-line no-console
   console.log(`Seed complete. Admin: ${admin.email}`);
 }
 
 main()
   .catch((err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exitCode = 1;
   })

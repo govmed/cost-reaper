@@ -21,7 +21,9 @@ const PERIODS: BillingPeriod[] = ['ONE_TIME', 'MONTHLY', 'YEARLY'];
 
 function Card({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded-xl border p-4 ${accent ? 'border-brand bg-teal-50' : 'border-slate-200 bg-white'}`}>
+    <div
+      className={`rounded-xl border p-4 ${accent ? 'border-brand bg-teal-50' : 'border-slate-200 bg-white'}`}
+    >
       <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
       <div className="mt-1 text-lg font-semibold tabular-nums">{value}</div>
     </div>
@@ -240,10 +242,18 @@ function GovernanceSection({
 }
 
 function Th({ children, right }: { children: ReactNode; right?: boolean }) {
-  return <th className={`px-3 py-2 font-medium ${right ? 'text-right' : 'text-left'}`}>{children}</th>;
+  return (
+    <th className={`px-3 py-2 font-medium ${right ? 'text-right' : 'text-left'}`}>{children}</th>
+  );
 }
 
-function PeriodSelect({ value, onChange }: { value: BillingPeriod; onChange: (v: BillingPeriod) => void }) {
+function PeriodSelect({
+  value,
+  onChange,
+}: {
+  value: BillingPeriod;
+  onChange: (v: BillingPeriod) => void;
+}) {
   return (
     <select
       value={value}
@@ -308,7 +318,10 @@ function LaborSection({
               <td className="px-3 py-2">{l.billingPeriod}</td>
               <td className="px-3 py-2 text-right tabular-nums">{l.lineTotal}</td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => m.delLabor.mutate(l.id)} className="text-rose-600 hover:underline">
+                <button
+                  onClick={() => m.delLabor.mutate(l.id)}
+                  className="text-rose-600 hover:underline"
+                >
                   Delete
                 </button>
               </td>
@@ -317,7 +330,11 @@ function LaborSection({
         </tbody>
       </table>
       <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <select value={roleId} onChange={(e) => setRoleId(e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64">
+        <select
+          value={roleId}
+          onChange={(e) => setRoleId(e.target.value)}
+          className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64"
+        >
           <option value="">Select role…</option>
           {roles.map((r) => (
             <option key={r.id} value={r.id}>
@@ -325,10 +342,26 @@ function LaborSection({
             </option>
           ))}
         </select>
-        <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" className="border border-slate-300 rounded px-2 py-1 text-sm w-20" placeholder="qty" />
-        <input value={units} onChange={(e) => setUnits(e.target.value)} type="number" className="border border-slate-300 rounded px-2 py-1 text-sm w-24" placeholder="units" />
+        <input
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
+          placeholder="qty"
+        />
+        <input
+          value={units}
+          onChange={(e) => setUnits(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
+          placeholder="units"
+        />
         <PeriodSelect value={period} onChange={setPeriod} />
-        <button onClick={add} disabled={!roleId} className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50">
+        <button
+          onClick={add}
+          disabled={!roleId}
+          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+        >
           Add labor
         </button>
       </div>
@@ -374,7 +407,10 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
               <td className="px-3 py-2">{n.billingPeriod}</td>
               <td className="px-3 py-2 text-right tabular-nums">{n.lineTotal}</td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => m.delNonLabor.mutate(n.id)} className="text-rose-600 hover:underline">
+                <button
+                  onClick={() => m.delNonLabor.mutate(n.id)}
+                  className="text-rose-600 hover:underline"
+                >
                   Delete
                 </button>
               </td>
@@ -383,10 +419,25 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
         </tbody>
       </table>
       <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <input value={category} onChange={(e) => setCategory(e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm" placeholder="Category (e.g. Licenses)" />
-        <input value={amount} onChange={(e) => setAmount(e.target.value)} type="number" className="border border-slate-300 rounded px-2 py-1 text-sm w-32" placeholder="amount" />
+        <input
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border border-slate-300 rounded px-2 py-1 text-sm"
+          placeholder="Category (e.g. Licenses)"
+        />
+        <input
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-32"
+          placeholder="amount"
+        />
         <PeriodSelect value={period} onChange={setPeriod} />
-        <button onClick={add} disabled={!category.trim() || !amount} className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50">
+        <button
+          onClick={add}
+          disabled={!category.trim() || !amount}
+          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+        >
           Add non-labor
         </button>
       </div>
@@ -394,7 +445,15 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   );
 }
 
-function CloudSection({ est, prices, m }: { est: EstimateDetail; prices: CloudPrice[]; m: Mutations }) {
+function CloudSection({
+  est,
+  prices,
+  m,
+}: {
+  est: EstimateDetail;
+  prices: CloudPrice[];
+  m: Mutations;
+}) {
   const [priceId, setPriceId] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [hours, setHours] = useState('730');
@@ -427,14 +486,18 @@ function CloudSection({ est, prices, m }: { est: EstimateDetail; prices: CloudPr
           {est.cloudItems.map((c) => (
             <tr key={c.id} className="border-t border-slate-100">
               <td className="px-3 py-2">
-                {c.provider} · {c.skuOrInstance} <span className="text-slate-400">({c.region})</span>
+                {c.provider} · {c.skuOrInstance}{' '}
+                <span className="text-slate-400">({c.region})</span>
               </td>
               <td className="px-3 py-2 text-right tabular-nums">{c.quantity}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.usageHoursPerMonth}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.unitPriceSnapshot}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.lineTotal}</td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => m.delCloud.mutate(c.id)} className="text-rose-600 hover:underline">
+                <button
+                  onClick={() => m.delCloud.mutate(c.id)}
+                  className="text-rose-600 hover:underline"
+                >
                   Delete
                 </button>
               </td>
@@ -443,7 +506,11 @@ function CloudSection({ est, prices, m }: { est: EstimateDetail; prices: CloudPr
         </tbody>
       </table>
       <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <select value={priceId} onChange={(e) => setPriceId(e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm min-w-72">
+        <select
+          value={priceId}
+          onChange={(e) => setPriceId(e.target.value)}
+          className="border border-slate-300 rounded px-2 py-1 text-sm min-w-72"
+        >
           <option value="">Select cloud instance…</option>
           {prices.map((p) => (
             <option key={p.id} value={p.id}>
@@ -451,9 +518,25 @@ function CloudSection({ est, prices, m }: { est: EstimateDetail; prices: CloudPr
             </option>
           ))}
         </select>
-        <input value={quantity} onChange={(e) => setQuantity(e.target.value)} type="number" className="border border-slate-300 rounded px-2 py-1 text-sm w-20" placeholder="qty" />
-        <input value={hours} onChange={(e) => setHours(e.target.value)} type="number" className="border border-slate-300 rounded px-2 py-1 text-sm w-24" placeholder="hrs/mo" />
-        <button onClick={add} disabled={!priceId} className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50">
+        <input
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
+          placeholder="qty"
+        />
+        <input
+          value={hours}
+          onChange={(e) => setHours(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
+          placeholder="hrs/mo"
+        />
+        <button
+          onClick={add}
+          disabled={!priceId}
+          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+        >
           Add cloud
         </button>
       </div>
@@ -472,9 +555,15 @@ function AssumptionsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
     <Section title="Assumptions & notes">
       <ul className="space-y-1 text-sm">
         {est.assumptions.map((a) => (
-          <li key={a.id} className="flex items-center justify-between border-b border-slate-100 py-1">
+          <li
+            key={a.id}
+            className="flex items-center justify-between border-b border-slate-100 py-1"
+          >
             <span>{a.text}</span>
-            <button onClick={() => m.delAssumption.mutate(a.id)} className="text-rose-600 hover:underline text-xs">
+            <button
+              onClick={() => m.delAssumption.mutate(a.id)}
+              className="text-rose-600 hover:underline text-xs"
+            >
               Delete
             </button>
           </li>
@@ -482,8 +571,17 @@ function AssumptionsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
         {est.assumptions.length === 0 && <li className="text-slate-400">None yet.</li>}
       </ul>
       <div className="flex gap-2 pt-2">
-        <input value={text} onChange={(e) => setText(e.target.value)} className="border border-slate-300 rounded px-2 py-1 text-sm flex-1" placeholder="Add an assumption…" />
-        <button onClick={add} disabled={!text.trim()} className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
+          placeholder="Add an assumption…"
+        />
+        <button
+          onClick={add}
+          disabled={!text.trim()}
+          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+        >
           Add
         </button>
       </div>

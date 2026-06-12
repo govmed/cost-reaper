@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "description": "Technology Project Cost Estimator — pnpm + Turborepo monorepo (web + API + shared packages).",
-  "repository": { "type": "git", "url": "https://github.com/govmed/cost-reaper.git" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/govmed/cost-reaper.git"
+  },
   "license": "UNLICENSED",
   "packageManager": "pnpm@9.12.0",
-  "engines": { "node": ">=22", "pnpm": ">=9" },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

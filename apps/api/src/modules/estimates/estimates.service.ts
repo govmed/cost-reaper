@@ -120,7 +120,10 @@ export class EstimatesService {
   }
 
   async clone(id: string, actorId: string) {
-    const e: any = await this.prisma.estimate.findUnique({ where: { id }, include: DETAIL_INCLUDE });
+    const e: any = await this.prisma.estimate.findUnique({
+      where: { id },
+      include: DETAIL_INCLUDE,
+    });
     if (!e) throw new NotFoundException('Estimate not found');
     const copy = await this.prisma.estimate.create({
       data: {
@@ -186,7 +189,10 @@ export class EstimatesService {
   }
 
   async exportCsv(id: string): Promise<{ filename: string; csv: string }> {
-    const e: any = await this.prisma.estimate.findUnique({ where: { id }, include: DETAIL_INCLUDE });
+    const e: any = await this.prisma.estimate.findUnique({
+      where: { id },
+      include: DETAIL_INCLUDE,
+    });
     if (!e) throw new NotFoundException('Estimate not found');
     const totals = this.computeTotals(e);
     const lines: CsvLine[] = [
@@ -218,7 +224,10 @@ export class EstimatesService {
         lineTotal: c.lineTotal.toString(),
       })),
     ];
-    return { filename: `estimate-${id}.csv`, csv: toCsv({ name: e.name, currency: e.currency }, lines, totals) };
+    return {
+      filename: `estimate-${id}.csv`,
+      csv: toCsv({ name: e.name, currency: e.currency }, lines, totals),
+    };
   }
 
   // ── Line items ───────────────────────────────────────────────────────────────
@@ -227,7 +236,8 @@ export class EstimatesService {
     await this.ensure(estimateId);
     let rate = dto.rateSnapshot;
     if (!rate) {
-      if (!dto.rateCardRoleId) throw new BadRequestException('rateSnapshot or rateCardRoleId is required');
+      if (!dto.rateCardRoleId)
+        throw new BadRequestException('rateSnapshot or rateCardRoleId is required');
       const role = await this.prisma.rateCardRole.findUnique({ where: { id: dto.rateCardRoleId } });
       if (!role) throw new NotFoundException('Rate-card role not found');
       rate = role.rate.toString();

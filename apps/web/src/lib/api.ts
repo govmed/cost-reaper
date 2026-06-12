@@ -23,10 +23,14 @@ function request(path: string, init: RequestInit, auth: boolean): Promise<Respon
 
 async function tryRefresh(): Promise<boolean> {
   if (!refreshToken) return false;
-  const res = await request('/auth/refresh', {
-    method: 'POST',
-    body: JSON.stringify({ refreshToken }),
-  }, false);
+  const res = await request(
+    '/auth/refresh',
+    {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    },
+    false,
+  );
   if (!res.ok) return false;
   const data = (await res.json()) as { accessToken: string; refreshToken: string };
   setTokens(data.accessToken, data.refreshToken);
@@ -68,7 +72,8 @@ export async function login(email: string, password: string): Promise<LoginRespo
 /** Fetch the CSV with the auth header and trigger a browser download. */
 export async function downloadCsv(id: string, name: string): Promise<void> {
   let res = await request(`/estimates/${id}/export`, {}, true);
-  if (res.status === 401 && (await tryRefresh())) res = await request(`/estimates/${id}/export`, {}, true);
+  if (res.status === 401 && (await tryRefresh()))
+    res = await request(`/estimates/${id}/export`, {}, true);
   if (!res.ok) throw new Error('Export failed');
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);

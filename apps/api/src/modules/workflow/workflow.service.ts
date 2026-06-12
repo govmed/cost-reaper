@@ -77,8 +77,13 @@ export class WorkflowService {
       where: { id: estimateId },
       include: {
         currentStage: true,
-        workflowDefinition: { include: { transitions: { include: { fromStage: true, toStage: true } } } },
-        transitionEvents: { include: { fromStage: true, toStage: true }, orderBy: { occurredAt: 'asc' } },
+        workflowDefinition: {
+          include: { transitions: { include: { fromStage: true, toStage: true } } },
+        },
+        transitionEvents: {
+          include: { fromStage: true, toStage: true },
+          orderBy: { occurredAt: 'asc' },
+        },
       },
     });
     if (!est) throw new NotFoundException('Estimate not found');
@@ -131,11 +136,16 @@ export class WorkflowService {
     if (t.requiresChecklistPass) {
       const checklist = await this.checklist.evaluate(estimateId);
       if (checklist.blocking) {
-        throw new BadRequestException('Resolve the blocking checklist items before this transition');
+        throw new BadRequestException(
+          'Resolve the blocking checklist items before this transition',
+        );
       }
     }
     await this.prisma.$transaction([
-      this.prisma.estimate.update({ where: { id: estimateId }, data: { currentStageId: t.toStageId } }),
+      this.prisma.estimate.update({
+        where: { id: estimateId },
+        data: { currentStageId: t.toStageId },
+      }),
       this.prisma.workflowTransitionEvent.create({
         data: {
           estimateId,

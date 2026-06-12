@@ -44,7 +44,9 @@ export class AuthService {
   async refresh(refreshToken: string): Promise<TokenPair> {
     let payload: { sub: string };
     try {
-      payload = await this.jwt.verifyAsync(refreshToken, { secret: process.env.JWT_REFRESH_SECRET });
+      payload = await this.jwt.verifyAsync(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -62,7 +64,10 @@ export class AuthService {
     );
     const refreshToken = await this.jwt.signAsync(
       { sub: user.id },
-      { secret: process.env.JWT_REFRESH_SECRET, expiresIn: `${process.env.REFRESH_TOKEN_TTL_DAYS ?? '7'}d` },
+      {
+        secret: process.env.JWT_REFRESH_SECRET,
+        expiresIn: `${process.env.REFRESH_TOKEN_TTL_DAYS ?? '7'}d`,
+      },
     );
     return { accessToken, refreshToken };
   }

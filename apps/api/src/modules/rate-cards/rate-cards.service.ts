@@ -30,7 +30,9 @@ export class RateCardsService {
         name: dto.name,
         currency: dto.currency,
         createdById: actorId,
-        roles: { create: dto.roles.map((r) => ({ roleName: r.roleName, unit: r.unit, rate: r.rate })) },
+        roles: {
+          create: dto.roles.map((r) => ({ roleName: r.roleName, unit: r.unit, rate: r.rate })),
+        },
       },
       include: { roles: true },
     });
@@ -66,7 +68,12 @@ export class RateCardsService {
     name: string;
     currency: string;
     isActive: boolean;
-    roles: { id: string; roleName: string; unit: RateCardDto['roles'][number]['unit']; rate: { toString(): string } }[];
+    roles: {
+      id: string;
+      roleName: string;
+      unit: RateCardDto['roles'][number]['unit'];
+      rate: { toString(): string };
+    }[];
     createdAt: Date;
     updatedAt: Date;
   }): RateCardDto {
