@@ -278,4 +278,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Result:** Pipeline green (test 47). Live smoke: "Licenses" → 201; "BogusCat" → 400 "not an active COST_CATEGORY value"; admin adds "Marketing" → instantly usable (201). No migration (category column already text).
 - **Next:** commit → PR → CI-green → merge; then continue FE-54 (estimate status) / remaining cluster.
 
+### 2026-06-13 — FE-36 user guide + FE-37 runbook
+- **Action:** Merged FE-11 (PR #17). Wrote `docs/USER_GUIDE.md` (roles, sign-in, reference-data prep, end-to-end estimate building incl. resource allocation/SDLC phase/upcharge/contingency, governance gates, CSV + printable summary, dashboard, clone) and `docs/RUNBOOK.md` (architecture, config/`.env`, scripted bring-up, scripts, health/readiness, migrations, seeding, backup/restore with pg_dump/pg_restore, rollback, observability, security ops, troubleshooting). Added a **Documentation** section to README linking all docs.
+- **Why:** FE-36 / FE-37 (Section 14 deliverables) — fill the two doc gaps.
+- **Files touched:** `docs/USER_GUIDE.md`, `docs/RUNBOOK.md`, `README.md`, CHANGELOG.
+- **Result:** Docs accurate to the implemented app; prettier-clean (`format:check` passes). Docs-only — no code/typecheck/test impact.
+- **Next:** commit → PR → CI-green → merge; then FE-54 part 2 (estimate status) or hardening (FE-31/32).
+
 <!-- Append new entries below this line -->
