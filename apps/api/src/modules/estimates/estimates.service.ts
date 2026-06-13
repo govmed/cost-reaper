@@ -134,6 +134,8 @@ export class EstimatesService {
 
   async update(id: string, dto: UpdateEstimateRequest, actorId: string) {
     await this.ensure(id);
+    // Estimate status is governed by the ESTIMATE_STATUS reference list (FR-29).
+    if (dto.status) await this.reference.assertActiveCode('ESTIMATE_STATUS', dto.status);
     await this.prisma.estimate.update({
       where: { id },
       data: {

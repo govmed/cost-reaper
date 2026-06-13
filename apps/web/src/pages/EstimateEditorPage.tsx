@@ -80,6 +80,7 @@ export default function EstimateEditorPage() {
   const { data: cloudPrices } = useCloudPrices();
   const { data: workflow } = useWorkflow(id);
   const { data: checklist } = useChecklist(id);
+  const { data: statuses } = useReferenceValues('ESTIMATE_STATUS');
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
   if (error) return <p className="text-rose-700">{(error as Error).message}</p>;
@@ -106,8 +107,19 @@ export default function EstimateEditorPage() {
             onChange={(e) => m.patch.mutate({ status: e.target.value })}
             className="border border-slate-300 rounded px-2 py-1 text-sm"
           >
-            <option value="DRAFT">DRAFT</option>
-            <option value="FINAL">FINAL</option>
+            {(statuses && statuses.length
+              ? statuses
+                  .filter((s) => s.isActive)
+                  .map((s) => ({ code: s.code, label: s.displayName }))
+              : [
+                  { code: 'DRAFT', label: 'Draft' },
+                  { code: 'FINAL', label: 'Final' },
+                ]
+            ).map((s) => (
+              <option key={s.code} value={s.code}>
+                {s.label}
+              </option>
+            ))}
           </select>
           <Link
             to={`/estimates/${est.id}/print`}

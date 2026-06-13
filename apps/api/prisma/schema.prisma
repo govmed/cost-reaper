@@ -23,11 +23,6 @@ enum RateUnit {
   DAY
 }
 
-enum EstimateStatus {
-  DRAFT
-  FINAL
-}
-
 enum BillingPeriod {
   ONE_TIME
   MONTHLY
@@ -154,7 +149,7 @@ model Estimate {
   id                    String              @id @default(uuid()) @db.Uuid
   name                  String
   description           String?
-  status                EstimateStatus      @default(DRAFT)
+  status                String              @default("DRAFT")
   currency              String              @db.Char(3)
   globalUpchargePercent Decimal             @default(0) @map("global_upcharge_percent") @db.Decimal(5, 2)
   contingencyPercent    Decimal             @default(0) @map("contingency_percent") @db.Decimal(5, 2)
