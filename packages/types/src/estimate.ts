@@ -134,6 +134,23 @@ export const EstimateSummaryDto = z.object({
 });
 export type EstimateSummaryDto = z.infer<typeof EstimateSummaryDto>;
 
+/** Capture a versioned baseline of an estimate (FR-15). */
+export const CaptureBaselineRequest = z.object({ label: z.string().min(1).max(120) });
+export type CaptureBaselineRequest = z.infer<typeof CaptureBaselineRequest>;
+
+/** A captured baseline's headline figures (the full snapshot is stored server-side). */
+export interface BaselineDto {
+  id: string;
+  label: string;
+  grandTotal: string;
+  clientPrice: string;
+  oneTimeTotal: string;
+  monthlyTotal: string;
+  yearlyTotal: string;
+  createdByEmail: string;
+  createdAt: string;
+}
+
 /** One estimate in a scenario comparison group (FR-14). */
 export interface ScenarioDto {
   id: string;

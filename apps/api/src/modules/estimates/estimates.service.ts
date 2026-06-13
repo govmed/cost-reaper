@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import {
   type AllocationLine,
   computeEstimate,
@@ -14,6 +15,8 @@ import {
 import type {
   AssumptionInput,
   AuthUser,
+  BaselineDto,
+  CaptureBaselineRequest,
   CloudLineInput,
   CommentInput,
   CreateEstimateRequest,
@@ -271,6 +274,53 @@ export class EstimatesService {
         updatedAt: e.updatedAt.toISOString(),
       };
     });
+  }
+
+  // ── Versioning / baselines (FR-15) ───────────────────────────────────────────
+
+  async captureBaseline(estimateId: string, dto: CaptureBaselineRequest, user: AuthUser) {
+    await this.ensure(estimateId);
+    const detail: any = await this.getDetail(estimateId);
+    const t = detail.totals;
+    await this.prisma.baseline.create({
+      data: {
+        estimateId,
+        label: dto.label,
+        grandTotal: t.grandTotal,
+        clientPrice: t.clientPrice,
+        oneTimeTotal: t.oneTimeTotal,
+        monthlyTotal: t.monthlyTotal,
+        yearlyTotal: t.yearlyTotal,
+        snapshotJson: detail as Prisma.InputJsonValue,
+        createdByEmail: user.email,
+      },
+    });
+    await this.audit.record('Estimate', estimateId, 'BASELINE', user.id);
+    return this.listBaselines(estimateId);
+  }
+
+  async listBaselines(estimateId: string): Promise<BaselineDto[]> {
+    const rows = await this.prisma.baseline.findMany({
+      where: { estimateId },
+      orderBy: { createdAt: 'desc' },
+    });
+    return rows.map((b) => ({
+      id: b.id,
+      label: b.label,
+      grandTotal: b.grandTotal.toString(),
+      clientPrice: b.clientPrice.toString(),
+      oneTimeTotal: b.oneTimeTotal.toString(),
+      monthlyTotal: b.monthlyTotal.toString(),
+      yearlyTotal: b.yearlyTotal.toString(),
+      createdByEmail: b.createdByEmail,
+      createdAt: b.createdAt.toISOString(),
+    }));
+  }
+
+  async deleteBaseline(estimateId: string, baselineId: string, actorId: string) {
+    await this.prisma.baseline.deleteMany({ where: { id: baselineId, estimateId } });
+    await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    return this.listBaselines(estimateId);
   }
 
   // ── Totals + export (FR-7, FR-22, FR-23, FR-10) ──────────────────────────────

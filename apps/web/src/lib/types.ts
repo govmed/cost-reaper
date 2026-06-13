@@ -140,6 +140,18 @@ export interface EstimateDetail {
   capacityViolations: CapacityViolation[];
 }
 
+export interface Baseline {
+  id: string;
+  label: string;
+  grandTotal: string;
+  clientPrice: string;
+  oneTimeTotal: string;
+  monthlyTotal: string;
+  yearlyTotal: string;
+  createdByEmail: string;
+  createdAt: string;
+}
+
 export interface Scenario {
   id: string;
   name: string;

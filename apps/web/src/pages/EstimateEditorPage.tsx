@@ -6,6 +6,7 @@ import {
   useCloudPrices,
   useEstimate,
   useEstimateMutations,
+  useBaselines,
   useRateCards,
   useReferenceValues,
   useScenarios,
@@ -160,6 +161,8 @@ export default function EstimateEditorPage() {
       <GovernanceSection workflow={workflow} checklist={checklist} m={m} />
 
       <ScenariosSection est={est} m={m} />
+
+      <BaselinesSection est={est} m={m} />
 
       <Section title="Settings">
         <div className="flex flex-wrap gap-6 items-end">
@@ -795,6 +798,85 @@ function CloudSection({
           Add cloud
         </button>
       </div>
+    </Section>
+  );
+}
+
+function BaselinesSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
+  const { data: baselines } = useBaselines(est.id);
+  const [label, setLabel] = useState('');
+  const cur = est.currency;
+  const currentGrand = Number(est.totals.grandTotal);
+  function capture() {
+    if (!label.trim()) return;
+    m.captureBaseline.mutate({ label: label.trim() }, { onSuccess: () => setLabel('') });
+  }
+  const delta = (base: string) => {
+    const d = currentGrand - Number(base);
+    const sign = d > 0 ? '+' : '';
+    return `${sign}${d.toFixed(4)}`;
+  };
+  return (
+    <Section title="Baselines & versions">
+      <div className="flex gap-2">
+        <input
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
+          placeholder="Baseline label (e.g. v1 approved)"
+        />
+        <button
+          onClick={capture}
+          disabled={!label.trim()}
+          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+        >
+          Capture baseline
+        </button>
+      </div>
+      {baselines && baselines.length > 0 && (
+        <table className="w-full text-sm">
+          <thead className="text-slate-500 text-left">
+            <tr>
+              <th className="px-2 py-1">Label</th>
+              <th className="px-2 py-1">Captured</th>
+              <th className="px-2 py-1 text-right">Grand total</th>
+              <th className="px-2 py-1 text-right">Δ vs current</th>
+              <th className="px-2 py-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {baselines.map((b) => {
+              const d = currentGrand - Number(b.grandTotal);
+              return (
+                <tr key={b.id} className="border-t border-slate-100">
+                  <td className="px-2 py-1">{b.label}</td>
+                  <td className="px-2 py-1 text-xs text-slate-500">
+                    {b.createdByEmail} · {new Date(b.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-2 py-1 text-right tabular-nums">
+                    {b.grandTotal} {cur}
+                  </td>
+                  <td
+                    className={`px-2 py-1 text-right tabular-nums ${
+                      d > 0 ? 'text-rose-700' : d < 0 ? 'text-emerald-700' : 'text-slate-400'
+                    }`}
+                  >
+                    {delta(b.grandTotal)} {cur}
+                  </td>
+                  <td className="px-2 py-1 text-right">
+                    <button
+                      onClick={() => m.delBaseline.mutate(b.id)}
+                      className="text-rose-600 hover:underline text-xs"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
     </Section>
   );
 }

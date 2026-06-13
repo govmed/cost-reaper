@@ -15,6 +15,7 @@ import type { Response } from 'express';
 import {
   AssumptionInput,
   type AuthUser,
+  CaptureBaselineRequest,
   CommentInput,
   CloudLineInput,
   CreateEstimateRequest,
@@ -99,6 +100,32 @@ export class EstimatesController {
   @Get(':id/scenarios')
   scenarios(@Param('id') id: string) {
     return this.estimates.scenarios(id);
+  }
+
+  // Versioning / baselines (FR-15).
+  @Post(':id/baselines')
+  @Roles('ADMIN', 'ESTIMATOR')
+  captureBaseline(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(CaptureBaselineRequest)) dto: CaptureBaselineRequest,
+    @CurrentUser() u: AuthUser,
+  ) {
+    return this.estimates.captureBaseline(id, dto, u);
+  }
+
+  @Get(':id/baselines')
+  baselines(@Param('id') id: string) {
+    return this.estimates.listBaselines(id);
+  }
+
+  @Delete(':id/baselines/:baselineId')
+  @Roles('ADMIN', 'ESTIMATOR')
+  delBaseline(
+    @Param('id') id: string,
+    @Param('baselineId') baselineId: string,
+    @CurrentUser() u: AuthUser,
+  ) {
+    return this.estimates.deleteBaseline(id, baselineId, u.id);
   }
 
   // ── Line items ───────────────────────────────────────────────────────────────
