@@ -6,6 +6,12 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Security hardening (FE-31, OWASP)
+
+#### Added
+- **Security response headers** on every API response (dep-free middleware): `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Content-Security-Policy: frame-ancestors 'none'`, `Referrer-Policy: no-referrer`, `Cross-Origin-Opener-Policy`, `Permissions-Policy`, and `Strict-Transport-Security` in production; `X-Powered-By` removed.
+- **Brute-force throttle** on the credential endpoints (`/auth/login`, `/auth/register`): an in-memory per-IP limiter returns `429` past a generous threshold. Complements the existing argon2 hashing + deny-by-default RBAC. Verified live (headers present, login still 200). No deps, no migration.
+
 ### Cloud price refresh + per-provider "last pulled" (FE-40, FR-21a/b)
 
 #### Added

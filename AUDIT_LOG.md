@@ -380,3 +380,7 @@ Built & verified **FE-25 versioning/baselines (FR-15)** — capture immutable sn
 ---
 ### [2026-06-13 02:20 UTC] — AGENT (continuous run)
 Built & verified **FE-40 cloud refresh + per-provider last-pulled (FR-21a/b)** — PricingProvider seam (stub) + admin sync + freshness table. Live: AWS sync → today, others unchanged. Committing → PR → merge, continuing.
+
+---
+### [2026-06-13 02:40 UTC] — AGENT (continuous run)
+Built & verified **FE-31 security hardening (OWASP)** — dep-free security headers + per-IP login throttle. Live: headers present, X-Powered-By removed, login 200. Committing → PR → merge, continuing.

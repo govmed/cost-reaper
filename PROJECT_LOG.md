@@ -323,3 +323,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** `PricingProvider` strategy seam (AWS/GCP/Azure stub) + `lastPulled()` (groupBy max fetchedAt) + `sync()` (admin re-stamp, audited); controller GET `/cloud-prices/last-pulled` + POST `/cloud-prices/sync` (static before `:id`); web freshness table (MM/DD/CCYY) + admin Refresh button. No migration (existing fetchedAt).
 - **Result:** Pipeline green (test 50). Live: last-pulled per provider; AWS sync → 06/13, others 06/12. Snapshots immutable (NFR-14).
 - **Next:** commit → PR → merge; continue (FE-31 hardening, FE-22 export, FE-12 multi-currency).
+
+### 2026-06-13 — FE-31 Security hardening (OWASP)
+- **Action:** `SecurityHeadersMiddleware` (nosniff/frame DENY/CSP frame-ancestors/referrer/COOP/permissions-policy/HSTS-in-prod; strips X-Powered-By) applied app-wide; `LoginThrottleGuard` (in-memory per-IP, 30/min → 429) on /auth/login + /auth/register; `x-powered-by` disabled in main.ts. Dep-free.
+- **Result:** Pipeline green (test 50). Live: all headers present, X-Powered-By gone, login still 200.
+- **Next:** commit → PR → merge; continue (FE-22 export, FE-12 multi-currency).
