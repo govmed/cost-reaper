@@ -151,6 +151,15 @@ export function computeEstimate(input: EngineInput): EngineResult {
   const grand = oneTime.plus(yearly).times(factor);
   const contingencyAmount = grand.minus(oneTime.plus(yearly));
 
+  // Client pricing (FR-16): margin on the grand-total cost, then tax on the sell price.
+  const marginPct = d(input.marginPercent ?? 0).div(HUNDRED);
+  const taxPct = d(input.taxPercent ?? 0).div(HUNDRED);
+  const marginDenom = new Decimal(1).minus(marginPct);
+  const sell = marginDenom.lte(0) ? grand : grand.div(marginDenom);
+  const marginAmount = sell.minus(grand);
+  const taxAmount = sell.times(taxPct);
+  const clientPrice = sell.plus(taxAmount);
+
   const categories: CategorySubtotal[] = [...catMap.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([category, v]) => ({
@@ -179,6 +188,10 @@ export function computeEstimate(input: EngineInput): EngineResult {
     monthlyTotal: monthlyTotal.toFixed(scale),
     yearlyTotal: yearlyTotal.toFixed(scale),
     grandTotal: grand.toFixed(scale),
+    marginAmount: marginAmount.toFixed(scale),
+    sellPrice: sell.toFixed(scale),
+    taxAmount: taxAmount.toFixed(scale),
+    clientPrice: clientPrice.toFixed(scale),
     categories,
     phases,
   };

@@ -158,6 +158,8 @@ model Estimate {
   currency              String              @db.Char(3)
   globalUpchargePercent Decimal             @default(0) @map("global_upcharge_percent") @db.Decimal(5, 2)
   contingencyPercent    Decimal             @default(0) @map("contingency_percent") @db.Decimal(5, 2)
+  marginPercent         Decimal             @default(0) @map("margin_percent") @db.Decimal(5, 2)
+  taxPercent            Decimal             @default(0) @map("tax_percent") @db.Decimal(5, 2)
   rateCardId            String?             @map("rate_card_id") @db.Uuid
   rateCard              RateCard?           @relation(fields: [rateCardId], references: [id])
   ownerId               String              @map("owner_id") @db.Uuid

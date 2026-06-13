@@ -356,3 +356,7 @@ Explained bypass-permissions mode (Shift+Tab / `--dangerously-skip-permissions`)
 **Actions taken:**
 - Engine `pert()` + test (48 total); labor 3-point columns (migration verified fresh-deploy + no drift); `addLabor` effective-units = PERT; DTO/clone/editor wired.
 - Live smoke: 2/4/12 → units 5, total 1050; invalid ordering → 400. Committing → PR → merge, then continuing to the next feature.
+
+---
+### [2026-06-13 00:50 UTC] — AGENT (continuous run)
+Built & verified **FE-20 margin & tax (FR-16)** — sell price = cost/(1−margin), client price = sell×(1+tax). Engine + migration verified; live 20%/10% on 1000 → client 1375. Committing → PR → merge, continuing.

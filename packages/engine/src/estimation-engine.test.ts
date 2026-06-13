@@ -20,6 +20,8 @@ function input(p: Partial<EngineInput> & Pick<EngineInput, 'lines'>): EngineInpu
   return {
     globalUpchargePercent: p.globalUpchargePercent ?? 0,
     contingencyPercent: p.contingencyPercent ?? 0,
+    marginPercent: p.marginPercent ?? 0,
+    taxPercent: p.taxPercent ?? 0,
     lines: p.lines,
     moneyScale: p.moneyScale ?? 4,
   };
@@ -190,6 +192,30 @@ describe('computeEstimate', () => {
       yearly: '6000.0000',
     });
     expect(r.phases.find((p) => p.phase === 'Unassigned')?.oneTime).toBe('300.0000');
+  });
+
+  it('applies margin (on cost) then tax (on sell price) for a client price (FR-16)', () => {
+    // cost 1000 → 20% margin → sell = 1000 / 0.8 = 1250 → 10% tax → 1375
+    const r = computeEstimate(
+      input({
+        marginPercent: 20,
+        taxPercent: 10,
+        lines: [line({ baseAmount: '1000', billingPeriod: 'ONE_TIME' })],
+      }),
+    );
+    expect(r.grandTotal).toBe('1000.0000');
+    expect(r.marginAmount).toBe('250.0000');
+    expect(r.sellPrice).toBe('1250.0000');
+    expect(r.taxAmount).toBe('125.0000');
+    expect(r.clientPrice).toBe('1375.0000');
+  });
+
+  it('leaves client price equal to cost when margin and tax are zero', () => {
+    const r = computeEstimate(
+      input({ lines: [line({ baseAmount: '500', billingPeriod: 'ONE_TIME' })] }),
+    );
+    expect(r.clientPrice).toBe('500.0000');
+    expect(r.marginAmount).toBe('0.0000');
   });
 
   it('rounds money half-up to the configured scale', () => {

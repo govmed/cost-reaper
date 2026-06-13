@@ -129,8 +129,16 @@ export default function EstimateEditorPage() {
         <Card label="One-time" value={`${t.oneTimeTotal} ${cur}`} />
         <Card label="Monthly" value={`${t.monthlyTotal} ${cur}`} />
         <Card label="Yearly" value={`${t.yearlyTotal} ${cur}`} />
-        <Card label="Grand total" value={`${t.grandTotal} ${cur}`} accent />
+        <Card label="Grand total (cost)" value={`${t.grandTotal} ${cur}`} />
       </div>
+      {(est.marginPercent > 0 || est.taxPercent > 0) && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card label="Margin" value={`${t.marginAmount} ${cur}`} />
+          <Card label="Sell price" value={`${t.sellPrice} ${cur}`} />
+          <Card label="Tax" value={`${t.taxAmount} ${cur}`} />
+          <Card label="Client price" value={`${t.clientPrice} ${cur}`} accent />
+        </div>
+      )}
 
       {est.capacityViolations.length > 0 && <CapacityBanner violations={est.capacityViolations} />}
 
@@ -149,6 +157,16 @@ export default function EstimateEditorPage() {
             label="Contingency %"
             value={est.contingencyPercent}
             onSave={(v) => m.patch.mutate({ contingencyPercent: v })}
+          />
+          <NumberSetting
+            label="Margin %"
+            value={est.marginPercent}
+            onSave={(v) => m.patch.mutate({ marginPercent: v })}
+          />
+          <NumberSetting
+            label="Tax %"
+            value={est.taxPercent}
+            onSave={(v) => m.patch.mutate({ taxPercent: v })}
           />
           <div className="text-sm text-slate-500">
             Upcharge {t.upchargeAmount} · Contingency {t.contingencyAmount} {cur}

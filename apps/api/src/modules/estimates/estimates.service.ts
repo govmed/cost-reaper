@@ -82,6 +82,8 @@ export class EstimatesService {
         ownerId,
         globalUpchargePercent: dto.globalUpchargePercent,
         contingencyPercent: dto.contingencyPercent,
+        marginPercent: dto.marginPercent,
+        taxPercent: dto.taxPercent,
         workflowDefinitionId: def?.id ?? null,
         currentStageId: initial?.id ?? null,
       },
@@ -141,6 +143,8 @@ export class EstimatesService {
         rateCardId: dto.rateCardId,
         globalUpchargePercent: dto.globalUpchargePercent,
         contingencyPercent: dto.contingencyPercent,
+        marginPercent: dto.marginPercent,
+        taxPercent: dto.taxPercent,
       },
     });
     await this.audit.record('Estimate', id, 'UPDATE', actorId);
@@ -168,6 +172,8 @@ export class EstimatesService {
         ownerId: actorId,
         globalUpchargePercent: e.globalUpchargePercent,
         contingencyPercent: e.contingencyPercent,
+        marginPercent: e.marginPercent,
+        taxPercent: e.taxPercent,
         laborItems: {
           create: e.laborItems.map((l: any) => ({
             rateCardRoleId: l.rateCardRoleId,
@@ -450,6 +456,8 @@ export class EstimatesService {
       currentStageLabel: e.currentStage?.label ?? null,
       globalUpchargePercent: Number(e.globalUpchargePercent),
       contingencyPercent: Number(e.contingencyPercent),
+      marginPercent: Number(e.marginPercent),
+      taxPercent: Number(e.taxPercent),
       laborItems: e.laborItems.map((l: any) => ({
         id: l.id,
         rateCardRoleId: l.rateCardRoleId,

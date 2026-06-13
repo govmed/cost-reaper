@@ -23,6 +23,10 @@ export type EngineLine = z.infer<typeof EngineLine>;
 export const EngineInput = z.object({
   globalUpchargePercent: Percent.default(0),
   contingencyPercent: Percent.default(0),
+  /** Client-pricing margin on the grand total (FR-16): sellPrice = cost / (1 − margin). */
+  marginPercent: Percent.default(0),
+  /** Tax applied on the sell price to get the final client price (FR-16). */
+  taxPercent: Percent.default(0),
   lines: z.array(EngineLine),
   /** Money rounding scale (default 4 → NUMERIC(18,4)). */
   moneyScale: z.number().int().min(0).max(8).default(4),
@@ -68,8 +72,15 @@ export const EngineResult = z.object({
   oneTimeTotal: Money,
   monthlyTotal: Money,
   yearlyTotal: Money,
-  /** one-time + annualized (yearly) recurring, post-contingency. */
+  /** one-time + annualized (yearly) recurring, post-contingency. This is the **cost**. */
   grandTotal: Money,
+  /** Client pricing (FR-16). marginAmount/taxAmount add to grandTotal. */
+  marginAmount: Money,
+  /** Cost + margin (the client price before tax). */
+  sellPrice: Money,
+  taxAmount: Money,
+  /** Final client price = sellPrice + tax. */
+  clientPrice: Money,
   categories: z.array(CategorySubtotal),
   /** Cost rolled up per SDLC phase (FR-28). */
   phases: z.array(PhaseSubtotal),
@@ -85,6 +96,8 @@ export const CreateEstimateRequest = z.object({
   rateCardId: z.string().uuid().optional(),
   globalUpchargePercent: Percent.default(0),
   contingencyPercent: Percent.default(0),
+  marginPercent: Percent.default(0),
+  taxPercent: Percent.default(0),
 });
 export type CreateEstimateRequest = z.infer<typeof CreateEstimateRequest>;
 
@@ -95,6 +108,8 @@ export const UpdateEstimateRequest = z.object({
   rateCardId: z.string().uuid().nullable().optional(),
   globalUpchargePercent: Percent.optional(),
   contingencyPercent: Percent.optional(),
+  marginPercent: Percent.optional(),
+  taxPercent: Percent.optional(),
 });
 export type UpdateEstimateRequest = z.infer<typeof UpdateEstimateRequest>;
 
