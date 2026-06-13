@@ -59,6 +59,19 @@ describe('summarizeDashboard (FR-18)', () => {
     expect(s.recent.map((r) => r.id)).toEqual(['new', 'mid']);
   });
 
+  it('converts per-currency totals to the base currency via FX (FR-17)', () => {
+    const s = summarizeDashboard(
+      [
+        row({ currency: 'USD', grandTotal: '1000.0000' }),
+        row({ currency: 'EUR', grandTotal: '100.0000' }),
+      ],
+      5,
+      { EUR: 1.08 },
+    );
+    expect(s.baseCurrency).toBe('USD');
+    expect(s.baseCurrencyTotal).toBe('1108.0000'); // 1000 + 100 × 1.08
+  });
+
   it('buckets estimates with no stage under Unassigned', () => {
     const s = summarizeDashboard([row({ currentStageKey: null, currentStageLabel: null })]);
     expect(s.byStage).toEqual([{ stageKey: 'UNASSIGNED', stageLabel: 'Unassigned', count: 1 }]);

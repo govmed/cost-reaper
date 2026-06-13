@@ -8,6 +8,7 @@ import type {
   EstimateDetail,
   EstimateSummary,
   EstimateWorkflow,
+  FxRate,
   Paginated,
   ProviderLastPulled,
   RateCard,
@@ -262,6 +263,26 @@ export function useCloudSync() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['cloud-last-pulled'] });
       void qc.invalidateQueries({ queryKey: ['cloud-prices'] });
+    },
+  });
+}
+
+// ── FX rates (FR-17) ──────────────────────────────────────────────────────────
+export function useFxRates() {
+  return useQuery({ queryKey: ['fx-rates'], queryFn: () => api<FxRate[]>('/fx-rates') });
+}
+
+export function useFxMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (v: { currency: string; rateToBase: string }) =>
+      api(`/fx-rates/${v.currency}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ rateToBase: v.rateToBase }),
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['fx-rates'] });
+      void qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
 }

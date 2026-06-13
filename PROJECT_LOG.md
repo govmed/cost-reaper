@@ -333,3 +333,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** `toExcelHtml` (HTML-table workbook) + `exportExcel` (shared `buildExport`); controller `GET /estimates/:id/export-excel` (application/vnd.ms-excel); web `downloadExcel` + Export Excel button. Dep-free. PDF = via printable summary.
 - **Result:** Pipeline green (test 50). Live: correct content-type/.xls + full table (lines, CLIENT PRICE, phase summary).
 - **Next:** commit → PR → merge; last feature FE-12 multi-currency.
+
+### 2026-06-13 — FE-12 Multi-currency / FX rates (FR-17) — FINAL FEATURE
+- **Action:** `FxRate` table + seed (USD base + 5); FxModule (GET list + admin PATCH upsert, audited); engine `scaleMoney`; dashboard converts per-currency totals → base (USD) `baseCurrencyTotal`; web FX rates admin page + dashboard base card; migration `20260613150000_fx_rates`.
+- **Result:** Pipeline green (test 51), migration verified. Live: 6 rates, dashboard baseCurrencyTotal, admin PATCH EUR→1.10 audited.
+- **Milestone:** All 54 features implemented.

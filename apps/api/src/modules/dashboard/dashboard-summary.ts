@@ -1,5 +1,5 @@
-import { sumMoney } from '@cost-reaper/engine';
-import type { DashboardSummary, EstimateStatus } from '@cost-reaper/types';
+import { scaleMoney, sumMoney } from '@cost-reaper/engine';
+import { BASE_CURRENCY, type DashboardSummary, type EstimateStatus } from '@cost-reaper/types';
 
 /** One estimate's already-computed headline figures (the aggregator's input). */
 export interface DashboardRow {
@@ -18,7 +18,11 @@ export interface DashboardRow {
  * per currency (exact decimal sum), and the most-recently-updated estimates.
  * I/O-free so it's unit-testable in isolation.
  */
-export function summarizeDashboard(rows: DashboardRow[], recentLimit = 5): DashboardSummary {
+export function summarizeDashboard(
+  rows: DashboardRow[],
+  recentLimit = 5,
+  fxRates: Record<string, number> = {},
+): DashboardSummary {
   const statusCounts = new Map<EstimateStatus, number>();
   for (const r of rows) statusCounts.set(r.status, (statusCounts.get(r.status) ?? 0) + 1);
   const byStatus = [...statusCounts.entries()]
@@ -61,5 +65,21 @@ export function summarizeDashboard(rows: DashboardRow[], recentLimit = 5): Dashb
       updatedAt: r.updatedAt,
     }));
 
-  return { totalEstimates: rows.length, byStatus, byStage, totalsByCurrency, recent };
+  // Convert every currency's total to the base currency via FX (FR-17).
+  const baseCurrencyTotal = sumMoney(
+    totalsByCurrency.map(({ currency, grandTotal }) => {
+      const rate = currency === BASE_CURRENCY ? 1 : (fxRates[currency] ?? 0);
+      return scaleMoney(grandTotal, rate);
+    }),
+  );
+
+  return {
+    totalEstimates: rows.length,
+    byStatus,
+    byStage,
+    totalsByCurrency,
+    baseCurrency: BASE_CURRENCY,
+    baseCurrencyTotal,
+    recent,
+  };
 }

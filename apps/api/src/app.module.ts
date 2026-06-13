@@ -19,6 +19,7 @@ import { EstimatesModule } from './modules/estimates/estimates.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { ReferenceModule } from './modules/reference/reference.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { FxModule } from './modules/fx/fx.module';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     WorkflowModule,
     ReferenceModule,
     DashboardModule,
-    // Next increments: export-pdf, scenarios (NFR-15).
+    FxModule,
   ],
   providers: [
     // Auth runs first (authenticate), then RBAC (authorize) — deny-by-default (NFR-16).

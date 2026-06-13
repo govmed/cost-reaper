@@ -209,11 +209,20 @@ export interface ProviderLastPulled {
   priceCount: number;
 }
 
+export interface FxRate {
+  currency: string;
+  rateToBase: string;
+  updatedByEmail: string | null;
+  updatedAt: string;
+}
+
 export interface DashboardSummary {
   totalEstimates: number;
   byStatus: { status: string; count: number }[];
   byStage: { stageKey: string; stageLabel: string; count: number }[];
   totalsByCurrency: { currency: string; grandTotal: string }[];
+  baseCurrency: string;
+  baseCurrencyTotal: string;
   recent: {
     id: string;
     name: string;

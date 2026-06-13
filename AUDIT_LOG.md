@@ -388,3 +388,7 @@ Built & verified **FE-31 security hardening (OWASP)** — dep-free security head
 ---
 ### [2026-06-13 03:00 UTC] — AGENT (continuous run)
 Built & verified **FE-22 Excel export (FR-20)** — dep-free .xls (HTML-table) export + button; PDF via printable summary. Live: correct content-type + full table. Committing → PR → merge, then last feature (FE-12).
+
+---
+### [2026-06-13 03:25 UTC] — AGENT (continuous run — final feature)
+Built & verified **FE-12 multi-currency/FX (FR-17)** — fx_rates table + admin API/page + dashboard base-currency conversion. Live verified. **All 54 features now done.** Committing → PR → merge.

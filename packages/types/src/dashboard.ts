@@ -7,6 +7,9 @@ export interface DashboardSummary {
   byStage: { stageKey: string; stageLabel: string; count: number }[];
   /** Grand totals summed per currency (estimates are single-currency, MVP). */
   totalsByCurrency: { currency: string; grandTotal: string }[];
+  /** All currencies converted via FX to the base currency (FR-17). */
+  baseCurrency: string;
+  baseCurrencyTotal: string;
   recent: {
     id: string;
     name: string;

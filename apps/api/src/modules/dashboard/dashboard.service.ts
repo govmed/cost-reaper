@@ -29,6 +29,9 @@ export class DashboardService {
       grandTotal: computeEstimate(buildEngineInput(toMappableEstimate(e))).grandTotal,
       updatedAt: e.updatedAt.toISOString(),
     }));
-    return summarizeDashboard(rows);
+    const fx = await this.prisma.fxRate.findMany();
+    const fxRates: Record<string, number> = {};
+    for (const f of fx) fxRates[f.currency] = Number(f.rateToBase);
+    return summarizeDashboard(rows, 5, fxRates);
   }
 }
