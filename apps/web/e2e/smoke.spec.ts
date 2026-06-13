@@ -26,6 +26,9 @@ test('login → create estimate → add a line → see totals', async ({ page })
 
   // The governance checklist panel renders (FR-25)
   await expect(page.getByRole('heading', { name: 'Smart checklist' })).toBeVisible();
+  // Checklist items are clickable and a rate-card selector exists to fix them.
+  await expect(page.getByText(/click an item to jump/)).toBeVisible();
+  await expect(page.getByText('Rate card', { exact: true })).toBeVisible();
 
   // Printable summary (FE-23): opens a print-ready view with the estimate + Print button.
   await page.getByRole('link', { name: 'Printable summary' }).click();

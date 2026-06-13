@@ -6,6 +6,12 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Smart-checklist navigation + rate-card selector (FR-25 UX)
+
+#### Added
+- **Clickable smart-checklist items**: each item now jumps the editor to the section where it's fixed and briefly **highlights** it (e.g. clicking "✕ Select a rate card for the estimate" scrolls to Settings; labor/cloud/non-labor and resource-capacity items jump to their sections). Mapped by rule key, with a scope fallback.
+- **Rate-card selector in the estimate editor** (Settings): pick/change the estimate's rate card directly — previously there was no in-editor control, so the `rate_card_selected` blocker couldn't be cleared from the estimate screen. Selecting one clears the blocker (verified live). Section anchors added throughout the editor.
+
 ### Live cloud price fetch — real AWS/GCP/Azure integration (FR-21a)
 
 #### Changed
