@@ -3,6 +3,7 @@ import type { CloudPriceQuery, ProviderLastPulledDto } from '@cost-reaper/types'
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { PRICING_PROVIDERS } from './pricing-providers';
+import { type CatalogRow, catalogKey } from './price-mappers';
 
 @Injectable()
 export class CloudPricesService {
@@ -28,9 +29,13 @@ export class CloudPricesService {
   }
 
   /**
-   * Admin-triggered price refresh (FR-21a). Pulls current prices via the
-   * provider strategy and re-stamps the catalog's `fetched_at`; saved-estimate
-   * price snapshots are never touched (NFR-14).
+   * Admin-triggered price refresh (FR-21a). Pulls fresh prices from each
+   * provider's pricing source (Azure Retail Prices — no auth; AWS Price List —
+   * SigV4, requires credentials; GCP Cloud Billing — requires an API key),
+   * updates matched catalog rows' unit price + source, and re-stamps the
+   * `fetched_at` "last pulled" time on the rest. Saved-estimate price snapshots
+   * are never touched (NFR-14); a provider that's unconfigured or unreachable
+   * falls back to the existing catalog.
    */
   async sync(provider: string | undefined, actorId: string): Promise<ProviderLastPulledDto[]> {
     const providers = provider
@@ -39,24 +44,40 @@ export class CloudPricesService {
     const now = new Date();
     for (const pv of providers) {
       const current = await this.prisma.cloudPrice.findMany({ where: { provider: pv } });
-      const fresh = await PRICING_PROVIDERS[pv].fetch(
-        current.map((c) => ({
-          region: c.region,
-          service: c.service,
-          skuOrInstance: c.skuOrInstance,
-          unit: c.unit,
-          unitPrice: c.unitPrice.toString(),
-          currency: c.currency,
-        })),
+      const strategy = PRICING_PROVIDERS[pv];
+      const rows: CatalogRow[] = current.map((c) => ({
+        provider: c.provider,
+        region: c.region,
+        service: c.service,
+        skuOrInstance: c.skuOrInstance,
+        unit: c.unit,
+        unitPrice: c.unitPrice.toString(),
+        currency: c.currency,
+      }));
+      const fresh = await strategy.fetchPrices(rows);
+
+      let refreshed = 0;
+      for (const c of current) {
+        const newPrice = fresh.get(catalogKey(c));
+        const data: { fetchedAt: Date; unitPrice?: string; source?: any; effectiveDate?: Date } = {
+          fetchedAt: now,
+        };
+        if (newPrice) {
+          data.source = strategy.source; // this row was confirmed from the live source
+          if (newPrice !== c.unitPrice.toString()) {
+            data.unitPrice = newPrice;
+            data.effectiveDate = now;
+            refreshed += 1;
+          }
+        }
+        await this.prisma.cloudPrice.update({ where: { id: c.id }, data });
+      }
+      await this.audit.record(
+        'CloudPrice',
+        pv,
+        `SYNC:${fresh.size}pulled:${refreshed}changed`,
+        actorId,
       );
-      // Stub returns the same catalog → re-stamp the pull time. A live pull would
-      // upsert any changed unit prices here (snapshots on estimates stay immutable).
-      void fresh;
-      await this.prisma.cloudPrice.updateMany({
-        where: { provider: pv },
-        data: { fetchedAt: now },
-      });
-      await this.audit.record('CloudPrice', pv, 'SYNC', actorId);
     }
     return this.lastPulled();
   }

@@ -41,6 +41,13 @@ services:
       CLOUD_HOURS_PER_MONTH: ${CLOUD_HOURS_PER_MONTH:-730}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD}
+      # Optional live cloud-pricing pull (FR-21a). Azure works without auth;
+      # AWS needs keys, GCP needs an API key. Unset → falls back to the catalog.
+      AZURE_RETAIL_PRICES_ENDPOINT: ${AZURE_RETAIL_PRICES_ENDPOINT:-https://prices.azure.com/api/retail/prices}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_PRICING_REGION: ${AWS_PRICING_REGION:-us-east-1}
+      GCP_BILLING_API_KEY: ${GCP_BILLING_API_KEY:-}
     ports:
       - '${API_PORT:-8000}:8000'
     healthcheck:

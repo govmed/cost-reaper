@@ -392,3 +392,10 @@ Built & verified **FE-22 Excel export (FR-20)** — dep-free .xls (HTML-table) e
 ---
 ### [2026-06-13 03:25 UTC] — AGENT (continuous run — final feature)
 Built & verified **FE-12 multi-currency/FX (FR-17)** — fx_rates table + admin API/page + dashboard base-currency conversion. Live verified. **All 54 features now done.** Committing → PR → merge.
+
+---
+### [2026-06-13 17:00 UTC] — USER
+Add the real AWS/GCP/Azure price fetch into the PricingProvider stub
+
+### [2026-06-13 17:00 UTC] — AGENT
+Implemented real provider integrations (FR-21a): Azure Retail Prices (live, no auth), AWS Price List via SigV4 (no SDK, gated on creds), GCP Cloud Billing (gated on key). Pure tested mappers + resilient network shells + graceful fallback (NFR-14). Live-verified Azure sync hit prices.azure.com (1.35s) and stamped source=AZURE_API. Pipeline green (test 56). Committing → PR → merge.
