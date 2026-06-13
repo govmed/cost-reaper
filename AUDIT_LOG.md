@@ -399,3 +399,10 @@ Add the real AWS/GCP/Azure price fetch into the PricingProvider stub
 
 ### [2026-06-13 17:00 UTC] — AGENT
 Implemented real provider integrations (FR-21a): Azure Retail Prices (live, no auth), AWS Price List via SigV4 (no SDK, gated on creds), GCP Cloud Billing (gated on key). Pure tested mappers + resilient network shells + graceful fallback (NFR-14). Live-verified Azure sync hit prices.azure.com (1.35s) and stamped source=AZURE_API. Pipeline green (test 56). Committing → PR → merge.
+
+---
+### [2026-06-13 17:20 UTC] — USER
+Under Estimates → Smart checklist, items aren't clickable to take me to where they're located (e.g. "Select a rate card" should let me see why it's blocked).
+
+### [2026-06-13 17:20 UTC] — AGENT
+Made checklist items clickable (scroll + flash the relevant section) and added a rate-card selector to the editor Settings (there was no in-editor control to clear the rate_card_selected blocker). Live-verified: selecting a rate card flips the item to passed. Pipeline green (test 56). Committing → PR → merge.

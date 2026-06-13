@@ -65,13 +65,45 @@ function NumberSetting({
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
   return (
-    <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+    <section
+      id={id}
+      className="bg-white border border-slate-200 rounded-xl p-4 space-y-3 scroll-mt-20 transition-shadow"
+    >
       <h2 className="font-semibold text-brand">{title}</h2>
       {children}
     </section>
   );
+}
+
+/** Where each checklist item is fixed — scroll the editor to that section + flash it. */
+const CHECKLIST_ANCHOR: Record<string, string> = {
+  rate_card_selected: 'sec-settings',
+  upcharge_set: 'sec-settings',
+  contingency_set: 'sec-settings',
+  labor_role_assigned: 'sec-labor',
+  resource_capacity: 'sec-labor',
+  cloud_line_complete: 'sec-cloud',
+  nonlabor_amount_period: 'sec-nonlabor',
+  billing_period_set: 'sec-labor',
+  totals_reconcile: 'sec-totals',
+};
+const SCOPE_ANCHOR: Record<string, string> = {
+  ESTIMATE: 'sec-settings',
+  LABOR: 'sec-labor',
+  NONLABOR: 'sec-nonlabor',
+  CLOUD: 'sec-cloud',
+  RESOURCE: 'sec-labor',
+};
+
+function goToChecklistItem(item: { key: string; scope: string }): void {
+  const anchor = CHECKLIST_ANCHOR[item.key] ?? SCOPE_ANCHOR[item.scope] ?? 'sec-settings';
+  const el = document.getElementById(anchor);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  el.classList.add('ring-2', 'ring-brand', 'ring-offset-2');
+  window.setTimeout(() => el.classList.remove('ring-2', 'ring-brand', 'ring-offset-2'), 1600);
 }
 
 export default function EstimateEditorPage() {
@@ -145,7 +177,10 @@ export default function EstimateEditorPage() {
       </div>
 
       {/* Totals */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div
+        id="sec-totals"
+        className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-xl scroll-mt-20 transition-shadow"
+      >
         <Card label="One-time" value={`${t.oneTimeTotal} ${cur}`} />
         <Card label="Monthly" value={`${t.monthlyTotal} ${cur}`} />
         <Card label="Yearly" value={`${t.yearlyTotal} ${cur}`} />
@@ -170,8 +205,23 @@ export default function EstimateEditorPage() {
 
       <BaselinesSection est={est} m={m} />
 
-      <Section title="Settings">
+      <Section title="Settings" id="sec-settings">
         <div className="flex flex-wrap gap-6 items-end">
+          <label className="text-sm">
+            <span className="text-slate-600">Rate card</span>
+            <select
+              value={est.rateCardId ?? ''}
+              onChange={(e) => m.patch.mutate({ rateCardId: e.target.value || null })}
+              className="mt-1 block border border-slate-300 rounded px-2 py-1 min-w-56"
+            >
+              <option value="">— none —</option>
+              {(rateCards ?? []).map((rc) => (
+                <option key={rc.id} value={rc.id}>
+                  {rc.name} ({rc.currency})
+                </option>
+              ))}
+            </select>
+          </label>
           <NumberSetting
             label="Global upcharge %"
             value={est.globalUpchargePercent}
@@ -274,22 +324,34 @@ function GovernanceSection({
             </div>
             <ul className="text-sm space-y-1">
               {checklist.items.map((i) => (
-                <li key={i.key} className="flex items-start gap-2">
-                  <span
-                    className={
-                      i.passed
-                        ? 'text-emerald-600'
-                        : i.severity === 'BLOCKER'
-                          ? 'text-rose-600'
-                          : 'text-amber-600'
-                    }
+                <li key={i.key}>
+                  <button
+                    onClick={() => goToChecklistItem(i)}
+                    title="Go to where to fix this"
+                    className="w-full flex items-start gap-2 text-left rounded hover:bg-slate-50 px-1 py-0.5 group"
                   >
-                    {i.passed ? '✓' : '✕'}
-                  </span>
-                  <span className="text-slate-600">{i.message}</span>
+                    <span
+                      className={
+                        i.passed
+                          ? 'text-emerald-600'
+                          : i.severity === 'BLOCKER'
+                            ? 'text-rose-600'
+                            : 'text-amber-600'
+                      }
+                    >
+                      {i.passed ? '✓' : '✕'}
+                    </span>
+                    <span className="text-slate-600 group-hover:text-slate-900 group-hover:underline">
+                      {i.message}
+                    </span>
+                    <span className="ml-auto text-slate-300 group-hover:text-brand">→</span>
+                  </button>
                 </li>
               ))}
             </ul>
+            <p className="text-xs text-slate-400">
+              Tip: click an item to jump to where it’s fixed.
+            </p>
           </>
         )}
       </Section>
@@ -466,7 +528,7 @@ function LaborSection({
   }
 
   return (
-    <Section title="Labor">
+    <Section title="Labor" id="sec-labor">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="text-slate-500">
@@ -637,7 +699,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   }
 
   return (
-    <Section title="Non-labor">
+    <Section title="Non-labor" id="sec-nonlabor">
       <table className="w-full text-sm">
         <thead className="text-slate-500">
           <tr>
@@ -731,7 +793,7 @@ function CloudSection({
   }
 
   return (
-    <Section title="Cloud compute">
+    <Section title="Cloud compute" id="sec-cloud">
       <table className="w-full text-sm">
         <thead className="text-slate-500">
           <tr>

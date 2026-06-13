@@ -343,3 +343,9 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** Replaced the PricingProvider stub with real integrations — Azure Retail Prices (no auth, live), AWS Price List GetProducts (SigV4 via node:crypto, gated on creds), GCP Cloud Billing skus (gated on key, core+ram → instance price). Pure tested mappers (`price-mappers.ts` + spec, 5 tests); resilient network shells (12s timeout, fallback). `sync` applies refreshed prices + source; compose passes cloud env. No migration.
 - **Result:** Pipeline green (test 56). Live: Azure sync 1.35s real call → B2ms/D2s_v5 source → AZURE_API (prices re-confirmed). AWS/GCP mappers unit-verified.
 - **Next:** commit → PR → merge.
+
+### 2026-06-13 — Smart-checklist deep-links + rate-card selector (FR-25 UX fix)
+- **Action:** Made checklist items clickable — `goToChecklistItem` scrolls to + flashes the relevant editor section (anchors `sec-settings/labor/nonlabor/cloud/totals`, mapped by rule key with scope fallback). Added a **rate-card `<select>`** to the editor Settings (PATCH rateCardId) since there was no in-editor way to set it — the cause of an unfixable `rate_card_selected` blocker. e2e extended.
+- **Why:** User reported checklist items weren't clickable and "Select a rate card" had nowhere to go.
+- **Result:** Pipeline green (test 56). Live: rate_card_selected false → PATCH rateCardId 200 → true. Web served.
+- **Next:** commit → PR → merge.
