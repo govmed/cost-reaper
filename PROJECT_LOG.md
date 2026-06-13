@@ -328,3 +328,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** `SecurityHeadersMiddleware` (nosniff/frame DENY/CSP frame-ancestors/referrer/COOP/permissions-policy/HSTS-in-prod; strips X-Powered-By) applied app-wide; `LoginThrottleGuard` (in-memory per-IP, 30/min → 429) on /auth/login + /auth/register; `x-powered-by` disabled in main.ts. Dep-free.
 - **Result:** Pipeline green (test 50). Live: all headers present, X-Powered-By gone, login still 200.
 - **Next:** commit → PR → merge; continue (FE-22 export, FE-12 multi-currency).
+
+### 2026-06-13 — FE-22 Excel export (FR-20)
+- **Action:** `toExcelHtml` (HTML-table workbook) + `exportExcel` (shared `buildExport`); controller `GET /estimates/:id/export-excel` (application/vnd.ms-excel); web `downloadExcel` + Export Excel button. Dep-free. PDF = via printable summary.
+- **Result:** Pipeline green (test 50). Live: correct content-type/.xls + full table (lines, CLIENT PRICE, phase summary).
+- **Next:** commit → PR → merge; last feature FE-12 multi-currency.

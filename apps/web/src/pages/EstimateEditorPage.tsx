@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { downloadCsv } from '../lib/api';
+import { downloadCsv, downloadExcel } from '../lib/api';
 import {
   useChecklist,
   useCloudPrices,
@@ -134,6 +134,12 @@ export default function EstimateEditorPage() {
             className="bg-brand text-white rounded px-3 py-1.5 text-sm font-medium"
           >
             Export CSV
+          </button>
+          <button
+            onClick={() => void downloadExcel(est.id, est.name)}
+            className="bg-brand text-white rounded px-3 py-1.5 text-sm font-medium"
+          >
+            Export Excel
           </button>
         </div>
       </div>

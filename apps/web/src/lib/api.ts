@@ -70,18 +70,25 @@ export async function login(email: string, password: string): Promise<LoginRespo
 }
 
 /** Fetch the CSV with the auth header and trigger a browser download. */
-export async function downloadCsv(id: string, name: string): Promise<void> {
-  let res = await request(`/estimates/${id}/export`, {}, true);
-  if (res.status === 401 && (await tryRefresh()))
-    res = await request(`/estimates/${id}/export`, {}, true);
+async function downloadExport(path: string, filename: string): Promise<void> {
+  let res = await request(path, {}, true);
+  if (res.status === 401 && (await tryRefresh())) res = await request(path, {}, true);
   if (!res.ok) throw new Error('Export failed');
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${name || 'estimate'}.csv`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+export function downloadCsv(id: string, name: string): Promise<void> {
+  return downloadExport(`/estimates/${id}/export`, `${name || 'estimate'}.csv`);
+}
+
+export function downloadExcel(id: string, name: string): Promise<void> {
+  return downloadExport(`/estimates/${id}/export-excel`, `${name || 'estimate'}.xls`);
 }

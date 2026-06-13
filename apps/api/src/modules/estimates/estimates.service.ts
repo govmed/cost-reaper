@@ -31,7 +31,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { ReferenceService } from '../reference/reference.service';
 import { buildEngineInput, toMappableEstimate } from './engine-mapping';
-import { CsvLine, toCsv } from './estimate-csv';
+import { CsvLine, toCsv, toExcelHtml } from './estimate-csv';
 
 const DETAIL_INCLUDE = {
   laborItems: { include: { rateCardRole: true } },
@@ -331,7 +331,8 @@ export class EstimatesService {
     return { ...this.computeTotals(e), currency: e.currency };
   }
 
-  async exportCsv(id: string): Promise<{ filename: string; csv: string }> {
+  /** Assemble the export rows + totals once, reused by CSV and Excel exports. */
+  private async buildExport(id: string) {
     const e: any = await this.prisma.estimate.findUnique({
       where: { id },
       include: DETAIL_INCLUDE,
@@ -370,10 +371,17 @@ export class EstimatesService {
         lineTotal: c.lineTotal.toString(),
       })),
     ];
-    return {
-      filename: `estimate-${id}.csv`,
-      csv: toCsv({ name: e.name, currency: e.currency }, lines, totals),
-    };
+    return { meta: { name: e.name, currency: e.currency }, lines, totals };
+  }
+
+  async exportCsv(id: string): Promise<{ filename: string; csv: string }> {
+    const { meta, lines, totals } = await this.buildExport(id);
+    return { filename: `estimate-${id}.csv`, csv: toCsv(meta, lines, totals) };
+  }
+
+  async exportExcel(id: string): Promise<{ filename: string; html: string }> {
+    const { meta, lines, totals } = await this.buildExport(id);
+    return { filename: `estimate-${id}.xls`, html: toExcelHtml(meta, lines, totals) };
   }
 
   // ── Line items ───────────────────────────────────────────────────────────────

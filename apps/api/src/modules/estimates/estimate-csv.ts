@@ -72,3 +72,62 @@ export function toCsv(
   }
   return rows.map((r) => r.map(esc).join(',')).join('\n') + '\n';
 }
+
+/**
+ * Render an estimate as a spreadsheet (FR-20 / FE-22). An HTML table served as
+ * application/vnd.ms-excel opens natively in Excel/Sheets — no dependency. The
+ * same data as the CSV: lines, totals, client pricing, and per-phase summary.
+ */
+function he(v: string): string {
+  return v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+export function toExcelHtml(
+  meta: { name: string; currency: string },
+  lines: CsvLine[],
+  totals: EngineResult,
+): string {
+  const th = (cells: string[]) =>
+    `<tr>${cells.map((c) => `<th align="left">${he(c)}</th>`).join('')}</tr>`;
+  const tr = (cells: string[]) => `<tr>${cells.map((c) => `<td>${he(c)}</td>`).join('')}</tr>`;
+  const kv = (k: string, v: string) => `<tr><td><b>${he(k)}</b></td><td>${he(v)}</td></tr>`;
+
+  const lineRows = lines
+    .map((l) =>
+      tr([
+        l.type,
+        l.description,
+        l.quantity,
+        l.unit,
+        l.rate,
+        l.billingPeriod,
+        l.phase || 'Unassigned',
+        l.lineTotal,
+      ]),
+    )
+    .join('');
+  const phaseRows = totals.phases
+    .map((p) => tr([p.phase, p.oneTime, p.monthly, p.yearly]))
+    .join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<table border="1">
+${kv('Estimate', meta.name)}
+${kv('Currency', meta.currency)}
+<tr></tr>
+${th(['Type', 'Description', 'Quantity', 'Unit', 'Rate/Amount', 'Billing', 'SDLC phase', 'Line total'])}
+${lineRows}
+<tr></tr>
+${kv('One-time total', totals.oneTimeTotal)}
+${kv('Monthly total', totals.monthlyTotal)}
+${kv('Yearly total', totals.yearlyTotal)}
+${kv('Upcharge', totals.upchargeAmount)}
+${kv('Contingency', totals.contingencyAmount)}
+${kv('GRAND TOTAL (cost)', totals.grandTotal)}
+${kv('Margin', totals.marginAmount)}
+${kv('Sell price', totals.sellPrice)}
+${kv('Tax', totals.taxAmount)}
+${kv('CLIENT PRICE', totals.clientPrice)}
+${totals.phases.length ? `<tr></tr>${th(['Cost by SDLC phase', 'One-time', 'Monthly', 'Yearly'])}${phaseRows}` : ''}
+</table></body></html>`;
+}

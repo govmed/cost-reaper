@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Excel export (FE-22, FR-20)
+
+#### Added
+- **Export Excel** button on the estimate editor: `GET /estimates/:id/export-excel` returns a spreadsheet (`application/vnd.ms-excel`, `.xls`) — line items, all totals, client pricing, and the per-SDLC-phase summary — that opens natively in Excel/Sheets. Dep-free (HTML-table workbook); shares one export-data builder with the CSV export. **PDF** export is covered by the **Printable summary** (browser Print → Save as PDF). Verified live.
+
 ### Security hardening (FE-31, OWASP)
 
 #### Added
