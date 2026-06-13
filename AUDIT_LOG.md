@@ -419,3 +419,6 @@ After this - in the help guide I want to create several step-by-step use cases. 
 
 ### [2026-06-13 17:32 UTC] — AGENT
 Acknowledged. After shipping the deep-link fix, will build an in-app Help guide: a comprehensive catalog of step-by-step use cases, each meta-tagged (feature IDs, route, and checklist-rule keys) and individually anchored so the app can deep-link straight into the relevant use case (e.g. from a blocked smart-checklist item).
+
+### [2026-06-13 18:00 UTC] — AGENT
+Built the in-app Help guide: 31 meta-tagged step-by-step use cases across 6 categories, each with a stable deep-link anchor (`/help#uc-<id>`), a searchable page with sidebar TOC + hash-scroll highlight, and per-card meta (feature IDs, "Go there" route). Wired the smart checklist so each failing item shows a "How?" link that deep-links to the use case explaining the fix (joined via the rule's checklistKeys meta-tag). USER_GUIDE §11 + e2e added. Pipeline green (test 56, lint 0). Committing → PR → merge.

@@ -13,6 +13,7 @@ import {
   useWorkflow,
 } from '../lib/queries';
 import { SDLC_PHASES } from '../lib/types';
+import { useCaseForChecklistKey } from '../lib/help-content';
 import type {
   BillingPeriod,
   CapacityViolation,
@@ -337,34 +338,46 @@ function GovernanceSection({
               </span>
             </div>
             <ul className="text-sm space-y-1">
-              {checklist.items.map((i) => (
-                <li key={i.key}>
-                  <button
-                    onClick={() => goToChecklistItem(i)}
-                    title="Go to where to fix this"
-                    className="w-full flex items-start gap-2 text-left rounded hover:bg-slate-50 px-1 py-0.5 group"
-                  >
-                    <span
-                      className={
-                        i.passed
-                          ? 'text-emerald-600'
-                          : i.severity === 'BLOCKER'
-                            ? 'text-rose-600'
-                            : 'text-amber-600'
-                      }
+              {checklist.items.map((i) => {
+                const guide = !i.passed ? useCaseForChecklistKey(i.key) : undefined;
+                return (
+                  <li key={i.key} className="flex items-start gap-1">
+                    <button
+                      onClick={() => goToChecklistItem(i)}
+                      title="Go to where to fix this"
+                      className="flex-1 flex items-start gap-2 text-left rounded hover:bg-slate-50 px-1 py-0.5 group"
                     >
-                      {i.passed ? '✓' : '✕'}
-                    </span>
-                    <span className="text-slate-600 group-hover:text-slate-900 group-hover:underline">
-                      {i.message}
-                    </span>
-                    <span className="ml-auto text-slate-300 group-hover:text-brand">→</span>
-                  </button>
-                </li>
-              ))}
+                      <span
+                        className={
+                          i.passed
+                            ? 'text-emerald-600'
+                            : i.severity === 'BLOCKER'
+                              ? 'text-rose-600'
+                              : 'text-amber-600'
+                        }
+                      >
+                        {i.passed ? '✓' : '✕'}
+                      </span>
+                      <span className="text-slate-600 group-hover:text-slate-900 group-hover:underline">
+                        {i.message}
+                      </span>
+                      <span className="ml-auto text-slate-300 group-hover:text-brand">→</span>
+                    </button>
+                    {guide && (
+                      <Link
+                        to={`/help#uc-${guide.id}`}
+                        title={`How to fix: ${guide.title}`}
+                        className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
+                      >
+                        How?
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
             <p className="text-xs text-slate-400">
-              Tip: click an item to jump to where it’s fixed.
+              Tip: click an item to jump to where it’s fixed, or “How?” for a step-by-step guide.
             </p>
           </>
         )}
