@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   type AllocationLine,
   computeEstimate,
@@ -8,7 +13,9 @@ import {
 } from '@cost-reaper/engine';
 import type {
   AssumptionInput,
+  AuthUser,
   CloudLineInput,
+  CommentInput,
   CreateEstimateRequest,
   EngineResult,
   EstimateListQuery,
@@ -27,6 +34,7 @@ const DETAIL_INCLUDE = {
   nonLaborItems: true,
   cloudItems: true,
   assumptions: { orderBy: { createdAt: 'asc' as const } },
+  comments: { orderBy: { createdAt: 'asc' as const } },
   currentStage: true,
 };
 
@@ -433,6 +441,29 @@ export class EstimatesService {
     return this.getDetail(estimateId);
   }
 
+  // ── Comments (FR-19) ─────────────────────────────────────────────────────────
+
+  async addComment(estimateId: string, dto: CommentInput, author: AuthUser) {
+    await this.ensure(estimateId);
+    await this.prisma.comment.create({
+      data: { estimateId, authorId: author.id, authorEmail: author.email, text: dto.text },
+    });
+    await this.audit.record('Estimate', estimateId, 'COMMENT', author.id);
+    return this.getDetail(estimateId);
+  }
+
+  /** A comment may be deleted by its author or an admin. */
+  async deleteComment(estimateId: string, commentId: string, user: AuthUser) {
+    const c = await this.prisma.comment.findFirst({ where: { id: commentId, estimateId } });
+    if (!c) throw new NotFoundException('Comment not found');
+    if (c.authorId !== user.id && user.role !== 'ADMIN') {
+      throw new ForbiddenException('Only the author or an admin can delete a comment');
+    }
+    await this.prisma.comment.delete({ where: { id: commentId } });
+    await this.audit.record('Estimate', estimateId, 'UPDATE', user.id);
+    return this.getDetail(estimateId);
+  }
+
   // ── Internals ────────────────────────────────────────────────────────────────
 
   private async ensure(id: string): Promise<void> {
@@ -511,6 +542,13 @@ export class EstimatesService {
         id: a.id,
         text: a.text,
         createdAt: a.createdAt.toISOString(),
+      })),
+      comments: (e.comments ?? []).map((c: any) => ({
+        id: c.id,
+        authorId: c.authorId,
+        authorEmail: c.authorEmail,
+        text: c.text,
+        createdAt: c.createdAt.toISOString(),
       })),
       totals: this.computeTotals(e),
       capacityViolations: findCapacityViolations(e.laborItems.map(toAllocationLine)),

@@ -364,3 +364,7 @@ Built & verified **FE-20 margin & tax (FR-16)** — sell price = cost/(1−margi
 ---
 ### [2026-06-13 01:05 UTC] — AGENT (continuous run)
 Built & verified **FE-54 part 2: estimate status data-driven (FR-29)** — enum→TEXT, validated against ESTIMATE_STATUS reference; editor dropdown from reference. Live: FINAL 200, BOGUS 400, admin ARCHIVED usable. Committing → PR → merge, continuing.
+
+---
+### [2026-06-13 01:20 UTC] — AGENT (continuous run)
+Built & verified **FE-28 comments (FR-19)** — comment model + endpoints + editor panel; author-or-admin delete. Live: comment posts + appears with author. Committing → PR → merge.

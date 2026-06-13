@@ -159,11 +159,13 @@ export function useEstimateMutations(id: string) {
     addNonLabor: useMutation({ mutationFn: post('/non-labor-items'), onSuccess }),
     addCloud: useMutation({ mutationFn: post('/cloud-items'), onSuccess }),
     addAssumption: useMutation({ mutationFn: post('/assumptions'), onSuccess }),
+    addComment: useMutation({ mutationFn: post('/comments'), onSuccess }),
     transition: useMutation({ mutationFn: post('/transitions'), onSuccess }),
     delLabor: useMutation({ mutationFn: del('/labor-items'), onSuccess }),
     delNonLabor: useMutation({ mutationFn: del('/non-labor-items'), onSuccess }),
     delCloud: useMutation({ mutationFn: del('/cloud-items'), onSuccess }),
     delAssumption: useMutation({ mutationFn: del('/assumptions'), onSuccess }),
+    delComment: useMutation({ mutationFn: del('/comments'), onSuccess }),
   };
 }
 

@@ -190,6 +190,7 @@ export default function EstimateEditorPage() {
       <NonLaborSection est={est} m={m} />
       <CloudSection est={est} prices={cloudPrices ?? []} m={m} />
       <AssumptionsSection est={est} m={m} />
+      <CommentsSection est={est} m={m} />
     </div>
   );
 }
@@ -789,6 +790,55 @@ function CloudSection({
           className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
         >
           Add cloud
+        </button>
+      </div>
+    </Section>
+  );
+}
+
+function CommentsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
+  const [text, setText] = useState('');
+  function add() {
+    if (!text.trim()) return;
+    m.addComment.mutate({ text }, { onSuccess: () => setText('') });
+  }
+  return (
+    <Section title="Comments">
+      <ul className="space-y-2 text-sm">
+        {est.comments.map((c) => (
+          <li key={c.id} className="border-b border-slate-100 pb-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500">
+                {c.authorEmail} · {new Date(c.createdAt).toLocaleString()}
+              </span>
+              <button
+                onClick={() => m.delComment.mutate(c.id)}
+                className="text-rose-600 hover:underline text-xs"
+              >
+                Delete
+              </button>
+            </div>
+            <div className="whitespace-pre-wrap">{c.text}</div>
+          </li>
+        ))}
+        {est.comments.length === 0 && <li className="text-slate-400">No comments yet.</li>}
+      </ul>
+      <div className="flex gap-2 pt-2">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') add();
+          }}
+          className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
+          placeholder="Add a comment…"
+        />
+        <button
+          onClick={add}
+          disabled={!text.trim()}
+          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+        >
+          Comment
         </button>
       </div>
     </Section>
