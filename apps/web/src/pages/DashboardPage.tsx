@@ -37,6 +37,12 @@ export default function DashboardPage() {
           }
         />
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <Stat
+          label={`Total (${data.baseCurrency} equivalent)`}
+          value={`${data.baseCurrencyTotal} ${data.baseCurrency}`}
+        />
+      </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-2">

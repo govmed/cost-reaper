@@ -6,6 +6,12 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Multi-currency / FX rates (FE-12, FR-17)
+
+#### Added
+- **FX rates** for multi-currency roll-ups: a seeded `fx_rates` table (USD base + EUR/GBP/CAD/AUD/JPY), `GET /fx-rates`, and admin upsert `PATCH /fx-rates/:currency` (audited). New admin **FX rates** page to view/edit rates.
+- The **dashboard** now converts every currency's grand total to the base currency (USD) via FX and shows a **Total (USD equivalent)** card (exact decimal `scaleMoney`). Migration `20260613150000_fx_rates` (verified fresh-deploy + no drift). Verified live (rates listed, base total computed, admin update audited).
+
 ### Excel export (FE-22, FR-20)
 
 #### Added

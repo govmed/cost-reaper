@@ -625,6 +625,26 @@ async function seedReferenceData(adminId: string): Promise<void> {
   }
 }
 
+// FX rates vs base USD (FR-17): base units per 1 unit of the currency. Idempotent.
+const FX_RATES: { currency: string; rateToBase: string }[] = [
+  { currency: 'USD', rateToBase: '1.000000' },
+  { currency: 'EUR', rateToBase: '1.080000' },
+  { currency: 'GBP', rateToBase: '1.270000' },
+  { currency: 'CAD', rateToBase: '0.740000' },
+  { currency: 'AUD', rateToBase: '0.660000' },
+  { currency: 'JPY', rateToBase: '0.006700' },
+];
+
+async function seedFxRates(): Promise<void> {
+  for (const r of FX_RATES) {
+    await prisma.fxRate.upsert({
+      where: { currency: r.currency },
+      update: { rateToBase: r.rateToBase },
+      create: { currency: r.currency, rateToBase: r.rateToBase },
+    });
+  }
+}
+
 async function main(): Promise<void> {
   const admin = await seedAdmin();
   await seedRateCard(admin.id);
@@ -632,6 +652,7 @@ async function main(): Promise<void> {
   await seedDefaultWorkflow(admin.id);
   await seedChecklistRules();
   await seedReferenceData(admin.id);
+  await seedFxRates();
   console.log(`Seed complete. Admin: ${admin.email}`);
 }
 

@@ -10,6 +10,7 @@ import RateCardsPage from './pages/RateCardsPage';
 import UsersPage from './pages/UsersPage';
 import CloudPricesPage from './pages/CloudPricesPage';
 import ReferenceDataPage from './pages/ReferenceDataPage';
+import FxRatesPage from './pages/FxRatesPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -48,6 +49,9 @@ export default function App() {
                   </Link>
                   <Link to="/reference-data" className="hover:underline">
                     Reference data
+                  </Link>
+                  <Link to="/fx-rates" className="hover:underline">
+                    FX rates
                   </Link>
                 </>
               )}
@@ -129,6 +133,14 @@ export default function App() {
             element={
               <Protected>
                 <ReferenceDataPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/fx-rates"
+            element={
+              <Protected>
+                <FxRatesPage />
               </Protected>
             }
           />
