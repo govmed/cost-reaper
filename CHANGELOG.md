@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Margin & tax — client pricing (FE-20, FR-16)
+
+#### Added
+- **Estimate-level margin and tax** to produce a client-facing price. The engine takes the grand-total **cost** and computes **sell price = cost / (1 − margin%)**, then **client price = sell × (1 + tax%)**, exposing `marginAmount`, `sellPrice`, `taxAmount`, `clientPrice`. Surfaced in the editor (Margin %/Tax % settings + a client-price card shown when either is set) and the CSV export. Migration `20260613100000_margin_tax` (2 columns, default 0; verified fresh-deploy + no drift). Verified live (20%/10% on 1000 → 1375).
+
 ### Three-point / PERT estimation (FE-19, FR-13)
 
 #### Added

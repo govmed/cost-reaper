@@ -293,3 +293,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** `apps/api/prisma/{schema.prisma,migrations/20260613090000_…}`, `packages/engine/src/{estimation-engine,index,*.test}.ts`, `packages/types/src/line-items.ts`, `apps/api/src/modules/estimates/estimates.service.ts`, `apps/web/src/{lib/types.ts,pages/EstimateEditorPage.tsx}`, CHANGELOG.
 - **Result:** Pipeline green (test 48), migration verified (fresh-deploy + no drift). Live smoke: PERT 2/4/12 → effective units 5, lineTotal 1050; invalid ordering → 400.
 - **Next:** commit → PR → CI → merge; continue with FE-20 margin/tax.
+
+### 2026-06-13 — FE-20 Margin & tax (client pricing, FR-16)
+- **Action:** Estimate-level marginPercent + taxPercent (migration `20260613100000_margin_tax`); engine computes sellPrice = cost/(1−margin), clientPrice = sell×(1+tax) + marginAmount/taxAmount; threaded through types/mapping/service/DTO; editor Margin/Tax settings + client-price card; CSV rows. Engine tests for the math.
+- **Result:** Pipeline green (test 50), migration verified. Live: 20%/10% on cost 1000 → margin 250, sell 1250, tax 125, client 1375.
+- **Next:** commit → PR → merge; continue (FE-54 status / FE-22 PDF / scenarios).

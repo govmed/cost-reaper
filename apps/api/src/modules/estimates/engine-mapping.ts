@@ -32,6 +32,8 @@ export interface MappableCloud {
 export interface MappableEstimate {
   globalUpchargePercent: number;
   contingencyPercent: number;
+  marginPercent: number;
+  taxPercent: number;
   labor: MappableLabor[];
   nonLabor: MappableNonLabor[];
   cloud: MappableCloud[];
@@ -43,6 +45,8 @@ export function toMappableEstimate(e: any): MappableEstimate {
   return {
     globalUpchargePercent: Number(e.globalUpchargePercent),
     contingencyPercent: Number(e.contingencyPercent),
+    marginPercent: Number(e.marginPercent ?? 0),
+    taxPercent: Number(e.taxPercent ?? 0),
     labor: e.laborItems.map((l: any) => ({
       id: l.id,
       roleName: l.rateCardRole?.roleName ?? null,
@@ -118,6 +122,8 @@ export function buildEngineInput(e: MappableEstimate): EngineInput {
   return {
     globalUpchargePercent: e.globalUpchargePercent,
     contingencyPercent: e.contingencyPercent,
+    marginPercent: e.marginPercent,
+    taxPercent: e.taxPercent,
     lines,
     moneyScale: 4,
   };

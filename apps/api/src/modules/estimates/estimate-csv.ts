@@ -58,7 +58,11 @@ export function toCsv(
     ['One-time total', totals.oneTimeTotal],
     ['Monthly total', totals.monthlyTotal],
     ['Yearly total', totals.yearlyTotal],
-    ['GRAND TOTAL', totals.grandTotal],
+    ['GRAND TOTAL (cost)', totals.grandTotal],
+    ['Margin amount', totals.marginAmount],
+    ['Sell price', totals.sellPrice],
+    ['Tax amount', totals.taxAmount],
+    ['CLIENT PRICE', totals.clientPrice],
   );
   if (totals.phases.length) {
     rows.push([], ['Cost by SDLC phase', 'One-time', 'Monthly', 'Yearly']);

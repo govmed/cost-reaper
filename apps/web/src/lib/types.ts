@@ -47,6 +47,10 @@ export interface EngineResult {
   monthlyTotal: string;
   yearlyTotal: string;
   grandTotal: string;
+  marginAmount: string;
+  sellPrice: string;
+  taxAmount: string;
+  clientPrice: string;
   categories: { category: string; oneTime: string; monthly: string; yearly: string }[];
   phases: { phase: string; oneTime: string; monthly: string; yearly: string }[];
 }
@@ -118,6 +122,8 @@ export interface EstimateDetail {
   ownerId: string;
   globalUpchargePercent: number;
   contingencyPercent: number;
+  marginPercent: number;
+  taxPercent: number;
   laborItems: LaborLine[];
   nonLaborItems: NonLaborLine[];
   cloudItems: CloudLine[];

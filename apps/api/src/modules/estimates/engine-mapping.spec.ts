@@ -7,6 +7,8 @@ describe('buildEngineInput + computeEstimate', () => {
     const input = buildEngineInput({
       globalUpchargePercent: 10,
       contingencyPercent: 0,
+      marginPercent: 0,
+      taxPercent: 0,
       labor: [
         {
           id: 'l1',
@@ -47,6 +49,8 @@ describe('buildEngineInput + computeEstimate', () => {
       buildEngineInput({
         globalUpchargePercent: 10,
         contingencyPercent: 0,
+        marginPercent: 0,
+        taxPercent: 0,
         labor: [
           {
             id: 'l1',

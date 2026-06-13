@@ -40,7 +40,8 @@ describe('toCsv', () => {
     );
 
     expect(csv).toContain('"My, Estimate"'); // comma -> quoted
-    expect(csv).toContain('GRAND TOTAL,1000.0000');
+    expect(csv).toContain('GRAND TOTAL (cost),1000.0000');
+    expect(csv).toContain('CLIENT PRICE,1000.0000'); // no margin/tax → equals cost
     expect(csv.trim().split('\n').length).toBeGreaterThan(10);
   });
 });
