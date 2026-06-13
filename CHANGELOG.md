@@ -6,6 +6,15 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Live cloud price fetch — real AWS/GCP/Azure integration (FR-21a)
+
+#### Changed
+- The `PricingProvider` stub is now **real provider integrations**:
+  - **Azure** — live, no-auth pull from the **Retail Prices API** (filters VM SKUs by region; matches Linux on-demand hourly prices). Verified live (sync round-trips to `prices.azure.com`, matched rows stamped `source: AZURE_API`).
+  - **AWS** — **SigV4-signed** call to the **Price List Query API** (`GetProducts`, EC2 on-demand), activated when `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` are set. No SDK dependency (signing via `node:crypto`).
+  - **GCP** — **Cloud Billing Catalog API**, activated when `GCP_BILLING_API_KEY` is set; computes per-instance price from the separate Core + RAM SKUs.
+- Each provider has a **pure, unit-tested response mapper** (Azure/AWS/GCP); network calls have a 12s timeout and **fall back to the catalog** on any error or missing credentials (estimate snapshots untouched, NFR-14). `sync` now updates matched rows' unit price + `source` and re-stamps `fetched_at`. `docker-compose` passes the optional cloud credentials through. No migration.
+
 ### Multi-currency / FX rates (FE-12, FR-17)
 
 #### Added

@@ -338,3 +338,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** `FxRate` table + seed (USD base + 5); FxModule (GET list + admin PATCH upsert, audited); engine `scaleMoney`; dashboard converts per-currency totals → base (USD) `baseCurrencyTotal`; web FX rates admin page + dashboard base card; migration `20260613150000_fx_rates`.
 - **Result:** Pipeline green (test 51), migration verified. Live: 6 rates, dashboard baseCurrencyTotal, admin PATCH EUR→1.10 audited.
 - **Milestone:** All 54 features implemented.
+
+### 2026-06-13 — FR-21a real cloud price fetch (Azure live, AWS SigV4, GCP)
+- **Action:** Replaced the PricingProvider stub with real integrations — Azure Retail Prices (no auth, live), AWS Price List GetProducts (SigV4 via node:crypto, gated on creds), GCP Cloud Billing skus (gated on key, core+ram → instance price). Pure tested mappers (`price-mappers.ts` + spec, 5 tests); resilient network shells (12s timeout, fallback). `sync` applies refreshed prices + source; compose passes cloud env. No migration.
+- **Result:** Pipeline green (test 56). Live: Azure sync 1.35s real call → B2ms/D2s_v5 source → AZURE_API (prices re-confirmed). AWS/GCP mappers unit-verified.
+- **Next:** commit → PR → merge.
