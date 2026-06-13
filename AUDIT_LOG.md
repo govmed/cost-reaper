@@ -406,3 +406,16 @@ Under Estimates → Smart checklist, items aren't clickable to take me to where 
 
 ### [2026-06-13 17:20 UTC] — AGENT
 Made checklist items clickable (scroll + flash the relevant section) and added a rate-card selector to the editor Settings (there was no in-editor control to clear the rate_card_selected blocker). Live-verified: selecting a rate card flips the item to passed. Pipeline green (test 56). Committing → PR → merge.
+
+---
+### [2026-06-13 17:30 UTC] — USER
+Deep-link to the specific incomplete line
+
+### [2026-06-13 17:30 UTC] — AGENT
+Added `entityIds` to checklist item results so each rule names the exact offending line(s); the editor now scrolls to + amber-flashes those specific `line-<id>` rows on click (section-anchor fallback for estimate-level items). Pipeline green (test 56, +entityIds assertions); live-verified the API returns the bad labor line's id. Committing → PR → merge.
+
+### [2026-06-13 17:32 UTC] — USER
+After this - in the help guide I want to create several step-by-step use cases. Like write all possible use cases. Meta tag these use cases so we can use that when a user gets step so we can deep link into that use case.
+
+### [2026-06-13 17:32 UTC] — AGENT
+Acknowledged. After shipping the deep-link fix, will build an in-app Help guide: a comprehensive catalog of step-by-step use cases, each meta-tagged (feature IDs, route, and checklist-rule keys) and individually anchored so the app can deep-link straight into the relevant use case (e.g. from a blocked smart-checklist item).

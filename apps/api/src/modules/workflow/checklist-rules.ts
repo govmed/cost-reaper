@@ -18,6 +18,7 @@ export interface ChecklistEstimate {
   globalUpchargePercent: number;
   contingencyPercent: number;
   labor: {
+    id: string;
     rateCardRoleId: string | null;
     rateSnapshot: string;
     quantity: number;
@@ -28,8 +29,9 @@ export interface ChecklistEstimate {
     startDate: string | null;
     endDate: string | null;
   }[];
-  nonLabor: { amount: string; billingPeriod: string }[];
+  nonLabor: { id: string; amount: string; billingPeriod: string }[];
   cloud: {
+    id: string;
     cloudPriceId: string | null;
     unitPriceSnapshot: string;
     quantity: number;
@@ -40,7 +42,12 @@ export interface ChecklistEstimate {
   }[];
 }
 
-type Evaluator = (e: ChecklistEstimate) => { passed: boolean; message: string };
+/** An evaluator may name the specific offending line IDs (for deep-linking). */
+type Evaluator = (e: ChecklistEstimate) => {
+  passed: boolean;
+  message: string;
+  entityIds?: string[];
+};
 
 /** Built-in rule logic, keyed by ChecklistRule.key (FR-25). Unknown keys pass. */
 const EVALUATORS: Record<string, Evaluator> = {
@@ -57,6 +64,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       message: bad.length
         ? `${bad.length} labor line(s) missing a role/rate, quantity or units.`
         : 'Every labor line has a role and quantity.',
+      entityIds: bad.map((l) => l.id),
     };
   },
   cloud_line_complete: (e) => {
@@ -73,6 +81,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       message: bad.length
         ? `${bad.length} cloud line(s) missing provider/region/instance/usage or price.`
         : 'Every cloud line is complete with a snapshotted price.',
+      entityIds: bad.map((c) => c.id),
     };
   },
   nonlabor_amount_period: (e) => {
@@ -82,6 +91,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       message: bad.length
         ? `${bad.length} non-labor line(s) missing an amount or billing period.`
         : 'Every non-labor line has an amount and billing period.',
+      entityIds: bad.map((n) => n.id),
     };
   },
   billing_period_set: (e) => {
@@ -92,6 +102,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       message: bad.length
         ? `${bad.length} line(s) missing a billing period.`
         : 'All lines have a billing period.',
+      entityIds: bad.map((x) => x.id),
     };
   },
   upcharge_set: (e) => ({
@@ -121,11 +132,16 @@ const EVALUATORS: Record<string, Evaluator> = {
     if (!violations.length) {
       return { passed: true, message: 'No resource exceeds 100% on any date.' };
     }
+    const offending = new Set(violations.map((v) => v.resourceName));
+    const entityIds = e.labor
+      .filter((l) => l.resourceName && offending.has(l.resourceName))
+      .map((l) => l.id);
     const v = violations[0];
     const more = violations.length > 1 ? ` (+${violations.length - 1} more)` : '';
     return {
       passed: false,
       message: `${v.resourceName} is over-allocated to ${v.totalPercent}% on ${v.date}${more}.`,
+      entityIds,
     };
   },
 };
@@ -144,6 +160,7 @@ export function evaluateChecklist(
       scope: r.scope,
       passed: res.passed,
       message: res.message,
+      entityIds: res.entityIds ?? [],
     };
   });
   const blocking = items.some((i) => i.severity === 'BLOCKER' && !i.passed);

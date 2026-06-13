@@ -97,13 +97,27 @@ const SCOPE_ANCHOR: Record<string, string> = {
   RESOURCE: 'sec-labor',
 };
 
-function goToChecklistItem(item: { key: string; scope: string }): void {
+function flash(el: HTMLElement, classes: string[], ms: number): void {
+  el.classList.add(...classes);
+  window.setTimeout(() => el.classList.remove(...classes), ms);
+}
+
+function goToChecklistItem(item: { key: string; scope: string; entityIds: string[] }): void {
+  // Deep-link to the specific offending line(s) when the rule names them (FR-25);
+  // otherwise fall back to the section where this kind of item is fixed.
+  const rows = item.entityIds
+    .map((eid) => document.getElementById(`line-${eid}`))
+    .filter((el): el is HTMLElement => el != null);
+  if (rows.length) {
+    rows[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    rows.forEach((r) => flash(r, ['bg-amber-100', 'ring-2', 'ring-amber-400'], 2200));
+    return;
+  }
   const anchor = CHECKLIST_ANCHOR[item.key] ?? SCOPE_ANCHOR[item.scope] ?? 'sec-settings';
   const el = document.getElementById(anchor);
   if (!el) return;
   el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  el.classList.add('ring-2', 'ring-brand', 'ring-offset-2');
-  window.setTimeout(() => el.classList.remove('ring-2', 'ring-brand', 'ring-offset-2'), 1600);
+  flash(el, ['ring-2', 'ring-brand', 'ring-offset-2'], 1600);
 }
 
 export default function EstimateEditorPage() {
@@ -548,7 +562,11 @@ function LaborSection({
           </thead>
           <tbody>
             {est.laborItems.map((l) => (
-              <tr key={l.id} className="border-t border-slate-100">
+              <tr
+                key={l.id}
+                id={`line-${l.id}`}
+                className="border-t border-slate-100 scroll-mt-24 transition-colors"
+              >
                 <td className="px-3 py-2">{l.roleName ?? l.description ?? '—'}</td>
                 <td className="px-3 py-2">{l.resourceName ?? '—'}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.allocationPercent}%</td>
@@ -713,7 +731,11 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
         </thead>
         <tbody>
           {est.nonLaborItems.map((n) => (
-            <tr key={n.id} className="border-t border-slate-100">
+            <tr
+              key={n.id}
+              id={`line-${n.id}`}
+              className="border-t border-slate-100 scroll-mt-24 transition-colors"
+            >
               <td className="px-3 py-2">{n.category}</td>
               <td className="px-3 py-2 text-right tabular-nums">{n.amount}</td>
               <td className="px-3 py-2">{n.billingPeriod}</td>
@@ -808,7 +830,11 @@ function CloudSection({
         </thead>
         <tbody>
           {est.cloudItems.map((c) => (
-            <tr key={c.id} className="border-t border-slate-100">
+            <tr
+              key={c.id}
+              id={`line-${c.id}`}
+              className="border-t border-slate-100 scroll-mt-24 transition-colors"
+            >
               <td className="px-3 py-2">
                 {c.provider} · {c.skuOrInstance}{' '}
                 <span className="text-slate-400">({c.region})</span>

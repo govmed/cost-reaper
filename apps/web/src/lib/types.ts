@@ -266,6 +266,8 @@ export interface ChecklistItem {
   scope: string;
   passed: boolean;
   message: string;
+  /** IDs of the specific line items this rule flags, for deep-linking. */
+  entityIds: string[];
 }
 export interface ChecklistResult {
   passed: boolean;

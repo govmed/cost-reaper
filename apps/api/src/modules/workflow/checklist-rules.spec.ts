@@ -34,6 +34,7 @@ describe('evaluateChecklist', () => {
       rateCardId: 'rc1',
       labor: [
         {
+          id: 'l1',
           rateCardRoleId: 'role1',
           rateSnapshot: '100',
           quantity: 1,
@@ -51,12 +52,13 @@ describe('evaluateChecklist', () => {
     expect(r.completeness).toBe(1);
   });
 
-  it('flags a labor line missing its role and rate', () => {
+  it('flags a labor line missing its role and rate, naming the line for deep-linking', () => {
     const r = evaluateChecklist(RULES, {
       ...empty,
       rateCardId: 'rc1',
       labor: [
         {
+          id: 'labor-bad',
           rateCardRoleId: null,
           rateSnapshot: '0',
           quantity: 1,
@@ -69,7 +71,9 @@ describe('evaluateChecklist', () => {
         },
       ],
     });
-    expect(r.items.find((i) => i.key === 'labor_role_assigned')?.passed).toBe(false);
+    const item = r.items.find((i) => i.key === 'labor_role_assigned');
+    expect(item?.passed).toBe(false);
+    expect(item?.entityIds).toEqual(['labor-bad']);
     expect(r.blocking).toBe(true);
   });
 });
@@ -79,6 +83,7 @@ describe('resource_capacity rule (FR-27)', () => {
     { key: 'resource_capacity', description: 'Capacity', severity: 'BLOCKER', scope: 'RESOURCE' },
   ];
   const laborLine = (over: Partial<ChecklistEstimate['labor'][number]>) => ({
+    id: over.id ?? 'l',
     rateCardRoleId: 'r',
     rateSnapshot: '100',
     quantity: 1,
@@ -117,12 +122,14 @@ describe('resource_capacity rule (FR-27)', () => {
       ...empty,
       labor: [
         laborLine({
+          id: 'ada-1',
           resourceName: 'Ada',
           allocationPercent: 70,
           startDate: '2026-07-01',
           endDate: '2026-07-31',
         }),
         laborLine({
+          id: 'ada-2',
           resourceName: 'Ada',
           allocationPercent: 50,
           startDate: '2026-07-15',
@@ -133,6 +140,8 @@ describe('resource_capacity rule (FR-27)', () => {
     expect(r.blocking).toBe(true);
     expect(r.items[0].message).toContain('Ada');
     expect(r.items[0].message).toContain('2026-07-15');
+    // Both of Ada's lines are named so the UI can highlight them (FR-25 deep-link).
+    expect(r.items[0].entityIds).toEqual(['ada-1', 'ada-2']);
   });
 
   it('does not flag non-overlapping windows (handoff on adjacent days)', () => {
