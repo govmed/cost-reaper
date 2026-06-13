@@ -5,6 +5,7 @@ import configuration from './config/configuration';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuditModule } from './common/audit/audit.module';
 import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { SecurityHeadersMiddleware } from './common/middleware/security-headers.middleware';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ProblemDetailsFilter } from './common/http/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -45,6 +46,6 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+    consumer.apply(SecurityHeadersMiddleware, CorrelationIdMiddleware).forRoutes('*');
   }
 }

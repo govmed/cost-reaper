@@ -7,6 +7,10 @@ import { AppModule } from './app.module';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
+  // Don't advertise the framework (FE-31 hardening).
+  (app.getHttpAdapter().getInstance() as { disable?: (k: string) => void }).disable?.(
+    'x-powered-by',
+  );
 
   // Versioned API (FR-12). Health/readiness stay at the root for probes.
   app.setGlobalPrefix('api/v1', { exclude: ['health', 'ready'] });
