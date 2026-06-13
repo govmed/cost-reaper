@@ -87,6 +87,18 @@ export type CloudLineInput = z.infer<typeof CloudLineInput>;
 export const AssumptionInput = z.object({ text: z.string().min(1).max(2000) });
 export type AssumptionInput = z.infer<typeof AssumptionInput>;
 
+/** A collaboration comment on an estimate (FR-19). */
+export const CommentInput = z.object({ text: z.string().min(1).max(4000) });
+export type CommentInput = z.infer<typeof CommentInput>;
+
+export interface CommentDto {
+  id: string;
+  authorId: string;
+  authorEmail: string;
+  text: string;
+  createdAt: string;
+}
+
 // ── Output DTOs (money as decimal strings) ───────────────────────────────────
 
 export interface LaborLineDto {

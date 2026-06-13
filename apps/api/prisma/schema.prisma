@@ -170,6 +170,7 @@ model Estimate {
   nonLaborItems    NonLaborLineItem[]
   cloudItems       CloudComputeLineItem[]
   assumptions      Assumption[]
+  comments         Comment[]
   transitionEvents WorkflowTransitionEvent[]
 
   @@index([ownerId])
@@ -252,6 +253,19 @@ model Assumption {
 
   @@index([estimateId])
   @@map("assumptions")
+}
+
+model Comment {
+  id          String   @id @default(uuid()) @db.Uuid
+  estimateId  String   @map("estimate_id") @db.Uuid
+  estimate    Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  authorId    String   @map("author_id") @db.Uuid
+  authorEmail String   @map("author_email")
+  text        String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([estimateId])
+  @@map("comments")
 }
 
 // ─── Governance: workflow (FR-24) + checklist (FR-25) ────────────────────────

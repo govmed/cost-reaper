@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Collaboration — comments (FE-28, FR-19)
+
+#### Added
+- **Comments on estimates**: any authenticated user can post comments (author email + timestamp captured); the **author or an admin** can delete. Surfaced as a **Comments** panel in the estimate editor and returned on the estimate detail. New `comments` table (migration `20260613120000_comments`, verified fresh-deploy + no drift); endpoints `POST/DELETE /estimates/:id/comments`. Clones do not copy comments.
+
 ### FE-54 (part 2) — estimate status data-driven (FR-29)
 
 #### Changed

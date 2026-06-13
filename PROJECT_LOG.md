@@ -303,3 +303,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** Dropped EstimateStatus enum; `status` → TEXT (migration `20260613110000_estimate_status_data_driven`, data+index preserving); `update()` validates status against active ESTIMATE_STATUS reference codes; editor status dropdown loads from reference. EstimateStatus Zod type loosened to `z.string()`.
 - **Result:** Pipeline green (test 50), migration verified (deploy + no drift). Live: FINAL 200, BOGUS 400, admin-added ARCHIVED usable 200.
 - **Next:** commit → PR → merge; continue.
+
+### 2026-06-13 — FE-28 Collaboration: comments (FR-19)
+- **Action:** `Comment` model (estimate_id, author_id, author_email snapshot, text, created_at; migration `20260613120000_comments`); detail include + DTO; `addComment`/`deleteComment` (author-or-admin delete) + controller endpoints; web Comments panel + hooks.
+- **Result:** Pipeline green (test 50), migration verified. Live: comment 201, appears with authorEmail.
+- **Next:** commit → PR → merge; continue.

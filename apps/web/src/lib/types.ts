@@ -111,6 +111,13 @@ export interface Assumption {
   text: string;
   createdAt: string;
 }
+export interface Comment {
+  id: string;
+  authorId: string;
+  authorEmail: string;
+  text: string;
+  createdAt: string;
+}
 
 export interface EstimateDetail {
   id: string;
@@ -128,6 +135,7 @@ export interface EstimateDetail {
   nonLaborItems: NonLaborLine[];
   cloudItems: CloudLine[];
   assumptions: Assumption[];
+  comments: Comment[];
   totals: EngineResult;
   capacityViolations: CapacityViolation[];
 }

@@ -15,6 +15,7 @@ import type { Response } from 'express';
 import {
   AssumptionInput,
   type AuthUser,
+  CommentInput,
   CloudLineInput,
   CreateEstimateRequest,
   EstimateListQuery,
@@ -159,5 +160,24 @@ export class EstimatesController {
     @CurrentUser() u: AuthUser,
   ) {
     return this.estimates.deleteAssumption(id, itemId, u.id);
+  }
+
+  // Comments (FR-19) — any authenticated role can comment; author or admin can delete.
+  @Post(':id/comments')
+  addComment(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(CommentInput)) dto: CommentInput,
+    @CurrentUser() u: AuthUser,
+  ) {
+    return this.estimates.addComment(id, dto, u);
+  }
+
+  @Delete(':id/comments/:commentId')
+  delComment(
+    @Param('id') id: string,
+    @Param('commentId') commentId: string,
+    @CurrentUser() u: AuthUser,
+  ) {
+    return this.estimates.deleteComment(id, commentId, u);
   }
 }
