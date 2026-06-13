@@ -73,9 +73,15 @@ scripts         cross-platform setup / start / stop / test / migrate / seed / lo
 docs            architecture, ADRs, API, database, runbook, user guide
 ```
 
+## Documentation
+
+- [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) — end-user walkthrough (sign in → build an estimate → govern → export).
+- [`docs/RUNBOOK.md`](docs/RUNBOOK.md) — run, deploy, configure, migrate, back up/restore, troubleshoot.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/DATABASE.md`](docs/DATABASE.md) · [`docs/API.md`](docs/API.md) (+ Swagger at `/docs`) · [`docs/adr/`](docs/adr/) · [`docs/html/`](docs/html/) (HTML docs + draw.io flowcharts).
+
 ## Project status
 
-Sprint 0 — Foundation (EP-1). See [`PROJECT_LOG.md`](PROJECT_LOG.md) for the running narrative and
+See [`PROJECT_LOG.md`](PROJECT_LOG.md) for the running narrative and
 [`CLAUDE.md`](CLAUDE.md) → Section 19 "Current State" for where things stand right now.
 
 ## Troubleshooting

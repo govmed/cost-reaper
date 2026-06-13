@@ -6,6 +6,13 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Docs — user guide & runbook (FE-36, FE-37)
+
+#### Added
+- **`docs/USER_GUIDE.md`** — end-user walkthrough: roles, sign-in, preparing reference data (rate cards, categories, cloud prices), building an estimate (labor/non-labor/cloud, resource allocation, SDLC phase, upcharge/contingency, totals), governance (workflow + smart checklist gates), search, **CSV export & printable summary**, dashboard, clone.
+- **`docs/RUNBOOK.md`** — operate & deploy: architecture, prerequisites, configuration (`.env`), scripted bring-up, the operational scripts, health/readiness, migrations, seeding, **backup/restore** (`pg_dump`/`pg_restore`), rollback, observability, security ops, troubleshooting.
+- Linked both (plus architecture/database/API/ADRs/HTML docs) from a new **Documentation** section in `README.md`.
+
 ### Governed cost categories (FE-11, FR-29)
 
 #### Changed
