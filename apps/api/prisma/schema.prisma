@@ -174,6 +174,7 @@ model Estimate {
   cloudItems       CloudComputeLineItem[]
   assumptions      Assumption[]
   comments         Comment[]
+  baselines        Baseline[]
   transitionEvents WorkflowTransitionEvent[]
 
   @@index([ownerId])
@@ -270,6 +271,24 @@ model Comment {
 
   @@index([estimateId])
   @@map("comments")
+}
+
+model Baseline {
+  id             String   @id @default(uuid()) @db.Uuid
+  estimateId     String   @map("estimate_id") @db.Uuid
+  estimate       Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  label          String
+  grandTotal     Decimal  @map("grand_total") @db.Decimal(18, 4)
+  clientPrice    Decimal  @map("client_price") @db.Decimal(18, 4)
+  oneTimeTotal   Decimal  @map("one_time_total") @db.Decimal(18, 4)
+  monthlyTotal   Decimal  @map("monthly_total") @db.Decimal(18, 4)
+  yearlyTotal    Decimal  @map("yearly_total") @db.Decimal(18, 4)
+  snapshotJson   Json     @map("snapshot_json")
+  createdByEmail String   @map("created_by_email")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([estimateId])
+  @@map("baselines")
 }
 
 // ─── Governance: workflow (FR-24) + checklist (FR-25) ────────────────────────

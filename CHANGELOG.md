@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Versioning — baselines & diff (FE-25, FR-15)
+
+#### Added
+- **Baselines**: capture an immutable, labelled snapshot of an estimate (full detail + denormalized totals) at a point in time, and **diff** it against the current estimate. The editor's **Baselines & versions** panel shows each baseline's grand total and the **Δ vs current**. `POST/GET/DELETE /estimates/:id/baselines`. New `baselines` table (migration `20260613140000_baselines`, verified fresh-deploy + no drift). Verified live (v1=1000 stays fixed; after edits current=1500 → Δ +500).
+
 ### Scenarios (FE-24, FR-14)
 
 #### Added

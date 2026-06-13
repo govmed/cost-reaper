@@ -313,3 +313,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** Estimate `scenarioOfId` self-FK (migration `20260613130000_scenarios`); `clone(..., asScenario)` links variants to a shared root; `scenarios(id)` returns root+variants with totals; controller POST/GET `/estimates/:id/scenarios`; web Scenarios compare panel + hook + ScenarioDto.
 - **Result:** Pipeline green (test 50), migration verified. Live: create scenario clones + links; GET returns group [base(root/current), scenario] both 1000.
 - **Next:** commit → PR → merge; continue (FE-25 versioning, FE-40 last-pulled, FE-31, FE-22, FE-12).
+
+### 2026-06-13 — FE-25 Versioning / baselines (FR-15)
+- **Action:** `Baseline` model (label, denormalized totals, full snapshot_json, createdByEmail; migration `20260613140000_baselines`); `captureBaseline`/`listBaselines`/`deleteBaseline` + controller endpoints; web Baselines panel with Δ-vs-current diff; CaptureBaselineRequest/BaselineDto types.
+- **Result:** Pipeline green (test 50; added Prisma import), migration verified. Live: capture v1=1000 immutable; after +500 edit current=1500 → Δ +500.
+- **Next:** commit → PR → merge; continue (FE-40 last-pulled, FE-31, FE-22, FE-12).

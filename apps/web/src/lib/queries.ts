@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from './api';
 import type {
+  Baseline,
   ChecklistResult,
   CloudPrice,
   DashboardSummary,
@@ -145,6 +146,7 @@ export function useEstimateMutations(id: string) {
     void qc.invalidateQueries({ queryKey: ['workflow', id] });
     void qc.invalidateQueries({ queryKey: ['checklist', id] });
     void qc.invalidateQueries({ queryKey: ['scenarios', id] });
+    void qc.invalidateQueries({ queryKey: ['baselines', id] });
   };
   const post = (path: string) => (body: unknown) =>
     api(`/estimates/${id}${path}`, { method: 'POST', body: JSON.stringify(body) });
@@ -166,6 +168,8 @@ export function useEstimateMutations(id: string) {
       mutationFn: () => api(`/estimates/${id}/scenarios`, { method: 'POST' }),
       onSuccess,
     }),
+    captureBaseline: useMutation({ mutationFn: post('/baselines'), onSuccess }),
+    delBaseline: useMutation({ mutationFn: del('/baselines'), onSuccess }),
     transition: useMutation({ mutationFn: post('/transitions'), onSuccess }),
     delLabor: useMutation({ mutationFn: del('/labor-items'), onSuccess }),
     delNonLabor: useMutation({ mutationFn: del('/non-labor-items'), onSuccess }),
@@ -228,6 +232,15 @@ export function useScenarios(id: string | undefined) {
   return useQuery({
     queryKey: ['scenarios', id],
     queryFn: () => api<Scenario[]>(`/estimates/${id}/scenarios`),
+    enabled: Boolean(id),
+  });
+}
+
+// ── Baselines / versioning (FR-15) ────────────────────────────────────────────
+export function useBaselines(id: string | undefined) {
+  return useQuery({
+    queryKey: ['baselines', id],
+    queryFn: () => api<Baseline[]>(`/estimates/${id}/baselines`),
     enabled: Boolean(id),
   });
 }
