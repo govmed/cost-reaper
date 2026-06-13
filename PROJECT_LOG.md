@@ -318,3 +318,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** `Baseline` model (label, denormalized totals, full snapshot_json, createdByEmail; migration `20260613140000_baselines`); `captureBaseline`/`listBaselines`/`deleteBaseline` + controller endpoints; web Baselines panel with Δ-vs-current diff; CaptureBaselineRequest/BaselineDto types.
 - **Result:** Pipeline green (test 50; added Prisma import), migration verified. Live: capture v1=1000 immutable; after +500 edit current=1500 → Δ +500.
 - **Next:** commit → PR → merge; continue (FE-40 last-pulled, FE-31, FE-22, FE-12).
+
+### 2026-06-13 — FE-40 cloud price refresh + last-pulled (FR-21a/b)
+- **Action:** `PricingProvider` strategy seam (AWS/GCP/Azure stub) + `lastPulled()` (groupBy max fetchedAt) + `sync()` (admin re-stamp, audited); controller GET `/cloud-prices/last-pulled` + POST `/cloud-prices/sync` (static before `:id`); web freshness table (MM/DD/CCYY) + admin Refresh button. No migration (existing fetchedAt).
+- **Result:** Pipeline green (test 50). Live: last-pulled per provider; AWS sync → 06/13, others 06/12. Snapshots immutable (NFR-14).
+- **Next:** commit → PR → merge; continue (FE-31 hardening, FE-22 export, FE-12 multi-currency).

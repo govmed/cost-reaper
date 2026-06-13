@@ -9,6 +9,7 @@ import type {
   EstimateSummary,
   EstimateWorkflow,
   Paginated,
+  ProviderLastPulled,
   RateCard,
   ReferenceType,
   ReferenceValue,
@@ -242,5 +243,25 @@ export function useBaselines(id: string | undefined) {
     queryKey: ['baselines', id],
     queryFn: () => api<Baseline[]>(`/estimates/${id}/baselines`),
     enabled: Boolean(id),
+  });
+}
+
+// ── Cloud price freshness + refresh (FR-21a/b) ────────────────────────────────
+export function useLastPulled() {
+  return useQuery({
+    queryKey: ['cloud-last-pulled'],
+    queryFn: () => api<ProviderLastPulled[]>('/cloud-prices/last-pulled'),
+  });
+}
+
+export function useCloudSync() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { provider?: string }) =>
+      api('/cloud-prices/sync', { method: 'POST', body: JSON.stringify(body) }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['cloud-last-pulled'] });
+      void qc.invalidateQueries({ queryKey: ['cloud-prices'] });
+    },
   });
 }
