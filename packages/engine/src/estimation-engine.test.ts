@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { EngineInput, EngineLine } from '@cost-reaper/types';
-import { computeEstimate, effectiveUpcharge } from './estimation-engine';
+import { computeEstimate, effectiveUpcharge, pert } from './estimation-engine';
 
 function line(
   p: Partial<EngineLine> & Pick<EngineLine, 'baseAmount' | 'billingPeriod'>,
@@ -214,6 +214,14 @@ describe('computeEstimate', () => {
     expect(r.monthlySubtotal).toBe('2000.0000');
     expect(r.yearlySubtotal).toBe('24000.0000');
     expect(r.grandTotal).toBe('24000.0000');
+  });
+});
+
+describe('pert (FR-13)', () => {
+  it('weights the most-likely 4× ((o + 4m + p) / 6)', () => {
+    expect(pert(2, 4, 12)).toBe(5); // (2 + 16 + 12) / 6
+    expect(pert(10, 10, 10)).toBe(10);
+    expect(pert(3, 6, 9)).toBe(6);
   });
 });
 

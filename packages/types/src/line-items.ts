@@ -28,6 +28,10 @@ export const LaborLineInput = z
     allocationPercent: Percent.default(100),
     startDate: IsoDate.optional(),
     endDate: IsoDate.optional(),
+    /** Three-point estimate (FR-13). When all three are set, effective units = PERT. */
+    unitsOptimistic: z.number().nonnegative().optional(),
+    unitsMostLikely: z.number().nonnegative().optional(),
+    unitsPessimistic: z.number().nonnegative().optional(),
   })
   .refine((v) => (v.startDate == null) === (v.endDate == null), {
     message: 'Provide both a start and end date, or neither.',
@@ -36,7 +40,26 @@ export const LaborLineInput = z
   .refine((v) => !v.startDate || !v.endDate || v.endDate >= v.startDate, {
     message: 'End date must be on or after the start date.',
     path: ['endDate'],
-  });
+  })
+  .refine(
+    (v) =>
+      (v.unitsOptimistic == null && v.unitsMostLikely == null && v.unitsPessimistic == null) ||
+      (v.unitsOptimistic != null && v.unitsMostLikely != null && v.unitsPessimistic != null),
+    {
+      message: 'Provide all three of optimistic/most-likely/pessimistic, or none.',
+      path: ['unitsMostLikely'],
+    },
+  )
+  .refine(
+    (v) =>
+      v.unitsOptimistic == null ||
+      (v.unitsOptimistic <= (v.unitsMostLikely ?? 0) &&
+        (v.unitsMostLikely ?? 0) <= (v.unitsPessimistic ?? 0)),
+    {
+      message: 'Three-point estimate must satisfy optimistic ≤ most-likely ≤ pessimistic.',
+      path: ['unitsPessimistic'],
+    },
+  );
 export type LaborLineInput = z.infer<typeof LaborLineInput>;
 
 export const NonLaborLineInput = z.object({
@@ -73,6 +96,10 @@ export interface LaborLineDto {
   description: string | null;
   quantity: string;
   units: string;
+  /** Three-point estimate (FR-13); null unless used. `units` reflects the PERT expected value. */
+  unitsOptimistic: string | null;
+  unitsMostLikely: string | null;
+  unitsPessimistic: string | null;
   rateSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;

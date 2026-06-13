@@ -286,3 +286,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Next:** commit → PR → CI-green → merge; then FE-54 part 2 (estimate status) or hardening (FE-31/32).
 
 <!-- Append new entries below this line -->
+
+### 2026-06-13 — FE-19 Three-point / PERT estimation (FR-13)
+- **Action:** Merged FE-36/37 (PR #18). Added three-point estimation to labor lines: optional optimistic/most-likely/pessimistic units (migration `20260613090000_pert_three_point`, 3 nullable cols); engine `pert()` + test; `addLabor` computes effective units = PERT when all three set and stores `units` as the expected value; DTO + clone carry the points; editor labor form gained the three inputs. Validation: all-or-none + o≤m≤p.
+- **Why:** FR-13 / FE-19 — estimation depth.
+- **Files touched:** `apps/api/prisma/{schema.prisma,migrations/20260613090000_…}`, `packages/engine/src/{estimation-engine,index,*.test}.ts`, `packages/types/src/line-items.ts`, `apps/api/src/modules/estimates/estimates.service.ts`, `apps/web/src/{lib/types.ts,pages/EstimateEditorPage.tsx}`, CHANGELOG.
+- **Result:** Pipeline green (test 48), migration verified (fresh-deploy + no drift). Live smoke: PERT 2/4/12 → effective units 5, lineTotal 1050; invalid ordering → 400.
+- **Next:** commit → PR → CI → merge; continue with FE-20 margin/tax.

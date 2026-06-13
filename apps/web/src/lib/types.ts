@@ -63,6 +63,9 @@ export interface LaborLine {
   description: string | null;
   quantity: string;
   units: string;
+  unitsOptimistic: string | null;
+  unitsMostLikely: string | null;
+  unitsPessimistic: string | null;
   rateSnapshot: string;
   upchargePercentOverride: number | null;
   billingPeriod: BillingPeriod;

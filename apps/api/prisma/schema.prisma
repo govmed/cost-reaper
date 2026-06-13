@@ -189,6 +189,9 @@ model LaborLineItem {
   description             String?
   quantity                Decimal       @default(1) @db.Decimal(18, 4)
   units                   Decimal       @db.Decimal(18, 4)
+  unitsOptimistic         Decimal?      @map("units_optimistic") @db.Decimal(18, 4)
+  unitsMostLikely         Decimal?      @map("units_most_likely") @db.Decimal(18, 4)
+  unitsPessimistic        Decimal?      @map("units_pessimistic") @db.Decimal(18, 4)
   rateSnapshot            Decimal       @map("rate_snapshot") @db.Decimal(18, 4)
   upchargePercentOverride Decimal?      @map("upcharge_percent_override") @db.Decimal(5, 2)
   billingPeriod           BillingPeriod @default(ONE_TIME) @map("billing_period")

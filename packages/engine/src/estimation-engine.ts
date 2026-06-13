@@ -30,6 +30,19 @@ export function sumMoney(values: string[], scale = 4): string {
   return values.reduce((acc, v) => acc.plus(new Decimal(v)), new Decimal(0)).toFixed(scale);
 }
 
+/**
+ * PERT / three-point expected value (FR-13): (optimistic + 4·mostLikely + pessimistic) / 6.
+ * Exact decimal math. Used to derive a labor line's effective units when a
+ * three-point estimate is supplied.
+ */
+export function pert(optimistic: number, mostLikely: number, pessimistic: number): number {
+  return new Decimal(optimistic)
+    .plus(new Decimal(mostLikely).times(4))
+    .plus(pessimistic)
+    .div(6)
+    .toNumber();
+}
+
 export function effectiveUpcharge(line: EngineLine, globalUpchargePercent: number): Decimal {
   const override = line.upchargePercentOverride;
   return d(override === null || override === undefined ? globalUpchargePercent : override);
