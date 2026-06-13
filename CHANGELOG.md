@@ -6,6 +6,12 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Cloud price refresh + per-provider "last pulled" (FE-40, FR-21a/b)
+
+#### Added
+- **Per-provider "last pulled" freshness** (FR-21b): `GET /cloud-prices/last-pulled` and a small table on the Cloud Prices screen showing each provider's last-pulled date (`MM/DD/CCYY`) + price count.
+- **Admin-triggered price refresh** (FR-21a): `POST /cloud-prices/sync` (admin) re-stamps the catalog's `fetched_at` via a **`PricingProvider` strategy seam** (AWS/GCP/Azure; the live provider-API fetch — AWS Price List / Azure Retail / GCP Billing — is a future drop-in, currently stubbed to echo the catalog). **Saved-estimate price snapshots are never altered** (NFR-14). A **Refresh prices** button on the Cloud Prices screen (admin) triggers it. Verified live (AWS sync → today; others unchanged). No migration (uses existing `fetched_at`).
+
 ### Versioning — baselines & diff (FE-25, FR-15)
 
 #### Added

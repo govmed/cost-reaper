@@ -1,10 +1,23 @@
 import { useMemo, useState } from 'react';
-import { useCloudPrices } from '../lib/queries';
+import { useAuth } from '../lib/auth';
+import { useCloudPrices, useCloudSync, useLastPulled } from '../lib/queries';
 
 const PROVIDERS = ['', 'AWS', 'GCP', 'AZURE'];
 
+/** Format an ISO datetime as MM/DD/CCYY (FR-21b), or em-dash when never pulled. */
+function fmtPulled(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${mm}/${dd}/${d.getFullYear()}`;
+}
+
 export default function CloudPricesPage() {
+  const { user } = useAuth();
   const { data, isLoading, error } = useCloudPrices();
+  const { data: freshness } = useLastPulled();
+  const sync = useCloudSync();
   const [provider, setProvider] = useState('');
   const [q, setQ] = useState('');
 
@@ -24,6 +37,40 @@ export default function CloudPricesPage() {
       <p className="text-sm text-slate-500 -mt-3">
         The seeded AWS / GCP / Azure price catalog used by cloud line items (read-only).
       </p>
+
+      {/* Per-provider freshness — last pulled (FR-21b) */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2 max-w-md">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-brand">Price freshness</h2>
+          {user?.role === 'ADMIN' && (
+            <button
+              onClick={() => sync.mutate({})}
+              disabled={sync.isPending}
+              className="bg-brand text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+            >
+              {sync.isPending ? 'Refreshing…' : 'Refresh prices'}
+            </button>
+          )}
+        </div>
+        <table className="w-full text-sm">
+          <thead className="text-slate-500 text-left">
+            <tr>
+              <th className="py-1">Provider</th>
+              <th className="py-1">Last pulled</th>
+              <th className="py-1 text-right">Prices</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(freshness ?? []).map((f) => (
+              <tr key={f.provider} className="border-t border-slate-100">
+                <td className="py-1 font-medium">{f.provider}</td>
+                <td className="py-1 tabular-nums">{fmtPulled(f.lastPulled)}</td>
+                <td className="py-1 text-right tabular-nums">{f.priceCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex flex-wrap gap-2 items-end">
         <label className="text-sm">

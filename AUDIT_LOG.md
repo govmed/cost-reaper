@@ -376,3 +376,7 @@ Built & verified **FE-24 scenarios (FR-14)** — linked estimate variants + comp
 ---
 ### [2026-06-13 02:00 UTC] — AGENT (continuous run)
 Built & verified **FE-25 versioning/baselines (FR-15)** — capture immutable snapshot + Δ-vs-current diff. Live: v1=1000 fixed, current=1500 → Δ+500. Committing → PR → merge, continuing.
+
+---
+### [2026-06-13 02:20 UTC] — AGENT (continuous run)
+Built & verified **FE-40 cloud refresh + per-provider last-pulled (FR-21a/b)** — PricingProvider seam (stub) + admin sync + freshness table. Live: AWS sync → today, others unchanged. Committing → PR → merge, continuing.

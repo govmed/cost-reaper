@@ -29,3 +29,14 @@ export const CloudPriceQuery = z.object({
   skuOrInstance: z.string().optional(),
 });
 export type CloudPriceQuery = z.infer<typeof CloudPriceQuery>;
+
+/** Admin-triggered price refresh (FR-21a); omit provider to refresh all. */
+export const CloudSyncRequest = z.object({ provider: CloudProvider.optional() });
+export type CloudSyncRequest = z.infer<typeof CloudSyncRequest>;
+
+/** When each provider's catalog was last pulled (FR-21b). */
+export interface ProviderLastPulledDto {
+  provider: string;
+  lastPulled: string | null;
+  priceCount: number;
+}

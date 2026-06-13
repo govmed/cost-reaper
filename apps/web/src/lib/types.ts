@@ -203,6 +203,11 @@ export interface CloudPrice {
   unitPrice: string;
   currency: string;
 }
+export interface ProviderLastPulled {
+  provider: string;
+  lastPulled: string | null;
+  priceCount: number;
+}
 
 export interface DashboardSummary {
   totalEstimates: number;
