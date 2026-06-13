@@ -99,6 +99,32 @@ test('Reference data admin page serves DB-driven values (FR-29)', async ({ page 
   await expect(page.getByText('Development').first()).toBeVisible();
 });
 
+test('Help guide lists use cases and deep-links by anchor', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Help', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Help & use cases' })).toBeVisible();
+  // A known meta-tagged use case renders with its steps.
+  await expect(
+    page.getByRole('heading', { name: 'Choose a rate card for an estimate' }),
+  ).toBeVisible();
+
+  // Deep-link straight into a specific use case by its anchor (the join key the
+  // smart checklist's "How?" link uses).
+  await page.goto('/help#uc-add-cloud-line');
+  await expect(
+    page.getByRole('heading', { name: 'Add a cloud compute line (AWS / GCP / Azure)' }),
+  ).toBeVisible();
+
+  // Search narrows the catalog.
+  await page.getByPlaceholder(/Search guides/).fill('upcharge');
+  await expect(
+    page.getByRole('heading', { name: 'Apply an upcharge (global + per-line)' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Choose a rate card for an estimate' }),
+  ).toHaveCount(0);
+});
+
 test('Dashboard summarizes estimates (FR-18)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Dashboard' }).click();

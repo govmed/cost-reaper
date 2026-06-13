@@ -134,6 +134,19 @@ totals per currency**, a **by-workflow-stage** breakdown, and **recent activity*
 Use **clone** to copy an estimate (including its line snapshots) as a starting point
 for a new scenario or revision. The copy is independent.
 
+## 11. In-app Help & use cases
+
+Open **Help** (top navigation) for a searchable catalog of **step-by-step use cases**
+covering every task — signing in, building an estimate, pricing & markup, governance,
+outputs, and administration. Each guide lists its steps, the persona it's for, the
+**requirement/feature IDs** it covers, and a **Go there →** link to the right screen.
+
+The guides are **deep-linkable**: every use case has a stable anchor of the form
+`/help#uc-<id>` (shown on each card), so other parts of the app can jump straight to
+the relevant guide. In particular, the estimate **Smart checklist** shows a **"How?"**
+link beside each failing item that opens the exact use case explaining how to resolve
+it — while clicking the item itself jumps to the specific line that needs fixing.
+
 ---
 
 See also: `docs/ARCHITECTURE.md` (how it's built), `docs/API.md` + Swagger UI at

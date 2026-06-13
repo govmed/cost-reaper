@@ -11,6 +11,7 @@ import UsersPage from './pages/UsersPage';
 import CloudPricesPage from './pages/CloudPricesPage';
 import ReferenceDataPage from './pages/ReferenceDataPage';
 import FxRatesPage from './pages/FxRatesPage';
+import HelpPage from './pages/HelpPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -41,6 +42,9 @@ export default function App() {
               </Link>
               <Link to="/cloud-prices" className="hover:underline">
                 Cloud prices
+              </Link>
+              <Link to="/help" className="hover:underline">
+                Help
               </Link>
               {user.role === 'ADMIN' && (
                 <>
@@ -141,6 +145,14 @@ export default function App() {
             element={
               <Protected>
                 <FxRatesPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/help"
+            element={
+              <Protected>
+                <HelpPage />
               </Protected>
             }
           />
