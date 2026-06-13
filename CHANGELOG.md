@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Three-point / PERT estimation (FE-19, FR-13)
+
+#### Added
+- **Three-point estimation on labor lines**: optional **optimistic / most-likely / pessimistic** units. When all three are set, the line's **effective units = PERT expected value** `(o + 4·m + p) / 6` (pure engine `pert`), and that's what drives the line total and all roll-ups. Validated (all-or-none; `o ≤ m ≤ p`). Stored alongside the raw three points (migration `20260613090000_pert_three_point`, 3 nullable columns; verified fresh-deploy + no drift). Editor labor form gained the three optional inputs. Verified live (2/4/12 → units 5, total 1050).
+
 ### Docs — user guide & runbook (FE-36, FE-37)
 
 #### Added

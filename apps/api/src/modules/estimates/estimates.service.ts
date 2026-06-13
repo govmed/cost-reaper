@@ -4,6 +4,7 @@ import {
   computeEstimate,
   findCapacityViolations,
   lineTotal,
+  pert,
 } from '@cost-reaper/engine';
 import type {
   AssumptionInput,
@@ -173,6 +174,9 @@ export class EstimatesService {
             description: l.description,
             quantity: l.quantity,
             units: l.units,
+            unitsOptimistic: l.unitsOptimistic,
+            unitsMostLikely: l.unitsMostLikely,
+            unitsPessimistic: l.unitsPessimistic,
             rateSnapshot: l.rateSnapshot,
             upchargePercentOverride: l.upchargePercentOverride,
             billingPeriod: l.billingPeriod,
@@ -307,13 +311,24 @@ export class EstimatesService {
       );
     }
 
+    // Three-point/PERT (FR-13): when all three points are given, the effective
+    // units = PERT expected value; `units` is stored as that expected value.
+    const threePoint =
+      dto.unitsOptimistic != null && dto.unitsMostLikely != null && dto.unitsPessimistic != null;
+    const effUnits = threePoint
+      ? pert(dto.unitsOptimistic!, dto.unitsMostLikely!, dto.unitsPessimistic!)
+      : dto.units;
+
     await this.prisma.laborLineItem.create({
       data: {
         estimateId,
         rateCardRoleId: dto.rateCardRoleId ?? null,
         description: dto.description ?? null,
         quantity: dto.quantity,
-        units: dto.units,
+        units: effUnits,
+        unitsOptimistic: dto.unitsOptimistic ?? null,
+        unitsMostLikely: dto.unitsMostLikely ?? null,
+        unitsPessimistic: dto.unitsPessimistic ?? null,
         rateSnapshot: rate,
         upchargePercentOverride: dto.upchargePercentOverride ?? null,
         billingPeriod: dto.billingPeriod,
@@ -322,7 +337,7 @@ export class EstimatesService {
         allocationPercent: dto.allocationPercent,
         startDate: dto.startDate ? new Date(dto.startDate) : null,
         endDate: dto.endDate ? new Date(dto.endDate) : null,
-        lineTotal: lineTotal(rate, dto.quantity * dto.units),
+        lineTotal: lineTotal(rate, dto.quantity * effUnits),
       },
     });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
@@ -442,6 +457,9 @@ export class EstimatesService {
         description: l.description,
         quantity: l.quantity.toString(),
         units: l.units.toString(),
+        unitsOptimistic: l.unitsOptimistic != null ? l.unitsOptimistic.toString() : null,
+        unitsMostLikely: l.unitsMostLikely != null ? l.unitsMostLikely.toString() : null,
+        unitsPessimistic: l.unitsPessimistic != null ? l.unitsPessimistic.toString() : null,
         rateSnapshot: l.rateSnapshot.toString(),
         upchargePercentOverride: pct(l.upchargePercentOverride),
         billingPeriod: l.billingPeriod,

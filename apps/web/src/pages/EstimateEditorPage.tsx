@@ -392,6 +392,10 @@ function LaborSection({
   const [allocation, setAllocation] = useState('100');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  // Three-point / PERT estimate (FR-13): all three → effective units = PERT.
+  const [opt, setOpt] = useState('');
+  const [likely, setLikely] = useState('');
+  const [pess, setPess] = useState('');
 
   function add() {
     if (!roleId) return;
@@ -409,6 +413,11 @@ function LaborSection({
     if (startDate && endDate) {
       body.startDate = startDate;
       body.endDate = endDate;
+    }
+    if (opt && likely && pess) {
+      body.unitsOptimistic = Number.parseFloat(opt) || 0;
+      body.unitsMostLikely = Number.parseFloat(likely) || 0;
+      body.unitsPessimistic = Number.parseFloat(pess) || 0;
     }
     m.addLabor.mutate(body, { onSuccess: () => setRoleId('') });
   }
@@ -515,6 +524,33 @@ function LaborSection({
           type="number"
           className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
           placeholder="units"
+        />
+        <span className="text-slate-400 text-xs" title="Optional three-point (PERT) estimate">
+          PERT:
+        </span>
+        <input
+          value={opt}
+          onChange={(e) => setOpt(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-16"
+          placeholder="opt"
+          title="Optimistic units"
+        />
+        <input
+          value={likely}
+          onChange={(e) => setLikely(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-16"
+          placeholder="likely"
+          title="Most-likely units"
+        />
+        <input
+          value={pess}
+          onChange={(e) => setPess(e.target.value)}
+          type="number"
+          className="border border-slate-300 rounded px-2 py-1 text-sm w-16"
+          placeholder="pess"
+          title="Pessimistic units"
         />
         <PeriodSelect value={period} onChange={setPeriod} />
         <button
