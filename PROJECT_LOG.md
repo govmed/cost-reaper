@@ -308,3 +308,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** `Comment` model (estimate_id, author_id, author_email snapshot, text, created_at; migration `20260613120000_comments`); detail include + DTO; `addComment`/`deleteComment` (author-or-admin delete) + controller endpoints; web Comments panel + hooks.
 - **Result:** Pipeline green (test 50), migration verified. Live: comment 201, appears with authorEmail.
 - **Next:** commit → PR → merge; continue.
+
+### 2026-06-13 — FE-24 Scenarios (FR-14)
+- **Action:** Estimate `scenarioOfId` self-FK (migration `20260613130000_scenarios`); `clone(..., asScenario)` links variants to a shared root; `scenarios(id)` returns root+variants with totals; controller POST/GET `/estimates/:id/scenarios`; web Scenarios compare panel + hook + ScenarioDto.
+- **Result:** Pipeline green (test 50), migration verified. Live: create scenario clones + links; GET returns group [base(root/current), scenario] both 1000.
+- **Next:** commit → PR → merge; continue (FE-25 versioning, FE-40 last-pulled, FE-31, FE-22, FE-12).

@@ -133,3 +133,16 @@ export const EstimateSummaryDto = z.object({
   updatedAt: z.string().datetime(),
 });
 export type EstimateSummaryDto = z.infer<typeof EstimateSummaryDto>;
+
+/** One estimate in a scenario comparison group (FR-14). */
+export interface ScenarioDto {
+  id: string;
+  name: string;
+  status: EstimateStatus;
+  currency: string;
+  grandTotal: string;
+  clientPrice: string;
+  isCurrent: boolean;
+  isRoot: boolean;
+  updatedAt: string;
+}

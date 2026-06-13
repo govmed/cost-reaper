@@ -11,6 +11,7 @@ import type {
   RateCard,
   ReferenceType,
   ReferenceValue,
+  Scenario,
   UserDto,
 } from './types';
 
@@ -143,6 +144,7 @@ export function useEstimateMutations(id: string) {
     void qc.invalidateQueries({ queryKey: ['estimates'] });
     void qc.invalidateQueries({ queryKey: ['workflow', id] });
     void qc.invalidateQueries({ queryKey: ['checklist', id] });
+    void qc.invalidateQueries({ queryKey: ['scenarios', id] });
   };
   const post = (path: string) => (body: unknown) =>
     api(`/estimates/${id}${path}`, { method: 'POST', body: JSON.stringify(body) });
@@ -160,6 +162,10 @@ export function useEstimateMutations(id: string) {
     addCloud: useMutation({ mutationFn: post('/cloud-items'), onSuccess }),
     addAssumption: useMutation({ mutationFn: post('/assumptions'), onSuccess }),
     addComment: useMutation({ mutationFn: post('/comments'), onSuccess }),
+    createScenario: useMutation({
+      mutationFn: () => api(`/estimates/${id}/scenarios`, { method: 'POST' }),
+      onSuccess,
+    }),
     transition: useMutation({ mutationFn: post('/transitions'), onSuccess }),
     delLabor: useMutation({ mutationFn: del('/labor-items'), onSuccess }),
     delNonLabor: useMutation({ mutationFn: del('/non-labor-items'), onSuccess }),
@@ -214,5 +220,14 @@ export function useDashboard() {
   return useQuery({
     queryKey: ['dashboard'],
     queryFn: () => api<DashboardSummary>('/dashboard'),
+  });
+}
+
+// ── Scenarios (FR-14) ─────────────────────────────────────────────────────────
+export function useScenarios(id: string | undefined) {
+  return useQuery({
+    queryKey: ['scenarios', id],
+    queryFn: () => api<Scenario[]>(`/estimates/${id}/scenarios`),
+    enabled: Boolean(id),
   });
 }

@@ -140,6 +140,18 @@ export interface EstimateDetail {
   capacityViolations: CapacityViolation[];
 }
 
+export interface Scenario {
+  id: string;
+  name: string;
+  status: string;
+  currency: string;
+  grandTotal: string;
+  clientPrice: string;
+  isCurrent: boolean;
+  isRoot: boolean;
+  updatedAt: string;
+}
+
 export interface EstimateSummary {
   id: string;
   name: string;

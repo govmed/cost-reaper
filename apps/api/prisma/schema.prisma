@@ -163,6 +163,9 @@ model Estimate {
   workflowDefinition    WorkflowDefinition? @relation(fields: [workflowDefinitionId], references: [id])
   currentStageId        String?             @map("current_stage_id") @db.Uuid
   currentStage          WorkflowStage?      @relation(fields: [currentStageId], references: [id])
+  scenarioOfId          String?             @map("scenario_of_id") @db.Uuid
+  scenarioOf            Estimate?           @relation("EstimateScenarios", fields: [scenarioOfId], references: [id])
+  scenarios             Estimate[]          @relation("EstimateScenarios")
   createdAt             DateTime            @default(now()) @map("created_at")
   updatedAt             DateTime            @updatedAt @map("updated_at")
 
@@ -175,6 +178,7 @@ model Estimate {
 
   @@index([ownerId])
   @@index([status])
+  @@index([scenarioOfId])
   @@map("estimates")
 }
 

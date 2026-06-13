@@ -89,6 +89,18 @@ export class EstimatesController {
     return this.estimates.clone(id, u.id);
   }
 
+  // Scenarios (FR-14): create a linked variant, and list the comparison group.
+  @Post(':id/scenarios')
+  @Roles('ADMIN', 'ESTIMATOR')
+  createScenario(@Param('id') id: string, @CurrentUser() u: AuthUser) {
+    return this.estimates.clone(id, u.id, true);
+  }
+
+  @Get(':id/scenarios')
+  scenarios(@Param('id') id: string) {
+    return this.estimates.scenarios(id);
+  }
+
   // ── Line items ───────────────────────────────────────────────────────────────
   @Post(':id/labor-items')
   @Roles('ADMIN', 'ESTIMATOR')

@@ -8,6 +8,7 @@ import {
   useEstimateMutations,
   useRateCards,
   useReferenceValues,
+  useScenarios,
   useWorkflow,
 } from '../lib/queries';
 import { SDLC_PHASES } from '../lib/types';
@@ -157,6 +158,8 @@ export default function EstimateEditorPage() {
       <PhaseBreakdownSection phases={t.phases} cur={cur} />
 
       <GovernanceSection workflow={workflow} checklist={checklist} m={m} />
+
+      <ScenariosSection est={est} m={m} />
 
       <Section title="Settings">
         <div className="flex flex-wrap gap-6 items-end">
@@ -792,6 +795,71 @@ function CloudSection({
           Add cloud
         </button>
       </div>
+    </Section>
+  );
+}
+
+function ScenariosSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
+  const { data: scenarios } = useScenarios(est.id);
+  const list = scenarios ?? [];
+  // Only show the panel once there's a group (more than just this estimate).
+  if (list.length <= 1 && !m.createScenario.isPending) {
+    return (
+      <Section title="Scenarios">
+        <div className="flex items-center justify-between">
+          <span className="text-slate-500 text-sm">
+            Create variants of this estimate to compare options.
+          </span>
+          <button
+            onClick={() => m.createScenario.mutate(undefined)}
+            className="bg-slate-800 text-white rounded px-3 py-1 text-sm"
+          >
+            Create scenario
+          </button>
+        </div>
+      </Section>
+    );
+  }
+  return (
+    <Section title="Scenarios — compare">
+      <table className="w-full text-sm">
+        <thead className="text-slate-500 text-left">
+          <tr>
+            <th className="px-2 py-1">Name</th>
+            <th className="px-2 py-1">Status</th>
+            <th className="px-2 py-1 text-right">Grand total (cost)</th>
+            <th className="px-2 py-1 text-right">Client price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((s) => (
+            <tr
+              key={s.id}
+              className={`border-t border-slate-100 ${s.isCurrent ? 'bg-teal-50' : ''}`}
+            >
+              <td className="px-2 py-1">
+                <Link to={`/estimates/${s.id}`} className="text-brand hover:underline">
+                  {s.name}
+                </Link>
+                {s.isRoot && <span className="text-slate-400 text-xs"> · base</span>}
+              </td>
+              <td className="px-2 py-1">{s.status}</td>
+              <td className="px-2 py-1 text-right tabular-nums">
+                {s.grandTotal} {s.currency}
+              </td>
+              <td className="px-2 py-1 text-right tabular-nums">
+                {s.clientPrice} {s.currency}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button
+        onClick={() => m.createScenario.mutate(undefined)}
+        className="bg-slate-800 text-white rounded px-3 py-1 text-sm"
+      >
+        Create another scenario
+      </button>
     </Section>
   );
 }
