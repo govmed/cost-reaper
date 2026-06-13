@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### FE-54 (part 2) — estimate status data-driven (FR-29)
+
+#### Changed
+- **Estimate `status` is no longer a hard-coded enum.** Dropped the Prisma/Zod `EstimateStatus` enum; the `status` column is now `TEXT` (migration `20260613110000_estimate_status_data_driven` converts in place, preserving values + the index). Status is **validated server-side against the active `ESTIMATE_STATUS` reference values**, and the editor's status dropdown loads from reference data. An admin can add a status (e.g. "Archived") with no code change — verified live (FINAL ok, BOGUS → 400, admin-added ARCHIVED usable).
+
 ### Margin & tax — client pricing (FE-20, FR-16)
 
 #### Added

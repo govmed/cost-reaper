@@ -32,7 +32,11 @@ export const UNASSIGNED_PHASE = 'Unassigned';
 export const RateUnit = z.enum(['HOUR', 'DAY']);
 export type RateUnit = z.infer<typeof RateUnit>;
 
-export const EstimateStatus = z.enum(['DRAFT', 'FINAL']);
+/**
+ * Estimate status is data-driven (FR-29) — values live in the `ESTIMATE_STATUS`
+ * reference table and are validated server-side. This is a plain code string.
+ */
+export const EstimateStatus = z.string().max(40);
 export type EstimateStatus = z.infer<typeof EstimateStatus>;
 
 export const CloudProvider = z.enum(['AWS', 'GCP', 'AZURE']);

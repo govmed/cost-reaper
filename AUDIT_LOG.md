@@ -360,3 +360,7 @@ Explained bypass-permissions mode (Shift+Tab / `--dangerously-skip-permissions`)
 ---
 ### [2026-06-13 00:50 UTC] — AGENT (continuous run)
 Built & verified **FE-20 margin & tax (FR-16)** — sell price = cost/(1−margin), client price = sell×(1+tax). Engine + migration verified; live 20%/10% on 1000 → client 1375. Committing → PR → merge, continuing.
+
+---
+### [2026-06-13 01:05 UTC] — AGENT (continuous run)
+Built & verified **FE-54 part 2: estimate status data-driven (FR-29)** — enum→TEXT, validated against ESTIMATE_STATUS reference; editor dropdown from reference. Live: FINAL 200, BOGUS 400, admin ARCHIVED usable. Committing → PR → merge, continuing.

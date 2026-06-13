@@ -298,3 +298,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** Estimate-level marginPercent + taxPercent (migration `20260613100000_margin_tax`); engine computes sellPrice = cost/(1−margin), clientPrice = sell×(1+tax) + marginAmount/taxAmount; threaded through types/mapping/service/DTO; editor Margin/Tax settings + client-price card; CSV rows. Engine tests for the math.
 - **Result:** Pipeline green (test 50), migration verified. Live: 20%/10% on cost 1000 → margin 250, sell 1250, tax 125, client 1375.
 - **Next:** commit → PR → merge; continue (FE-54 status / FE-22 PDF / scenarios).
+
+### 2026-06-13 — FE-54 part 2: estimate status data-driven (FR-29)
+- **Action:** Dropped EstimateStatus enum; `status` → TEXT (migration `20260613110000_estimate_status_data_driven`, data+index preserving); `update()` validates status against active ESTIMATE_STATUS reference codes; editor status dropdown loads from reference. EstimateStatus Zod type loosened to `z.string()`.
+- **Result:** Pipeline green (test 50), migration verified (deploy + no drift). Live: FINAL 200, BOGUS 400, admin-added ARCHIVED usable 200.
+- **Next:** commit → PR → merge; continue.
