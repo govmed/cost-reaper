@@ -22,6 +22,7 @@ export class ChecklistService {
       globalUpchargePercent: Number(est.globalUpchargePercent),
       contingencyPercent: Number(est.contingencyPercent),
       labor: est.laborItems.map((l: any) => ({
+        id: l.id,
         rateCardRoleId: l.rateCardRoleId,
         rateSnapshot: l.rateSnapshot.toString(),
         quantity: Number(l.quantity),
@@ -33,10 +34,12 @@ export class ChecklistService {
         endDate: l.endDate ? l.endDate.toISOString().slice(0, 10) : null,
       })),
       nonLabor: est.nonLaborItems.map((n: any) => ({
+        id: n.id,
         amount: n.amount.toString(),
         billingPeriod: n.billingPeriod,
       })),
       cloud: est.cloudItems.map((c: any) => ({
+        id: c.id,
         cloudPriceId: c.cloudPriceId,
         unitPriceSnapshot: c.unitPriceSnapshot.toString(),
         quantity: Number(c.quantity),

@@ -349,3 +349,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Why:** User reported checklist items weren't clickable and "Select a rate card" had nowhere to go.
 - **Result:** Pipeline green (test 56). Live: rate_card_selected false → PATCH rateCardId 200 → true. Web served.
 - **Next:** commit → PR → merge.
+
+### 2026-06-13 — Deep-link checklist items to the specific incomplete line (FR-25)
+- **Action:** Checklist evaluators now name the exact offending line IDs. Added `entityIds: string[]` to `ChecklistItemResult` (governance.ts); `ChecklistEstimate` line entries carry `id`; the 5 filtering evaluators (`labor_role_assigned`, `cloud_line_complete`, `nonlabor_amount_period`, `billing_period_set`, `resource_capacity`) return `bad.map(x=>x.id)` (capacity → all labor lines of the over-allocated resource); `checklist.service` maps line `id`s in. Web: line `<tr>`s get `id="line-<id>"` + `scroll-mt-24 transition-colors`; `goToChecklistItem` scrolls to + amber-flashes the specific rows when `entityIds` is non-empty, else falls back to the section anchor.
+- **Why:** Clicking a checklist item should jump to the *exact* line that's wrong, not just the section (user request).
+- **Files touched:** packages/types/src/governance.ts, apps/api/src/modules/workflow/checklist-rules.ts(+spec), apps/api/src/modules/workflow/checklist.service.ts, apps/web/src/lib/types.ts, apps/web/src/pages/EstimateEditorPage.tsx
+- **Result:** Pipeline green in a clean container (lint, typecheck 6/6, test 56 incl. new entityIds assertions, build 4/4). Live: rebuilt API; a labor line with units=0 → checklist `labor_role_assigned` returns `entityIds=[<that line id>]`, `rate_card_selected` returns `entityIds=[]`.
+- **Next:** commit → PR → merge; then build the meta-tagged Help guide of step-by-step use cases.

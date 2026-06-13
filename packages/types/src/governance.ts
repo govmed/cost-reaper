@@ -54,6 +54,8 @@ export const ChecklistItemResult = z.object({
   scope: ChecklistScope,
   passed: z.boolean(),
   message: z.string(),
+  /** IDs of the specific line items this rule flags, for deep-linking (empty for estimate-level rules). */
+  entityIds: z.array(z.string()).default([]),
 });
 export type ChecklistItemResult = z.infer<typeof ChecklistItemResult>;
 
