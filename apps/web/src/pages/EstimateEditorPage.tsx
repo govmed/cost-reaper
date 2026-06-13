@@ -13,7 +13,7 @@ import {
   useWorkflow,
 } from '../lib/queries';
 import { SDLC_PHASES } from '../lib/types';
-import { useCaseForChecklistKey } from '../lib/help-content';
+import { useCaseById, useCaseForChecklistKey } from '../lib/help-content';
 import type {
   BillingPeriod,
   CapacityViolation,
@@ -337,9 +337,25 @@ function GovernanceSection({
                 · {Math.round(checklist.completeness * 100)}% complete
               </span>
             </div>
+            {checklist.items.length === 0 && (
+              <div className="text-sm text-slate-500 flex items-center gap-2">
+                <span>No checklist items match this estimate yet.</span>
+                <Link
+                  to="/help#uc-smart-checklist"
+                  title="How the smart checklist works"
+                  className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
+                >
+                  How?
+                </Link>
+              </div>
+            )}
             <ul className="text-sm space-y-1">
               {checklist.items.map((i) => {
-                const guide = !i.passed ? useCaseForChecklistKey(i.key) : undefined;
+                // Failing items deep-link to their specific guide; if no guide
+                // matches the rule key, fall back to the general checklist guide.
+                const guide = !i.passed
+                  ? (useCaseForChecklistKey(i.key) ?? useCaseById('smart-checklist'))
+                  : undefined;
                 return (
                   <li key={i.key} className="flex items-start gap-1">
                     <button
@@ -376,9 +392,11 @@ function GovernanceSection({
                 );
               })}
             </ul>
-            <p className="text-xs text-slate-400">
-              Tip: click an item to jump to where it’s fixed, or “How?” for a step-by-step guide.
-            </p>
+            {checklist.items.length > 0 && (
+              <p className="text-xs text-slate-400">
+                Tip: click an item to jump to where it’s fixed, or “How?” for a step-by-step guide.
+              </p>
+            )}
           </>
         )}
       </Section>

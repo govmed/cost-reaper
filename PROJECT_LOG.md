@@ -363,3 +363,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/lib/help-content.ts (new), apps/web/src/pages/HelpPage.tsx (new), apps/web/src/App.tsx, apps/web/src/pages/EstimateEditorPage.tsx, apps/web/e2e/smoke.spec.ts, docs/USER_GUIDE.md
 - **Result:** Clean-container pipeline green (format, lint 0 problems, typecheck 6/6, test 56, build 4/4). Live: rebuilt web; `/help` serves (200) and the catalog is compiled into the bundle.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-13 — Smart-checklist "How?" fallback + empty-state deep-link
+- **Action:** Every failing checklist item now always has a "How?" deep-link: when no use case matches the rule key, it falls back to the general `/help#uc-smart-checklist` guide (`useCaseForChecklistKey(key) ?? useCaseById('smart-checklist')`). Added a panel **empty-state** — when the checklist has no items, it shows "No checklist items match this estimate yet." with a "How?" deep-link to the same guide; the "click an item" tip is hidden when empty.
+- **Why:** User asked for a "How?" deep-link from the empty-state when no checklist items match — and the per-item How? link previously vanished for any rule key without a specific guide.
+- **Files touched:** apps/web/src/pages/EstimateEditorPage.tsx
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). Live: rebuilt web; empty-state string compiled into the bundle, /help 200, api healthy.
+- **Next:** commit → PR → CI-green → merge.

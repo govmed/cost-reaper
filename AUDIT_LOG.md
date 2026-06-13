@@ -422,3 +422,9 @@ Acknowledged. After shipping the deep-link fix, will build an in-app Help guide:
 
 ### [2026-06-13 18:00 UTC] — AGENT
 Built the in-app Help guide: 31 meta-tagged step-by-step use cases across 6 categories, each with a stable deep-link anchor (`/help#uc-<id>`), a searchable page with sidebar TOC + hash-scroll highlight, and per-card meta (feature IDs, "Go there" route). Wired the smart checklist so each failing item shows a "How?" link that deep-links to the use case explaining the fix (joined via the rule's checklistKeys meta-tag). USER_GUIDE §11 + e2e added. Pipeline green (test 56, lint 0). Committing → PR → merge.
+
+### [2026-06-13 18:20 UTC] — USER
+Add a "How?" deep-link from the empty-state when no checklist items match
+
+### [2026-06-13 18:20 UTC] — AGENT
+Added a panel empty-state to the smart checklist ("No checklist items match this estimate yet." + a How? deep-link to /help#uc-smart-checklist), and made every failing item's How? link fall back to that general guide when its rule key has no specific use case. Hid the click-an-item tip when empty. Pipeline green; empty-state compiled into the live bundle. Committing → PR → merge.
