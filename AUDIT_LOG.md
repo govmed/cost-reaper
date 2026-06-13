@@ -384,3 +384,7 @@ Built & verified **FE-40 cloud refresh + per-provider last-pulled (FR-21a/b)** �
 ---
 ### [2026-06-13 02:40 UTC] — AGENT (continuous run)
 Built & verified **FE-31 security hardening (OWASP)** — dep-free security headers + per-IP login throttle. Live: headers present, X-Powered-By removed, login 200. Committing → PR → merge, continuing.
+
+---
+### [2026-06-13 03:00 UTC] — AGENT (continuous run)
+Built & verified **FE-22 Excel export (FR-20)** — dep-free .xls (HTML-table) export + button; PDF via printable summary. Live: correct content-type + full table. Committing → PR → merge, then last feature (FE-12).

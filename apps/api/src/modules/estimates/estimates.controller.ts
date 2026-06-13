@@ -58,6 +58,14 @@ export class EstimatesController {
     res.send(csv);
   }
 
+  @Get(':id/export-excel')
+  async exportExcel(@Param('id') id: string, @Res() res: Response): Promise<void> {
+    const { filename, html } = await this.estimates.exportExcel(id);
+    res.setHeader('Content-Type', 'application/vnd.ms-excel');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(html);
+  }
+
   @Post()
   @Roles('ADMIN', 'ESTIMATOR')
   create(
