@@ -21,6 +21,7 @@ import type {
   EstimateListQuery,
   LaborLineInput,
   NonLaborLineInput,
+  ScenarioDto,
   UpdateEstimateRequest,
 } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -167,15 +168,18 @@ export class EstimatesService {
     await this.audit.record('Estimate', id, 'DELETE', actorId);
   }
 
-  async clone(id: string, actorId: string) {
+  async clone(id: string, actorId: string, asScenario = false) {
     const e: any = await this.prisma.estimate.findUnique({
       where: { id },
       include: DETAIL_INCLUDE,
     });
     if (!e) throw new NotFoundException('Estimate not found');
+    // A scenario links to the shared root so all variants compare together (FR-14).
+    const scenarioOfId = asScenario ? (e.scenarioOfId ?? e.id) : null;
     const copy = await this.prisma.estimate.create({
       data: {
-        name: `${e.name} (copy)`,
+        name: asScenario ? `${e.name} (scenario)` : `${e.name} (copy)`,
+        scenarioOfId,
         description: e.description,
         currency: e.currency,
         rateCardId: e.rateCardId,
@@ -236,8 +240,37 @@ export class EstimatesService {
         assumptions: { create: e.assumptions.map((a: any) => ({ text: a.text })) },
       },
     });
-    await this.audit.record('Estimate', copy.id, 'CLONE', actorId);
+    await this.audit.record('Estimate', copy.id, asScenario ? 'SCENARIO' : 'CLONE', actorId);
     return this.getDetail(copy.id);
+  }
+
+  /** The estimate's scenario group (root + all variants) with totals, for comparison (FR-14). */
+  async scenarios(id: string): Promise<ScenarioDto[]> {
+    const est = await this.prisma.estimate.findUnique({
+      where: { id },
+      select: { id: true, scenarioOfId: true },
+    });
+    if (!est) throw new NotFoundException('Estimate not found');
+    const rootId = est.scenarioOfId ?? est.id;
+    const rows: any[] = await this.prisma.estimate.findMany({
+      where: { OR: [{ id: rootId }, { scenarioOfId: rootId }] },
+      orderBy: { createdAt: 'asc' },
+      include: DETAIL_INCLUDE,
+    });
+    return rows.map((e) => {
+      const totals = this.computeTotals(e);
+      return {
+        id: e.id,
+        name: e.name,
+        status: e.status,
+        currency: e.currency,
+        grandTotal: totals.grandTotal,
+        clientPrice: totals.clientPrice,
+        isCurrent: e.id === id,
+        isRoot: e.id === rootId,
+        updatedAt: e.updatedAt.toISOString(),
+      };
+    });
   }
 
   // ── Totals + export (FR-7, FR-22, FR-23, FR-10) ──────────────────────────────

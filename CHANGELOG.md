@@ -6,6 +6,11 @@ it ships a first release.
 
 ## [Unreleased]
 
+### Scenarios (FE-24, FR-14)
+
+#### Added
+- **Scenarios** — create linked **variants** of an estimate and **compare** them side by side. "Create scenario" clones the estimate (with its line snapshots) and links it to a shared root via `scenario_of_id` (migration `20260613130000_scenarios`, verified fresh-deploy + no drift). `GET /estimates/:id/scenarios` returns the whole group (root + variants) with grand total + client price; `POST /estimates/:id/scenarios` creates one. The editor gains a **Scenarios — compare** panel. Clones (non-scenario) are unaffected.
+
 ### Collaboration — comments (FE-28, FR-19)
 
 #### Added
