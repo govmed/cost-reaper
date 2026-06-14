@@ -51,7 +51,7 @@ export default function SowEditorPage() {
       assumptions: sow.assumptions,
       termsAndConditions: sow.termsAndConditions,
     });
-  }, [sow?.id, sow?.updatedAt]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sow?.id, sow?.updatedAt]);
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
   if (error) return <p className="text-rose-700">{(error as Error).message}</p>;
