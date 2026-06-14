@@ -333,6 +333,8 @@ export interface WorkflowStageDef {
 }
 export interface WorkflowTransitionDef {
   id: string;
+  key: string;
+  description: string | null;
   fromStageKey: string;
   toStageKey: string;
   allowedRole: Role;
@@ -341,9 +343,21 @@ export interface WorkflowTransitionDef {
 }
 export interface WorkflowDefinition {
   id: string;
+  key: string;
   name: string;
+  description: string | null;
   isDefault: boolean;
   isActive: boolean;
   stages: WorkflowStageDef[];
   transitions: WorkflowTransitionDef[];
+}
+export interface WorkflowSummary {
+  id: string;
+  key: string;
+  name: string;
+  description: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+  stageCount: number;
+  transitionCount: number;
 }

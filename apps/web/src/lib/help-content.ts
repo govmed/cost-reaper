@@ -771,14 +771,16 @@ export const HELP_USE_CASES: UseCase[] = [
   },
   {
     id: 'manage-workflow',
-    title: 'Configure the approval workflow',
+    title: 'Manage workflows & transitions',
     category: 'Administration',
     persona: 'Administrator',
-    goal: 'Author the estimate workflow — its stages and role-gated transitions.',
+    goal: 'Keep a repo of approval workflows and author each one’s stages and transitions.',
     featureIds: ['FR-24', 'FE-43'],
-    route: '/workflow',
+    route: '/workflows',
     keywords: [
       'workflow',
+      'workflows',
+      'repo',
       'stages',
       'transitions',
       'approval',
@@ -788,7 +790,11 @@ export const HELP_USE_CASES: UseCase[] = [
       'configure',
     ],
     steps: [
-      { text: 'Open “Workflow” (Admin only) from the top navigation.' },
+      { text: 'Open “Workflows” (Admin only) from the top navigation.' },
+      {
+        text: 'Create a workflow — the system assigns a key; you add a label and description. Then open it to edit stages/transitions.',
+        detail: 'Each transition also gets a system key and an optional description for context.',
+      },
       {
         text: 'Under Stages, add/rename stages, set their order, and mark one as Initial and any as Terminal.',
         detail:

@@ -4,9 +4,11 @@ import {
   type AuthUser,
   CreateStageRequest,
   CreateTransitionRequest,
+  CreateWorkflowRequest,
   TransitionRequest,
   UpdateStageRequest,
   UpdateTransitionRequest,
+  UpdateWorkflowRequest,
 } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -14,7 +16,7 @@ import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ChecklistService } from './checklist.service';
 import { WorkflowService } from './workflow.service';
 
-// FR-24 (customizable workflow) + FR-25 (smart checklist that gates transitions).
+// FR-24 (configurable workflow repo) + FR-25 (smart checklist that gates transitions).
 @ApiTags('workflow')
 @ApiBearerAuth()
 @Controller()
@@ -24,23 +26,57 @@ export class WorkflowController {
     private readonly checklist: ChecklistService,
   ) {}
 
-  @Get('workflows/default')
-  getDefault() {
-    return this.workflow.getDefault();
+  // ── Workflow repo (list + admin CRUD) ──────────────────────────────────────
+
+  @Get('workflows')
+  list() {
+    return this.workflow.listWorkflows();
   }
 
-  // ── Authoring (FR-24, admin) ───────────────────────────────────────────────
+  @Post('workflows')
+  @Roles('ADMIN')
+  create(
+    @Body(new ZodValidationPipe(CreateWorkflowRequest)) dto: CreateWorkflowRequest,
+    @CurrentUser() u: AuthUser,
+  ) {
+    return this.workflow.createWorkflow(dto, u);
+  }
 
-  @Post('workflows/default/stages')
+  // `:wf` is a workflow id, or the literal "default".
+  @Get('workflows/:wf')
+  getOne(@Param('wf') wf: string) {
+    return this.workflow.getDefinition(wf);
+  }
+
+  @Patch('workflows/:wf')
+  @Roles('ADMIN')
+  update(
+    @Param('wf') wf: string,
+    @Body(new ZodValidationPipe(UpdateWorkflowRequest)) dto: UpdateWorkflowRequest,
+    @CurrentUser() u: AuthUser,
+  ) {
+    return this.workflow.updateWorkflow(wf, dto, u);
+  }
+
+  @Delete('workflows/:wf')
+  @Roles('ADMIN')
+  remove(@Param('wf') wf: string, @CurrentUser() u: AuthUser) {
+    return this.workflow.deleteWorkflow(wf, u);
+  }
+
+  // ── Stage authoring (per workflow, admin) ──────────────────────────────────
+
+  @Post('workflows/:wf/stages')
   @Roles('ADMIN')
   addStage(
+    @Param('wf') wf: string,
     @Body(new ZodValidationPipe(CreateStageRequest)) dto: CreateStageRequest,
     @CurrentUser() u: AuthUser,
   ) {
-    return this.workflow.addStage(dto, u);
+    return this.workflow.addStage(wf, dto, u);
   }
 
-  @Patch('workflows/default/stages/:stageId')
+  @Patch('workflows/:wf/stages/:stageId')
   @Roles('ADMIN')
   updateStage(
     @Param('stageId') stageId: string,
@@ -50,22 +86,25 @@ export class WorkflowController {
     return this.workflow.updateStage(stageId, dto, u);
   }
 
-  @Delete('workflows/default/stages/:stageId')
+  @Delete('workflows/:wf/stages/:stageId')
   @Roles('ADMIN')
   deleteStage(@Param('stageId') stageId: string, @CurrentUser() u: AuthUser) {
     return this.workflow.deleteStage(stageId, u);
   }
 
-  @Post('workflows/default/transitions')
+  // ── Transition authoring (per workflow, admin) ─────────────────────────────
+
+  @Post('workflows/:wf/transitions')
   @Roles('ADMIN')
   addTransition(
+    @Param('wf') wf: string,
     @Body(new ZodValidationPipe(CreateTransitionRequest)) dto: CreateTransitionRequest,
     @CurrentUser() u: AuthUser,
   ) {
-    return this.workflow.addTransition(dto, u);
+    return this.workflow.addTransition(wf, dto, u);
   }
 
-  @Patch('workflows/default/transitions/:transitionId')
+  @Patch('workflows/:wf/transitions/:transitionId')
   @Roles('ADMIN')
   updateTransition(
     @Param('transitionId') transitionId: string,
@@ -75,11 +114,13 @@ export class WorkflowController {
     return this.workflow.updateTransition(transitionId, dto, u);
   }
 
-  @Delete('workflows/default/transitions/:transitionId')
+  @Delete('workflows/:wf/transitions/:transitionId')
   @Roles('ADMIN')
   deleteTransition(@Param('transitionId') transitionId: string, @CurrentUser() u: AuthUser) {
     return this.workflow.deleteTransition(transitionId, u);
   }
+
+  // ── Per-estimate workflow + checklist ──────────────────────────────────────
 
   @Get('estimates/:id/workflow')
   getWorkflow(@Param('id') id: string, @CurrentUser() user: AuthUser) {

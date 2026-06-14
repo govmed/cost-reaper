@@ -697,7 +697,9 @@ async function seedDefaultWorkflow(adminId: string) {
 
   const def = await prisma.workflowDefinition.create({
     data: {
+      key: 'WF-DEFAULT',
       name: 'Default Approval Workflow',
+      description: 'The standard estimate approval lifecycle.',
       isDefault: true,
       isActive: true,
       createdById: adminId,
@@ -759,6 +761,7 @@ async function seedDefaultWorkflow(adminId: string) {
   for (const t of transitions) {
     await prisma.workflowTransition.create({
       data: {
+        key: `TR-${t.from}__${t.to}`,
         workflowDefinitionId: def.id,
         fromStageId: stageIds[t.from],
         toStageId: stageIds[t.to],

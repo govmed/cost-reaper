@@ -4,14 +4,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { randomBytes } from 'node:crypto';
 import type {
   AuthUser,
   CreateStageRequest,
   CreateTransitionRequest,
+  CreateWorkflowRequest,
   EstimateWorkflowDto,
   UpdateStageRequest,
   UpdateTransitionRequest,
+  UpdateWorkflowRequest,
   WorkflowDefinitionDto,
+  WorkflowSummaryDto,
 } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
@@ -25,18 +29,12 @@ export class WorkflowService {
     private readonly audit: AuditService,
   ) {}
 
-  async getDefault(): Promise<WorkflowDefinitionDto> {
-    const def: any = await this.prisma.workflowDefinition.findFirst({
-      where: { isDefault: true },
-      include: {
-        stages: { orderBy: { sortOrder: 'asc' } },
-        transitions: { include: { fromStage: true, toStage: true } },
-      },
-    });
-    if (!def) throw new NotFoundException('No default workflow configured');
+  private toDto(def: any): WorkflowDefinitionDto {
     return {
       id: def.id,
+      key: def.key,
       name: def.name,
+      description: def.description ?? null,
       isDefault: def.isDefault,
       isActive: def.isActive,
       stages: def.stages.map((s: any) => ({
@@ -49,6 +47,8 @@ export class WorkflowService {
       })),
       transitions: def.transitions.map((t: any) => ({
         id: t.id,
+        key: t.key,
+        description: t.description ?? null,
         fromStageKey: t.fromStage.key,
         toStageKey: t.toStage.key,
         allowedRole: t.allowedRole,
@@ -56,6 +56,37 @@ export class WorkflowService {
         requiresChecklistPass: t.requiresChecklistPass,
       })),
     };
+  }
+
+  async getDefinitionById(id: string): Promise<WorkflowDefinitionDto> {
+    const def = await this.prisma.workflowDefinition.findUnique({
+      where: { id },
+      include: {
+        stages: { orderBy: { sortOrder: 'asc' } },
+        transitions: { include: { fromStage: true, toStage: true } },
+      },
+    });
+    if (!def) throw new NotFoundException('Workflow not found');
+    return this.toDto(def);
+  }
+
+  /** Resolve a workflow ref ('default' or an id) to an id. */
+  private async resolveWf(wf: string): Promise<string> {
+    if (wf === 'default') return this.defaultId();
+    const found = await this.prisma.workflowDefinition.findUnique({
+      where: { id: wf },
+      select: { id: true },
+    });
+    if (!found) throw new NotFoundException('Workflow not found');
+    return found.id;
+  }
+
+  async getDefinition(wf: string): Promise<WorkflowDefinitionDto> {
+    return this.getDefinitionById(await this.resolveWf(wf));
+  }
+
+  async getDefault(): Promise<WorkflowDefinitionDto> {
+    return this.getDefinitionById(await this.defaultId());
   }
 
   private async defaultId(): Promise<string> {
@@ -67,10 +98,114 @@ export class WorkflowService {
     return def.id;
   }
 
+  // ── Workflow repo (FR-24, admin) ───────────────────────────────────────────
+
+  async listWorkflows(): Promise<WorkflowSummaryDto[]> {
+    const defs = await this.prisma.workflowDefinition.findMany({
+      orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
+      include: { _count: { select: { stages: true, transitions: true } } },
+    });
+    return defs.map((d: any) => ({
+      id: d.id,
+      key: d.key,
+      name: d.name,
+      description: d.description ?? null,
+      isDefault: d.isDefault,
+      isActive: d.isActive,
+      stageCount: d._count.stages,
+      transitionCount: d._count.transitions,
+    }));
+  }
+
+  /** Create a workflow with a system key and a starter Draft→Final lifecycle. */
+  async createWorkflow(dto: CreateWorkflowRequest, user: AuthUser): Promise<WorkflowSummaryDto> {
+    const key = `WF-${randomBytes(3).toString('hex').toUpperCase()}`;
+    const def = await this.prisma.workflowDefinition.create({
+      data: {
+        key,
+        name: dto.name,
+        description: dto.description ?? null,
+        isDefault: false,
+        isActive: true,
+        createdById: user.id,
+        stages: {
+          create: [
+            { key: 'DRAFT', label: 'Draft', sortOrder: 1, isInitial: true, isTerminal: false },
+            {
+              key: 'IN_REVIEW',
+              label: 'In Review',
+              sortOrder: 2,
+              isInitial: false,
+              isTerminal: false,
+            },
+            {
+              key: 'APPROVED',
+              label: 'Approved',
+              sortOrder: 3,
+              isInitial: false,
+              isTerminal: false,
+            },
+            { key: 'FINAL', label: 'Final', sortOrder: 4, isInitial: false, isTerminal: true },
+          ],
+        },
+      },
+      include: { stages: true },
+    });
+    const stageId = (k: string) => def.stages.find((s) => s.key === k)!.id;
+    await this.prisma.workflowTransition.createMany({
+      data: [
+        { key: `TR-${randomBytes(3).toString('hex').toUpperCase()}`, workflowDefinitionId: def.id, fromStageId: stageId('DRAFT'), toStageId: stageId('IN_REVIEW'), allowedRole: 'ESTIMATOR', label: 'Submit for review', requiresChecklistPass: true }, // prettier-ignore
+        { key: `TR-${randomBytes(3).toString('hex').toUpperCase()}`, workflowDefinitionId: def.id, fromStageId: stageId('IN_REVIEW'), toStageId: stageId('APPROVED'), allowedRole: 'ADMIN', label: 'Approve', requiresChecklistPass: true }, // prettier-ignore
+        { key: `TR-${randomBytes(3).toString('hex').toUpperCase()}`, workflowDefinitionId: def.id, fromStageId: stageId('APPROVED'), toStageId: stageId('FINAL'), allowedRole: 'ADMIN', label: 'Finalize', requiresChecklistPass: true }, // prettier-ignore
+      ],
+    });
+    await this.audit.record('WorkflowDefinition', key, 'CREATE', user.id);
+    const summaries = await this.listWorkflows();
+    return summaries.find((s) => s.id === def.id)!;
+  }
+
+  async updateWorkflow(
+    id: string,
+    dto: UpdateWorkflowRequest,
+    user: AuthUser,
+  ): Promise<WorkflowSummaryDto[]> {
+    const def = await this.prisma.workflowDefinition.findUnique({ where: { id } });
+    if (!def) throw new NotFoundException('Workflow not found');
+    await this.prisma.workflowDefinition.update({
+      where: { id },
+      data: {
+        name: dto.name ?? undefined,
+        description: dto.description ?? undefined,
+        isActive: dto.isActive ?? undefined,
+      },
+    });
+    await this.audit.record('WorkflowDefinition', def.key, 'UPDATE', user.id);
+    return this.listWorkflows();
+  }
+
+  async deleteWorkflow(id: string, user: AuthUser): Promise<WorkflowSummaryDto[]> {
+    const def = await this.prisma.workflowDefinition.findUnique({
+      where: { id },
+      include: { _count: { select: { estimates: true } } },
+    });
+    if (!def) throw new NotFoundException('Workflow not found');
+    if (def.isDefault) throw new BadRequestException('The default workflow cannot be deleted');
+    if ((def as any)._count.estimates > 0) {
+      throw new BadRequestException('Cannot delete a workflow that estimates are using');
+    }
+    await this.prisma.workflowDefinition.delete({ where: { id } });
+    await this.audit.record('WorkflowDefinition', def.key, 'DELETE', user.id);
+    return this.listWorkflows();
+  }
+
   // ── Authoring: stages (FR-24, admin) ───────────────────────────────────────
 
-  async addStage(dto: CreateStageRequest, user: AuthUser): Promise<WorkflowDefinitionDto> {
-    const workflowDefinitionId = await this.defaultId();
+  async addStage(
+    wf: string,
+    dto: CreateStageRequest,
+    user: AuthUser,
+  ): Promise<WorkflowDefinitionDto> {
+    const workflowDefinitionId = await this.resolveWf(wf);
     const dup = await this.prisma.workflowStage.findFirst({
       where: { workflowDefinitionId, key: dto.key },
     });
@@ -95,7 +230,7 @@ export class WorkflowService {
       });
     });
     await this.audit.record('WorkflowStage', dto.key, 'CREATE', user.id);
-    return this.getDefault();
+    return this.getDefinitionById(workflowDefinitionId);
   }
 
   async updateStage(
@@ -123,7 +258,7 @@ export class WorkflowService {
       });
     });
     await this.audit.record('WorkflowStage', stage.key, 'UPDATE', user.id);
-    return this.getDefault();
+    return this.getDefinitionById(stage.workflowDefinitionId);
   }
 
   async deleteStage(stageId: string, user: AuthUser): Promise<WorkflowDefinitionDto> {
@@ -144,16 +279,17 @@ export class WorkflowService {
     // Transitions referencing this stage cascade-delete (onDelete: Cascade).
     await this.prisma.workflowStage.delete({ where: { id: stageId } });
     await this.audit.record('WorkflowStage', stage.key, 'DELETE', user.id);
-    return this.getDefault();
+    return this.getDefinitionById(stage.workflowDefinitionId);
   }
 
   // ── Authoring: transitions (FR-24, admin) ──────────────────────────────────
 
   async addTransition(
+    wf: string,
     dto: CreateTransitionRequest,
     user: AuthUser,
   ): Promise<WorkflowDefinitionDto> {
-    const workflowDefinitionId = await this.defaultId();
+    const workflowDefinitionId = await this.resolveWf(wf);
     const stages = await this.prisma.workflowStage.findMany({ where: { workflowDefinitionId } });
     const from = stages.find((s) => s.key === dto.fromStageKey);
     const to = stages.find((s) => s.key === dto.toStageKey);
@@ -164,8 +300,11 @@ export class WorkflowService {
       where: { workflowDefinitionId, fromStageId: from.id, toStageId: to.id },
     });
     if (dup) throw new BadRequestException('That transition already exists');
+    const key = `TR-${randomBytes(3).toString('hex').toUpperCase()}`;
     await this.prisma.workflowTransition.create({
       data: {
+        key,
+        description: dto.description ?? null,
         workflowDefinitionId,
         fromStageId: from.id,
         toStageId: to.id,
@@ -174,13 +313,8 @@ export class WorkflowService {
         requiresChecklistPass: dto.requiresChecklistPass ?? true,
       },
     });
-    await this.audit.record(
-      'WorkflowTransition',
-      `${dto.fromStageKey}->${dto.toStageKey}`,
-      'CREATE',
-      user.id,
-    );
-    return this.getDefault();
+    await this.audit.record('WorkflowTransition', key, 'CREATE', user.id);
+    return this.getDefinitionById(workflowDefinitionId);
   }
 
   async updateTransition(
@@ -195,19 +329,20 @@ export class WorkflowService {
       data: {
         allowedRole: dto.allowedRole ?? undefined,
         label: dto.label ?? undefined,
+        description: dto.description ?? undefined,
         requiresChecklistPass: dto.requiresChecklistPass ?? undefined,
       },
     });
-    await this.audit.record('WorkflowTransition', transitionId, 'UPDATE', user.id);
-    return this.getDefault();
+    await this.audit.record('WorkflowTransition', tr.key, 'UPDATE', user.id);
+    return this.getDefinitionById(tr.workflowDefinitionId);
   }
 
   async deleteTransition(transitionId: string, user: AuthUser): Promise<WorkflowDefinitionDto> {
     const tr = await this.prisma.workflowTransition.findUnique({ where: { id: transitionId } });
     if (!tr) throw new NotFoundException('Transition not found');
     await this.prisma.workflowTransition.delete({ where: { id: transitionId } });
-    await this.audit.record('WorkflowTransition', transitionId, 'DELETE', user.id);
-    return this.getDefault();
+    await this.audit.record('WorkflowTransition', tr.key, 'DELETE', user.id);
+    return this.getDefinitionById(tr.workflowDefinitionId);
   }
 
   /** Lazily attach the default workflow + initial stage to an estimate that has none. */
