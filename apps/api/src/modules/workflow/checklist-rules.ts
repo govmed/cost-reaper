@@ -42,11 +42,17 @@ export interface ChecklistEstimate {
   }[];
 }
 
-/** An evaluator may name the specific offending line IDs (for deep-linking). */
+/**
+ * An evaluator may name the specific offending line IDs (for deep-linking) and
+ * may declare itself **not applicable** — e.g. a per-line rule on an estimate
+ * that has no lines of that type yet. A not-applicable rule shows as "N/A"
+ * rather than a (vacuously) green pass, so green means "verified".
+ */
 type Evaluator = (e: ChecklistEstimate) => {
   passed: boolean;
   message: string;
   entityIds?: string[];
+  applicable?: boolean;
 };
 
 /** Built-in rule logic, keyed by ChecklistRule.key (FR-25). Unknown keys pass. */
@@ -60,10 +66,13 @@ const EVALUATORS: Record<string, Evaluator> = {
       (l) => (!l.rateCardRoleId && Number(l.rateSnapshot) <= 0) || l.units <= 0 || l.quantity <= 0,
     );
     return {
+      applicable: e.labor.length > 0,
       passed: bad.length === 0,
-      message: bad.length
-        ? `${bad.length} labor line(s) missing a role/rate, quantity or units.`
-        : 'Every labor line has a role and quantity.',
+      message: !e.labor.length
+        ? 'No labor lines to check yet.'
+        : bad.length
+          ? `${bad.length} labor line(s) missing a role/rate, quantity or units.`
+          : 'Every labor line has a role and quantity.',
       entityIds: bad.map((l) => l.id),
     };
   },
@@ -77,20 +86,26 @@ const EVALUATORS: Record<string, Evaluator> = {
         !c.skuOrInstance,
     );
     return {
+      applicable: e.cloud.length > 0,
       passed: bad.length === 0,
-      message: bad.length
-        ? `${bad.length} cloud line(s) missing provider/region/instance/usage or price.`
-        : 'Every cloud line is complete with a snapshotted price.',
+      message: !e.cloud.length
+        ? 'No cloud lines to check yet.'
+        : bad.length
+          ? `${bad.length} cloud line(s) missing provider/region/instance/usage or price.`
+          : 'Every cloud line is complete with a snapshotted price.',
       entityIds: bad.map((c) => c.id),
     };
   },
   nonlabor_amount_period: (e) => {
     const bad = e.nonLabor.filter((n) => Number(n.amount) <= 0 || !n.billingPeriod);
     return {
+      applicable: e.nonLabor.length > 0,
       passed: bad.length === 0,
-      message: bad.length
-        ? `${bad.length} non-labor line(s) missing an amount or billing period.`
-        : 'Every non-labor line has an amount and billing period.',
+      message: !e.nonLabor.length
+        ? 'No non-labor lines to check yet.'
+        : bad.length
+          ? `${bad.length} non-labor line(s) missing an amount or billing period.`
+          : 'Every non-labor line has an amount and billing period.',
       entityIds: bad.map((n) => n.id),
     };
   },
@@ -98,10 +113,13 @@ const EVALUATORS: Record<string, Evaluator> = {
     const all = [...e.labor, ...e.nonLabor, ...e.cloud];
     const bad = all.filter((x) => !x.billingPeriod);
     return {
+      applicable: all.length > 0,
       passed: bad.length === 0,
-      message: bad.length
-        ? `${bad.length} line(s) missing a billing period.`
-        : 'All lines have a billing period.',
+      message: !all.length
+        ? 'No lines to check yet.'
+        : bad.length
+          ? `${bad.length} line(s) missing a billing period.`
+          : 'All lines have a billing period.',
       entityIds: bad.map((x) => x.id),
     };
   },
@@ -121,6 +139,7 @@ const EVALUATORS: Record<string, Evaluator> = {
     };
   },
   resource_capacity: (e) => {
+    const hasResources = e.labor.some((l) => l.resourceName);
     const violations = findCapacityViolations(
       e.labor.map((l) => ({
         resourceName: l.resourceName,
@@ -130,7 +149,13 @@ const EVALUATORS: Record<string, Evaluator> = {
       })),
     );
     if (!violations.length) {
-      return { passed: true, message: 'No resource exceeds 100% on any date.' };
+      return {
+        applicable: hasResources,
+        passed: true,
+        message: hasResources
+          ? 'No resource exceeds 100% on any date.'
+          : 'No assigned resources to check yet.',
+      };
     }
     const offending = new Set(violations.map((v) => v.resourceName));
     const entityIds = e.labor
@@ -164,14 +189,18 @@ export function evaluateChecklist(
       passed: res.passed,
       message: res.message,
       entityIds: res.entityIds ?? [],
+      applicable: res.applicable ?? true,
     };
   });
-  const blocking = items.some((i) => i.severity === 'BLOCKER' && !i.passed);
-  const passedCount = items.filter((i) => i.passed).length;
+  // Only applicable rules count toward blocking/completeness — a rule with nothing
+  // to check (N/A) neither blocks nor inflates progress.
+  const blocking = items.some((i) => i.severity === 'BLOCKER' && i.applicable && !i.passed);
+  const applicable = items.filter((i) => i.applicable);
+  const passedCount = applicable.filter((i) => i.passed).length;
   return {
     passed: !blocking,
     blocking,
-    completeness: items.length ? passedCount / items.length : 1,
+    completeness: applicable.length ? passedCount / applicable.length : 1,
     items,
   };
 }

@@ -132,6 +132,8 @@ export const ChecklistItemResult = z.object({
   message: z.string(),
   /** IDs of the specific line items this rule flags, for deep-linking (empty for estimate-level rules). */
   entityIds: z.array(z.string()).default([]),
+  /** false when there's nothing for this rule to check yet (e.g. no lines) — shown as N/A, not a pass. */
+  applicable: z.boolean().default(true),
 });
 export type ChecklistItemResult = z.infer<typeof ChecklistItemResult>;
 

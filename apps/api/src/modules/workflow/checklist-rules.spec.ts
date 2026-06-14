@@ -76,6 +76,16 @@ describe('evaluateChecklist', () => {
     expect(item?.entityIds).toEqual(['labor-bad']);
     expect(r.blocking).toBe(true);
   });
+
+  it('marks a per-line rule N/A (not a vacuous pass) when there are no such lines', () => {
+    const r = evaluateChecklist(RULES, { ...empty, rateCardId: 'rc1' });
+    const labor = r.items.find((i) => i.key === 'labor_role_assigned');
+    expect(labor?.applicable).toBe(false); // no labor lines → nothing to check
+    // Completeness counts only applicable rules: rate_card (pass) + totals_reconcile (fail) = 1/2.
+    expect(r.completeness).toBe(0.5);
+    // A N/A blocker does not block.
+    expect(r.blocking).toBe(false);
+  });
 });
 
 describe('resource_capacity rule (FR-27)', () => {
