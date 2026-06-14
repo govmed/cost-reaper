@@ -55,6 +55,15 @@ export const CreateSowRequest = z.object({
 });
 export type CreateSowRequest = z.infer<typeof CreateSowRequest>;
 
+/** An estimate eligible to be a SOW source — i.e. at an approved/final workflow stage. */
+export const SowEligibleEstimateDto = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  stageKey: z.string(),
+  stageLabel: z.string(),
+});
+export type SowEligibleEstimateDto = z.infer<typeof SowEligibleEstimateDto>;
+
 const longText = z.string().max(20000);
 
 export const UpdateSowRequest = z.object({

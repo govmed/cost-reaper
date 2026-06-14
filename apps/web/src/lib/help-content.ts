@@ -632,9 +632,9 @@ export const HELP_USE_CASES: UseCase[] = [
     steps: [
       { text: 'Open “SOW” from the top navigation.' },
       {
-        text: 'Pick a source estimate and click “New SOW from estimate”.',
+        text: 'Pick an approved source estimate and click “New SOW from estimate”.',
         detail:
-          'A system document number (e.g. SOW-A1B2C3) is assigned. Title, overview, assumptions, and pricing are pre-filled from the estimate.',
+          'Only estimates that have reached the Approved/Final stage of their workflow appear in the picker (so the SOW is built on complete, checklist-passed numbers). A system document number (e.g. SOW-A1B2C3) is assigned, and Title, overview, assumptions, and pricing are pre-filled from the estimate.',
       },
       {
         text: 'Edit the sections — parties, scope, deliverables, timeline, payment terms, assumptions, and terms & conditions — then “Save changes”.',

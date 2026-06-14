@@ -9,6 +9,7 @@
  * Idempotent: safe to re-run (upserts / find-or-create).
  */
 import {
+  BillingPeriod,
   ChecklistScope,
   ChecklistSeverity,
   CloudPriceSource,
@@ -1178,6 +1179,54 @@ async function seedFxRates(): Promise<void> {
   }
 }
 
+// A worked, already-approved estimate so the Statement of Work picker has an
+// eligible source out of the box (a SOW can only be built from an approved
+// estimate). Idempotent by name.
+async function seedSampleEstimate(adminId: string) {
+  const name = 'Sample Approved Estimate — Cloud Migration';
+  const existing = await prisma.estimate.findFirst({ where: { name } });
+  if (existing) return existing;
+  const rateCard = await prisma.rateCard.findFirst({
+    where: { name: 'Standard Rate Card 2026' },
+    include: { roles: true },
+  });
+  const wf = await prisma.workflowDefinition.findFirst({
+    where: { isDefault: true },
+    include: { stages: true },
+  });
+  const approved = wf?.stages.find((s) => s.key === 'APPROVED');
+  const role = rateCard?.roles[0];
+  if (!rateCard || !wf || !approved || !role) return null;
+  return prisma.estimate.create({
+    data: {
+      name,
+      description: 'A worked example, already approved — ready to turn into a Statement of Work.',
+      status: 'FINAL',
+      currency: rateCard.currency,
+      globalUpchargePercent: '10',
+      contingencyPercent: '15',
+      rateCardId: rateCard.id,
+      ownerId: adminId,
+      workflowDefinitionId: wf.id,
+      currentStageId: approved.id,
+      laborItems: {
+        create: [
+          {
+            rateCardRoleId: role.id,
+            resourceName: 'Lead Architect',
+            quantity: '1',
+            units: '160',
+            rateSnapshot: role.rate,
+            billingPeriod: BillingPeriod.ONE_TIME,
+            sdlcPhase: 'DEVELOPMENT',
+            lineTotal: '33600.0000',
+          },
+        ],
+      },
+    },
+  });
+}
+
 async function main(): Promise<void> {
   const admin = await seedAdmin();
   await seedRateCard(admin.id);
@@ -1186,6 +1235,7 @@ async function main(): Promise<void> {
   await seedChecklistRules();
   await seedReferenceData(admin.id);
   await seedFxRates();
+  await seedSampleEstimate(admin.id);
   console.log(`Seed complete. Admin: ${admin.email}`);
 }
 

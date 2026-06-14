@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { useSows, useCreateSow, useSowMutations, useEstimates } from '../lib/queries';
+import { useSows, useCreateSow, useSowMutations, useEligibleEstimates } from '../lib/queries';
 import type { SowSummary } from '../lib/types';
 
-/** Statements of Work (BR-7) — list + create-from-estimate. */
+/** Statements of Work (BR-7) — list + create from an *approved* estimate. */
 export default function SowListPage() {
   const { user } = useAuth();
   const canEdit = user?.role === 'ADMIN' || user?.role === 'ESTIMATOR';
   const navigate = useNavigate();
   const { data, isLoading, error } = useSows();
-  const { data: estimates } = useEstimates({});
+  const { data: eligible } = useEligibleEstimates();
   const create = useCreateSow();
   const [estimateId, setEstimateId] = useState('');
 
@@ -19,45 +19,55 @@ export default function SowListPage() {
     create.mutate({ estimateId }, { onSuccess: (sow) => navigate(`/sow/${sow.id}`) });
   }
 
+  const hasEligible = (eligible?.length ?? 0) > 0;
+
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-semibold">Statements of Work</h1>
         <p className="text-sm text-slate-500 max-w-2xl">
-          Compose an official, legal Statement of Work from an estimate, edit its sections, then
-          print it to PDF. Issuing a SOW locks it and snapshots its pricing (BR-7).
+          Compose an official, legal Statement of Work from an <strong>approved</strong> estimate,
+          edit its sections, then print it to PDF. Only estimates that have reached the
+          Approved/Final stage of their workflow can be a SOW source. Issuing a SOW locks it and
+          snapshots its pricing (BR-7).
         </p>
       </div>
 
-      {canEdit && (
-        <div className="flex flex-wrap gap-2 items-center bg-white border border-slate-200 rounded-xl p-3">
-          <select
-            value={estimateId}
-            onChange={(e) => setEstimateId(e.target.value)}
-            className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64"
-            title="Source estimate"
-          >
-            <option value="">Select an estimate…</option>
-            {estimates?.data.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.name}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={add}
-            disabled={!estimateId || create.isPending}
-            className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
-          >
-            New SOW from estimate
-          </button>
-          {create.error && (
-            <span className="text-rose-700 text-sm" role="alert">
-              {(create.error as Error).message}
-            </span>
-          )}
-        </div>
-      )}
+      {canEdit &&
+        (hasEligible ? (
+          <div className="flex flex-wrap gap-2 items-center bg-white border border-slate-200 rounded-xl p-3">
+            <select
+              value={estimateId}
+              onChange={(e) => setEstimateId(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64"
+              title="Source estimate"
+            >
+              <option value="">Select an approved estimate…</option>
+              {eligible?.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.name} · {e.stageLabel}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={add}
+              disabled={!estimateId || create.isPending}
+              className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+            >
+              New SOW from estimate
+            </button>
+            {create.error && (
+              <span className="text-rose-700 text-sm" role="alert">
+                {(create.error as Error).message}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 text-sm">
+            No approved estimates yet. Move an estimate to the <strong>Approved</strong> (or Final)
+            stage in its workflow — once its smart checklist passes — to create a SOW from it.
+          </div>
+        ))}
 
       {isLoading && <p className="text-slate-500">Loading…</p>}
       {error && <p className="text-rose-700">{(error as Error).message}</p>}

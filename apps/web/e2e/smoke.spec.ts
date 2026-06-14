@@ -227,19 +227,16 @@ test('Dashboard summarizes estimates and drills into a stage (FR-18)', async ({ 
   await expect(firstStage).toHaveAttribute('aria-expanded', 'true');
 });
 
-test('Statement of Work: create from estimate, edit, open PDF (BR-7)', async ({ page }) => {
+test('Statement of Work: create from an approved estimate, edit, open PDF (BR-7)', async ({
+  page,
+}) => {
   await login(page);
 
-  // A SOW is composed from an estimate — create one first.
-  const estName = `E2E SOW Estimate ${Date.now()}`;
-  await page.getByPlaceholder('Q3 Platform build').fill(estName);
-  await page.getByRole('button', { name: 'Create' }).click();
-  await expect(page.getByRole('heading', { name: estName })).toBeVisible();
-
-  // Compose a SOW from that estimate (nav label is "SOW"; the page heading is fuller).
+  // A SOW can only be built from an APPROVED estimate; the seed ships one, so it's
+  // the only option in the picker (a draft estimate would not appear).
   await page.getByRole('link', { name: 'SOW', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Statements of Work' })).toBeVisible();
-  await page.locator('select[title="Source estimate"]').selectOption({ label: estName });
+  await page.locator('select[title="Source estimate"]').selectOption({ index: 1 });
   await page.getByRole('button', { name: 'New SOW from estimate' }).click();
 
   // Lands on the editor — a system SOW number + editable title + Save.
