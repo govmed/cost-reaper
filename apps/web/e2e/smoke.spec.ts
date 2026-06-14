@@ -141,7 +141,8 @@ test('Workflow repo lists workflows and opens the editor (FR-24)', async ({ page
   await login(page);
   await page.getByRole('link', { name: 'Workflows', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Workflows' })).toBeVisible();
-  await expect(page.getByText('Default Approval Workflow')).toBeVisible();
+  // The default workflow's system key renders as text (the label is an editable input for admins).
+  await expect(page.getByText('WF-DEFAULT')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create workflow' })).toBeVisible();
   // Open the default workflow's stage/transition editor.
   await page
