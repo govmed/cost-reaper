@@ -62,6 +62,7 @@ async function seedRateCard(adminId: string) {
 
 interface SeedPrice {
   provider: CloudProvider;
+  category: string;
   region: string;
   service: string;
   skuOrInstance: string;
@@ -69,7 +70,91 @@ interface SeedPrice {
   unitPrice: string;
 }
 
-/** Expand `[sku, price]` pairs into catalog rows for a provider/region/service. */
+// Enterprise category for each service — everything an architect needs to model
+// a cloud build. Service names are unique per category across providers (FR-21).
+const SERVICE_CATEGORY: Record<string, string> = {
+  // Compute
+  EC2: 'Compute',
+  'Compute Engine': 'Compute',
+  'Virtual Machines': 'Compute',
+  // Storage
+  S3: 'Storage',
+  EBS: 'Storage',
+  EFS: 'Storage',
+  'Cloud Storage': 'Storage',
+  Filestore: 'Storage',
+  'Blob Storage': 'Storage',
+  'Managed Disks': 'Storage',
+  'Azure Files': 'Storage',
+  // Networking
+  'Data Transfer': 'Networking',
+  'Elastic Load Balancing': 'Networking',
+  'NAT Gateway': 'Networking',
+  CloudFront: 'Networking',
+  'Route 53': 'Networking',
+  'VPN / Direct Connect': 'Networking',
+  'Cloud Load Balancing': 'Networking',
+  'Cloud NAT': 'Networking',
+  'Cloud CDN': 'Networking',
+  'Cloud DNS': 'Networking',
+  'Cloud VPN / Interconnect': 'Networking',
+  'Network Egress': 'Networking',
+  'Load Balancer': 'Networking',
+  'Application Gateway': 'Networking',
+  'Front Door / CDN': 'Networking',
+  'DNS / VPN Gateway': 'Networking',
+  // Database
+  RDS: 'Database',
+  DynamoDB: 'Database',
+  ElastiCache: 'Database',
+  'Cloud SQL': 'Database',
+  Firestore: 'Database',
+  Memorystore: 'Database',
+  'Azure SQL Database': 'Database',
+  'Cosmos DB': 'Database',
+  'Cache for Redis': 'Database',
+  // Containers & Serverless
+  Lambda: 'Containers & Serverless',
+  Fargate: 'Containers & Serverless',
+  EKS: 'Containers & Serverless',
+  'Cloud Functions': 'Containers & Serverless',
+  'Cloud Run': 'Containers & Serverless',
+  GKE: 'Containers & Serverless',
+  'Azure Functions': 'Containers & Serverless',
+  'Container Instances': 'Containers & Serverless',
+  AKS: 'Containers & Serverless',
+  // Analytics & Big Data
+  Athena: 'Analytics & Big Data',
+  'Kinesis Data Streams': 'Analytics & Big Data',
+  BigQuery: 'Analytics & Big Data',
+  Dataflow: 'Analytics & Big Data',
+  'Synapse Analytics': 'Analytics & Big Data',
+  'Event Hubs': 'Analytics & Big Data',
+  // AI & Machine Learning
+  SageMaker: 'AI & Machine Learning',
+  Bedrock: 'AI & Machine Learning',
+  'Vertex AI': 'AI & Machine Learning',
+  'Azure OpenAI': 'AI & Machine Learning',
+  'Azure ML': 'AI & Machine Learning',
+  // Security, Identity & Tools
+  WAF: 'Security & Tools',
+  KMS: 'Security & Tools',
+  'Secrets Manager': 'Security & Tools',
+  'Cloud Armor': 'Security & Tools',
+  'Secret Manager': 'Security & Tools',
+  'Key Vault': 'Security & Tools',
+  'Defender for Cloud': 'Security & Tools',
+  // Management & Monitoring
+  CloudWatch: 'Management & Monitoring',
+  'Cloud Monitoring': 'Management & Monitoring',
+  'Azure Monitor': 'Management & Monitoring',
+};
+
+function categoryFor(service: string): string {
+  return SERVICE_CATEGORY[service] ?? 'Compute';
+}
+
+/** Expand `[sku, price]` pairs into categorized catalog rows for a service. */
 function catalogRows(
   provider: CloudProvider,
   region: string,
@@ -77,8 +162,10 @@ function catalogRows(
   unit: CloudPriceUnit,
   entries: [string, string][],
 ): SeedPrice[] {
+  const category = categoryFor(service);
   return entries.map(([skuOrInstance, unitPrice]) => ({
     provider,
+    category,
     region,
     service,
     skuOrInstance,
@@ -88,7 +175,10 @@ function catalogRows(
 }
 
 const HOUR = CloudPriceUnit.HOUR;
+const MONTH = CloudPriceUnit.MONTH;
 const GB_MONTH = CloudPriceUnit.GB_MONTH;
+const GB = CloudPriceUnit.GB;
+const REQUEST = CloudPriceUnit.REQUEST;
 
 // A broad compute catalog (FR-21) across AWS / GCP / Azure — general purpose,
 // compute/memory/storage optimized, and accelerated (GPU/ML) families, plus
@@ -320,6 +410,188 @@ const CLOUD_PRICES: SeedPrice[] = [
     ['B2ms', '0.091500'],
     ['D2s_v5', '0.105000'],
   ]),
+
+  // ═══ AWS — beyond compute (us-east-1) ═══
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'S3', GB_MONTH, [
+    ['Infrequent Access', '0.012500'],
+    ['Glacier Flexible', '0.003600'],
+    ['Glacier Deep Archive', '0.000990'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'EFS', GB_MONTH, [['Standard', '0.300000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Data Transfer', GB, [
+    ['Data Out to Internet', '0.090000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Elastic Load Balancing', HOUR, [
+    ['Application Load Balancer', '0.022500'],
+    ['Network Load Balancer', '0.022500'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'NAT Gateway', HOUR, [
+    ['NAT Gateway', '0.045000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'CloudFront', GB, [
+    ['Data Transfer Out', '0.085000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Route 53', MONTH, [['Hosted Zone', '0.500000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'VPN / Direct Connect', HOUR, [
+    ['Site-to-Site VPN', '0.050000'],
+    ['Direct Connect 1Gbps', '0.300000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'RDS', HOUR, [
+    ['db.m5.large MySQL', '0.171000'],
+    ['db.r5.large PostgreSQL', '0.250000'],
+    ['Aurora db.r5.large', '0.290000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'DynamoDB', GB_MONTH, [
+    ['On-Demand Storage', '0.250000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'ElastiCache', HOUR, [
+    ['cache.m5.large', '0.156000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Lambda', REQUEST, [
+    ['Requests (per 1M)', '0.200000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Fargate', HOUR, [
+    ['vCPU', '0.040480'],
+    ['Memory GB', '0.004445'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'EKS', HOUR, [['Cluster', '0.100000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Athena', GB, [['Data Scanned', '0.005000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Kinesis Data Streams', HOUR, [
+    ['Shard', '0.015000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'SageMaker', HOUR, [['ml.m5.xlarge', '0.230000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Bedrock', REQUEST, [
+    ['Claude (per 1K tokens)', '0.008000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'WAF', MONTH, [['Web ACL', '5.000000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'KMS', MONTH, [['Customer Key', '1.000000']]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Secrets Manager', MONTH, [
+    ['Secret', '0.400000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'CloudWatch', MONTH, [
+    ['Custom Metric', '0.300000'],
+  ]),
+
+  // ═══ GCP — beyond compute (us-central1) ═══
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Storage', GB_MONTH, [
+    ['Nearline', '0.010000'],
+    ['Coldline', '0.004000'],
+    ['Archive', '0.001200'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Filestore', GB_MONTH, [
+    ['Basic HDD', '0.200000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Network Egress', GB, [
+    ['Internet Egress', '0.120000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Load Balancing', HOUR, [
+    ['Forwarding Rule', '0.025000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud NAT', HOUR, [['Gateway', '0.044000']]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud CDN', GB, [['Cache Egress', '0.080000']]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud DNS', MONTH, [
+    ['Managed Zone', '0.200000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud VPN / Interconnect', HOUR, [
+    ['HA VPN Tunnel', '0.050000'],
+    ['Interconnect 10Gbps', '1.640000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud SQL', HOUR, [
+    ['db-n1-standard-2', '0.098500'],
+    ['db-n1-standard-4', '0.197000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Firestore', GB_MONTH, [
+    ['Stored Data', '0.180000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Memorystore', GB_MONTH, [
+    ['Redis GB', '0.049000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Functions', REQUEST, [
+    ['Invocations (per 1M)', '0.400000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Run', HOUR, [
+    ['vCPU', '0.086400'],
+    ['Memory GB', '0.009000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'GKE', HOUR, [
+    ['Cluster Management', '0.100000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'BigQuery', GB, [['Query Scanned', '0.006250']]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Dataflow', HOUR, [['vCPU', '0.069000']]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Vertex AI', HOUR, [
+    ['Training n1-standard-4', '0.490000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Armor', MONTH, [
+    ['Security Policy', '5.000000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Secret Manager', MONTH, [
+    ['Secret Version', '0.060000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Monitoring', GB, [
+    ['Log Ingestion', '0.500000'],
+  ]),
+
+  // ═══ Azure — beyond compute (eastus) ═══
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Blob Storage', GB_MONTH, [
+    ['Cool LRS', '0.010000'],
+    ['Archive LRS', '0.000990'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Files', GB_MONTH, [
+    ['Standard', '0.060000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Load Balancer', HOUR, [
+    ['Standard Rule', '0.025000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Application Gateway', HOUR, [
+    ['Standard_v2', '0.025200'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Front Door / CDN', GB, [
+    ['Data Transfer Out', '0.081000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'DNS / VPN Gateway', HOUR, [
+    ['VPN Gateway VpnGw1', '0.190000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'DNS / VPN Gateway', MONTH, [
+    ['DNS Zone', '0.500000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure SQL Database', HOUR, [
+    ['S3 (100 DTU)', '0.201600'],
+    ['GP Gen5 2 vCore', '0.252800'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Cosmos DB', HOUR, [
+    ['Provisioned (per 100 RU/s)', '0.008000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Cache for Redis', HOUR, [
+    ['C1 Standard', '0.055000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Functions', REQUEST, [
+    ['Executions (per 1M)', '0.200000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Container Instances', HOUR, [
+    ['vCPU', '0.050600'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'AKS', HOUR, [
+    ['Cluster (Standard tier)', '0.100000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Synapse Analytics', GB, [
+    ['Data Scanned', '0.005000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Event Hubs', HOUR, [
+    ['Throughput Unit', '0.030000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure OpenAI', REQUEST, [
+    ['GPT-4o (per 1K tokens)', '0.005000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure ML', HOUR, [['Compute D3 v2', '0.230000']]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Key Vault', REQUEST, [
+    ['Operations (per 10K)', '0.030000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Defender for Cloud', MONTH, [
+    ['Per Server', '15.000000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Monitor', GB, [
+    ['Log Ingestion', '2.300000'],
+  ]),
 ];
 
 async function seedCloudPrices() {
@@ -334,9 +606,10 @@ async function seedCloudPrices() {
           unit: p.unit,
         },
       },
-      update: { unitPrice: p.unitPrice },
+      update: { unitPrice: p.unitPrice, category: p.category },
       create: {
         provider: p.provider,
+        category: p.category,
         region: p.region,
         service: p.service,
         skuOrInstance: p.skuOrInstance,

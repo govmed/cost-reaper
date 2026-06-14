@@ -85,12 +85,18 @@ export class CloudPricesService {
   async list(q: CloudPriceQuery) {
     const where: any = {};
     if (q.provider) where.provider = q.provider;
+    if (q.category) where.category = q.category;
     if (q.region) where.region = { contains: q.region, mode: 'insensitive' };
     if (q.service) where.service = { contains: q.service, mode: 'insensitive' };
     if (q.skuOrInstance) where.skuOrInstance = { contains: q.skuOrInstance, mode: 'insensitive' };
     const rows = await this.prisma.cloudPrice.findMany({
       where,
-      orderBy: [{ provider: 'asc' }, { service: 'asc' }, { skuOrInstance: 'asc' }],
+      orderBy: [
+        { category: 'asc' },
+        { provider: 'asc' },
+        { service: 'asc' },
+        { skuOrInstance: 'asc' },
+      ],
     });
     return rows.map((p) => this.toDto(p));
   }
@@ -104,6 +110,7 @@ export class CloudPricesService {
   private toDto(p: {
     id: string;
     provider: string;
+    category: string;
     region: string;
     service: string;
     skuOrInstance: string;
@@ -116,6 +123,7 @@ export class CloudPricesService {
     return {
       id: p.id,
       provider: p.provider,
+      category: p.category,
       region: p.region,
       service: p.service,
       skuOrInstance: p.skuOrInstance,

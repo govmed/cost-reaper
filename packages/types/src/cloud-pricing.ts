@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { CloudProvider, Currency } from './common';
 
-export const CloudPriceUnit = z.enum(['HOUR', 'MONTH', 'GB_MONTH', 'REQUEST']);
+export const CloudPriceUnit = z.enum(['HOUR', 'MONTH', 'GB_MONTH', 'GB', 'REQUEST']);
 export type CloudPriceUnit = z.infer<typeof CloudPriceUnit>;
 
 export const CloudPriceSource = z.enum(['CATALOG_SEED', 'AWS_API', 'AZURE_API', 'GCP_API']);
@@ -10,6 +10,8 @@ export type CloudPriceSource = z.infer<typeof CloudPriceSource>;
 export const CloudPriceDto = z.object({
   id: z.string().uuid(),
   provider: CloudProvider,
+  /** Enterprise category, e.g. Compute / Storage / Networking / Database. */
+  category: z.string(),
   region: z.string(),
   service: z.string(),
   skuOrInstance: z.string(),
@@ -24,6 +26,7 @@ export type CloudPriceDto = z.infer<typeof CloudPriceDto>;
 
 export const CloudPriceQuery = z.object({
   provider: CloudProvider.optional(),
+  category: z.string().optional(),
   region: z.string().optional(),
   service: z.string().optional(),
   skuOrInstance: z.string().optional(),
