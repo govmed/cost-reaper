@@ -373,3 +373,39 @@ export interface WorkflowSummary {
   stageCount: number;
   transitionCount: number;
 }
+
+// ── Statement of Work (BR-7) ─────────────────────────────────────────────────
+export interface SowSummary {
+  id: string;
+  number: string;
+  estimateId: string;
+  estimateName: string;
+  title: string;
+  status: string;
+  clientName: string;
+  updatedAt: string;
+}
+export interface StatementOfWork {
+  id: string;
+  number: string;
+  estimateId: string;
+  estimateName: string;
+  title: string;
+  status: string;
+  clientName: string;
+  providerName: string;
+  overview: string;
+  scope: string;
+  deliverables: string;
+  timeline: string;
+  paymentTerms: string;
+  assumptions: string;
+  termsAndConditions: string;
+  effectiveDate: string | null;
+  issuedAt: string | null;
+  preparedByEmail: string | null;
+  currency: string;
+  pricing: EngineResult;
+  createdAt: string;
+  updatedAt: string;
+}

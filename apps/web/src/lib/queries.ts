@@ -18,6 +18,8 @@ import type {
   ReferenceType,
   ReferenceValue,
   Scenario,
+  SowSummary,
+  StatementOfWork,
   UserDto,
   WorkflowDefinition,
   WorkflowSummary,
@@ -478,4 +480,54 @@ export function useFxRefresh() {
       void qc.invalidateQueries({ queryKey: ['dashboard'] });
     },
   });
+}
+
+// ── Statement of Work (BR-7) ─────────────────────────────────────────────────
+
+export function useSows() {
+  return useQuery({ queryKey: ['sow'], queryFn: () => api<SowSummary[]>('/sow') });
+}
+
+export function useSow(id: string | undefined) {
+  return useQuery({
+    queryKey: ['sow', id],
+    queryFn: () => api<StatementOfWork>(`/sow/${id}`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useCreateSow() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { estimateId: string; title?: string; clientName?: string }) =>
+      api<StatementOfWork>('/sow', { method: 'POST', body: JSON.stringify(body) }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['sow'] }),
+  });
+}
+
+export function useSowMutations(id: string) {
+  const qc = useQueryClient();
+  const onSuccess = () => {
+    void qc.invalidateQueries({ queryKey: ['sow', id] });
+    void qc.invalidateQueries({ queryKey: ['sow'] });
+  };
+  return {
+    update: useMutation({
+      mutationFn: (body: Record<string, unknown>) =>
+        api(`/sow/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    issue: useMutation({
+      mutationFn: () => api(`/sow/${id}/issue`, { method: 'POST' }),
+      onSuccess,
+    }),
+    revert: useMutation({
+      mutationFn: () => api(`/sow/${id}/revert`, { method: 'POST' }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: () => api(`/sow/${id}`, { method: 'DELETE' }),
+      onSuccess: () => void qc.invalidateQueries({ queryKey: ['sow'] }),
+    }),
+  };
 }

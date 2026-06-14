@@ -7,5 +7,6 @@ import { ReferenceModule } from '../reference/reference.module';
   imports: [ReferenceModule],
   controllers: [EstimatesController],
   providers: [EstimatesService],
+  exports: [EstimatesService],
 })
 export class EstimatesModule {}

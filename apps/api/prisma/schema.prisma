@@ -173,13 +173,14 @@ model Estimate {
   createdAt             DateTime            @default(now()) @map("created_at")
   updatedAt             DateTime            @updatedAt @map("updated_at")
 
-  laborItems       LaborLineItem[]
-  nonLaborItems    NonLaborLineItem[]
-  cloudItems       CloudComputeLineItem[]
-  assumptions      Assumption[]
-  comments         Comment[]
-  baselines        Baseline[]
-  transitionEvents WorkflowTransitionEvent[]
+  laborItems        LaborLineItem[]
+  nonLaborItems     NonLaborLineItem[]
+  cloudItems        CloudComputeLineItem[]
+  assumptions       Assumption[]
+  comments          Comment[]
+  baselines         Baseline[]
+  transitionEvents  WorkflowTransitionEvent[]
+  statementsOfWork  StatementOfWork[]
 
   @@index([ownerId])
   @@index([status])
@@ -306,6 +307,38 @@ model Baseline {
 
   @@index([estimateId])
   @@map("baselines")
+}
+
+// An editable, official Statement of Work composed from an estimate; the user
+// edits the sections, then prints it to an official/legal PDF. Issuing locks it
+// and snapshots the pricing so the document is immutable thereafter (BR-3, BR-7).
+model StatementOfWork {
+  id                 String    @id @default(uuid()) @db.Uuid
+  estimateId         String    @map("estimate_id") @db.Uuid
+  estimate           Estimate  @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  /// System-assigned document number (e.g. SOW-A1B2C3).
+  number             String    @unique
+  title              String
+  status             String    @default("DRAFT")
+  clientName         String    @default("") @map("client_name")
+  providerName       String    @default("") @map("provider_name")
+  overview           String    @default("")
+  scope              String    @default("")
+  deliverables       String    @default("")
+  timeline           String    @default("")
+  paymentTerms       String    @default("") @map("payment_terms")
+  assumptions        String    @default("")
+  termsAndConditions String    @default("") @map("terms_and_conditions")
+  effectiveDate      DateTime? @map("effective_date")
+  issuedAt           DateTime? @map("issued_at")
+  totalsSnapshot     Json?     @map("totals_snapshot")
+  currencySnapshot   String?   @map("currency_snapshot")
+  preparedByEmail    String?   @map("prepared_by_email")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@index([estimateId])
+  @@map("statements_of_work")
 }
 
 // ─── Governance: workflow (FR-24) + checklist (FR-25) ────────────────────────

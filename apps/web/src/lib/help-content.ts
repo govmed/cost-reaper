@@ -620,6 +620,35 @@ export const HELP_USE_CASES: UseCase[] = [
     ],
     related: ['export-csv', 'export-excel'],
   },
+  {
+    id: 'statement-of-work',
+    title: 'Create an official Statement of Work (SOW) PDF',
+    category: 'Outputs',
+    persona: 'Estimator',
+    goal: 'Compose, edit, and issue a legal SOW from an estimate, then print it to PDF.',
+    featureIds: ['BR-7'],
+    route: '/sow',
+    keywords: ['sow', 'statement of work', 'contract', 'legal', 'pdf', 'official', 'issue'],
+    steps: [
+      { text: 'Open “Statements of Work” from the top navigation.' },
+      {
+        text: 'Pick a source estimate and click “New SOW from estimate”.',
+        detail:
+          'A system document number (e.g. SOW-A1B2C3) is assigned. Title, overview, assumptions, and pricing are pre-filled from the estimate.',
+      },
+      {
+        text: 'Edit the sections — parties, scope, deliverables, timeline, payment terms, assumptions, and terms & conditions — then “Save changes”.',
+      },
+      {
+        text: 'Click “Issue (lock)” to finalize: the SOW is locked and its pricing is snapshotted so it never changes if the estimate is later edited.',
+        detail: 'Use “Revert to draft” to reopen an issued SOW for further edits.',
+      },
+      {
+        text: 'Open the PDF view and choose “Print / Save as PDF” to produce the official document, including signature blocks.',
+      },
+    ],
+    related: ['printable-summary', 'export-csv'],
+  },
 
   // ── Administration ───────────────────────────────────────────────────────────
   {

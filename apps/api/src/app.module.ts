@@ -16,6 +16,7 @@ import { UsersModule } from './modules/users/users.module';
 import { RateCardsModule } from './modules/rate-cards/rate-cards.module';
 import { CloudPricingModule } from './modules/cloud-pricing/cloud-pricing.module';
 import { EstimatesModule } from './modules/estimates/estimates.module';
+import { SowModule } from './modules/sow/sow.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { ReferenceModule } from './modules/reference/reference.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
@@ -32,6 +33,7 @@ import { FxModule } from './modules/fx/fx.module';
     RateCardsModule,
     CloudPricingModule,
     EstimatesModule,
+    SowModule,
     WorkflowModule,
     ReferenceModule,
     DashboardModule,
