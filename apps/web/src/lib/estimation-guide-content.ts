@@ -11,7 +11,7 @@ export const ESTIMATION_GUIDE: GuideSection[] = [
     title: 'Why estimate well',
     body: [
       'A good estimate is a defensible, repeatable statement of what a project will cost — not a guess. It lets you compare options, set a budget, price a proposal, and re-baseline as scope changes. The goal is not a single "right" number but a transparent model whose assumptions and method anyone can inspect.',
-      'KerdosSOW is a bottom-up estimating tool: you build the number from line items (labor, non-labor, cloud, managed services, SaaS), apply contingency and markup, and record the assumptions behind it. This guide covers the estimating discipline; the User Guide covers the software.',
+      'Kerdos is a bottom-up estimating tool: you build the number from line items (labor, non-labor, cloud, managed services, SaaS), apply contingency and markup, and record the assumptions behind it. This guide covers the estimating discipline; the User Guide covers the software.',
     ],
     links: [{ label: 'Open the User Guide', to: '/guide' }],
   },
@@ -24,7 +24,7 @@ export const ESTIMATION_GUIDE: GuideSection[] = [
     bullets: [
       'Analogous (top-down) — scale from a similar past project ("like the last platform build, +30%"). Fast, rough; good for early ballparks.',
       'Parametric — multiply a rate by a size driver (e.g. $/story point, $/integration, $/seat). Reliable when you have a calibrated rate and a countable size.',
-      'Bottom-up — sum detailed line items by role, task, and resource. The most accurate and the most effort; this is KerdosSOW’s core model.',
+      'Bottom-up — sum detailed line items by role, task, and resource. The most accurate and the most effort; this is Kerdos’s core model.',
       'Three-point / PERT — capture optimistic (o), most-likely (m), and pessimistic (p) effort, then use the weighted mean (o + 4m + p) / 6. It tames optimism bias and surfaces risk.',
     ],
     links: [{ label: 'Use PERT in the tool', to: '/help#uc-pert-estimate' }],
@@ -140,7 +140,7 @@ export const ESTIMATION_GUIDE: GuideSection[] = [
   {
     id: 'glossary',
     title: 'Glossary',
-    body: ['Common estimating terms used throughout KerdosSOW:'],
+    body: ['Common estimating terms used throughout Kerdos:'],
     bullets: [
       'Bottom-up — building the total from detailed line items.',
       'PERT / three-point — (optimistic + 4×most-likely + pessimistic) / 6.',

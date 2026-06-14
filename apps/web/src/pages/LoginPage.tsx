@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { getSsoStatus, ssoLoginUrl, type SsoStatus } from '../lib/api';
+import BrandLogo from '../components/BrandLogo';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -38,9 +39,14 @@ export default function LoginPage() {
       onSubmit={onSubmit}
       className="max-w-sm mx-auto mt-16 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4"
     >
-      <div>
-        <div className="text-2xl font-bold tracking-tight text-brand">KerdosSOW</div>
-        <p className="text-xs text-slate-400">Project Cost Estimator</p>
+      <div className="flex items-center gap-3 text-brand">
+        <BrandLogo className="h-9 w-9" />
+        <div>
+          <div className="text-2xl font-bold leading-none tracking-tight">Kerdos</div>
+          <p className="text-xs font-medium text-slate-400">
+            Project Cost Estimator · Veridion LLC
+          </p>
+        </div>
       </div>
       <h1 className="text-base font-medium text-slate-700">Sign in</h1>
       {error && <div className="text-sm text-rose-700 bg-rose-50 rounded px-3 py-2">{error}</div>}

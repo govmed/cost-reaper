@@ -20,7 +20,7 @@ async function bootstrap(): Promise<void> {
   });
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('KerdosSOW API')
+    .setTitle('Kerdos API')
     .setDescription('Technology Project Cost Estimator REST API (FR-12).')
     .setVersion('0.1.0')
     .addBearerAuth()
