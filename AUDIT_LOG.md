@@ -545,3 +545,9 @@ Yes, build the estimation guide and confirm #51 merged
 
 ### [2026-06-14 05:45 UTC] — AGENT
 Confirmed #51 merged (4b0dc41) — but its e2e was red (the new category breakdown duplicated the "Licenses" cell); forward-fixed + merged green via #52 (e49a55e). Built the Estimation Guide: an /estimation-guide menu page — an 11-section methodology/training handbook (techniques, uncertainty, pricing, TCO, pitfalls, worked example, glossary) cross-linked to the app features and Help use cases, with sticky TOC + hash deep-linking. Pipeline green; live. Committing → PR → merge.
+
+### [2026-06-14 06:00 UTC] — USER
+New Feature give the flexibility to create a repo of several workflows. ... system assigned key ... label and description ... add/update/delete Admin role only.  /  ... a repo of several transitions as well.  /  Do the same for Checklist rule sets.  /  ... official and legal statement of work pdf ... another menu item ... edit the SOW before creating it.
+
+### [2026-06-14 06:00 UTC] — AGENT
+Plan: (A) workflow + transition repo [done], (B) checklist rule sets repo, (C) editable SOW→PDF menu item. Shipped A: WorkflowDefinition + WorkflowTransition gain a system key + description (migration, drift-free); a Workflows repo page (admin create/edit/delete with system key + label + description) + per-workflow stage/transition editor (transitions show system key + editable description). Pipeline green (test 69); live-verified create/edit/transition/delete + guards. Committing → PR → merge, then B and C.

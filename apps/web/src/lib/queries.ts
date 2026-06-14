@@ -19,6 +19,7 @@ import type {
   Scenario,
   UserDto,
   WorkflowDefinition,
+  WorkflowSummary,
 } from './types';
 
 export function useEstimates(params: { q?: string; status?: string }) {
@@ -94,12 +95,41 @@ export function useWorkflow(id: string | undefined) {
   });
 }
 
-// ── Workflow authoring (FR-24, admin) ────────────────────────────────────────
+// ── Workflow repo + authoring (FR-24, admin) ─────────────────────────────────
 
-export function useDefaultWorkflow() {
+export function useWorkflows() {
+  return useQuery({ queryKey: ['workflows'], queryFn: () => api<WorkflowSummary[]>('/workflows') });
+}
+
+export function useWorkflowRepoMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => void qc.invalidateQueries({ queryKey: ['workflows'] });
+  return {
+    create: useMutation({
+      mutationFn: (body: { name: string; description?: string }) =>
+        api('/workflows', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    update: useMutation({
+      mutationFn: (v: {
+        id: string;
+        body: { name?: string; description?: string; isActive?: boolean };
+      }) => api(`/workflows/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => api(`/workflows/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
+}
+
+/** A workflow definition by ref ('default' or an id). */
+export function useWorkflowDefinition(wf: string | undefined) {
   return useQuery({
-    queryKey: ['workflow-default'],
-    queryFn: () => api<WorkflowDefinition>('/workflows/default'),
+    queryKey: ['workflow-def', wf],
+    queryFn: () => api<WorkflowDefinition>(`/workflows/${wf}`),
+    enabled: Boolean(wf),
   });
 }
 
@@ -115,47 +145,42 @@ export interface TransitionInput {
   toStageKey?: string;
   allowedRole?: string;
   label?: string;
+  description?: string;
   requiresChecklistPass?: boolean;
 }
 
-export function useWorkflowAuthoring() {
+/** Stage/transition authoring for a specific workflow ('default' or an id). */
+export function useWorkflowAuthoring(wf: string) {
   const qc = useQueryClient();
-  const onSuccess = () => {
-    void qc.invalidateQueries({ queryKey: ['workflow-default'] });
-  };
+  const onSuccess = () => void qc.invalidateQueries({ queryKey: ['workflow-def', wf] });
+  const base = `/workflows/${wf}`;
   return {
     addStage: useMutation({
       mutationFn: (body: StageInput) =>
-        api('/workflows/default/stages', { method: 'POST', body: JSON.stringify(body) }),
+        api(`${base}/stages`, { method: 'POST', body: JSON.stringify(body) }),
       onSuccess,
     }),
     updateStage: useMutation({
       mutationFn: (v: { id: string; body: StageInput }) =>
-        api(`/workflows/default/stages/${v.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify(v.body),
-        }),
+        api(`${base}/stages/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
       onSuccess,
     }),
     deleteStage: useMutation({
-      mutationFn: (id: string) => api(`/workflows/default/stages/${id}`, { method: 'DELETE' }),
+      mutationFn: (id: string) => api(`${base}/stages/${id}`, { method: 'DELETE' }),
       onSuccess,
     }),
     addTransition: useMutation({
       mutationFn: (body: TransitionInput) =>
-        api('/workflows/default/transitions', { method: 'POST', body: JSON.stringify(body) }),
+        api(`${base}/transitions`, { method: 'POST', body: JSON.stringify(body) }),
       onSuccess,
     }),
     updateTransition: useMutation({
       mutationFn: (v: { id: string; body: TransitionInput }) =>
-        api(`/workflows/default/transitions/${v.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify(v.body),
-        }),
+        api(`${base}/transitions/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
       onSuccess,
     }),
     deleteTransition: useMutation({
-      mutationFn: (id: string) => api(`/workflows/default/transitions/${id}`, { method: 'DELETE' }),
+      mutationFn: (id: string) => api(`${base}/transitions/${id}`, { method: 'DELETE' }),
       onSuccess,
     }),
   };

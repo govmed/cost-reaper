@@ -312,7 +312,10 @@ model Baseline {
 
 model WorkflowDefinition {
   id          String   @id @default(uuid()) @db.Uuid
+  /// System-assigned stable key (e.g. WF-A1B2C3); the user-facing label is `name`.
+  key         String   @unique
   name        String
+  description String?
   isDefault   Boolean  @default(false) @map("is_default")
   isActive    Boolean  @default(true) @map("is_active")
   createdById String?  @map("created_by") @db.Uuid
@@ -351,6 +354,9 @@ model WorkflowTransition {
   id                    String             @id @default(uuid()) @db.Uuid
   workflowDefinitionId  String             @map("workflow_definition_id") @db.Uuid
   workflowDefinition    WorkflowDefinition @relation(fields: [workflowDefinitionId], references: [id], onDelete: Cascade)
+  /// System-assigned stable key (e.g. TR-A1B2C3); `label` is the user-facing button text.
+  key                   String             @unique
+  description           String?
   fromStageId           String             @map("from_stage_id") @db.Uuid
   fromStage             WorkflowStage      @relation("FromStage", fields: [fromStageId], references: [id], onDelete: Cascade)
   toStageId             String             @map("to_stage_id") @db.Uuid

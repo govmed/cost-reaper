@@ -1,16 +1,18 @@
 import { useState, type ReactNode } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { useDefaultWorkflow, useWorkflowAuthoring } from '../lib/queries';
+import { useWorkflowAuthoring, useWorkflowDefinition } from '../lib/queries';
 import type { WorkflowDefinition, WorkflowStageDef } from '../lib/types';
 
 const ROLES = ['ADMIN', 'ESTIMATOR', 'VIEWER'];
 
-/** Admin authoring of the configurable approval workflow (FR-24, FE-43). */
+/** Admin authoring of one workflow's stages + transitions (FR-24, FE-43). */
 export default function WorkflowPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const { data, isLoading, error } = useDefaultWorkflow();
-  const a = useWorkflowAuthoring();
+  const { id = 'default' } = useParams<{ id: string }>();
+  const { data, isLoading, error } = useWorkflowDefinition(id);
+  const a = useWorkflowAuthoring(id);
 
   const mutationError =
     (a.addStage.error ||
@@ -24,11 +26,16 @@ export default function WorkflowPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold">Workflow</h1>
+        <Link to="/workflows" className="text-sm text-slate-500 hover:underline">
+          ← Workflows
+        </Link>
+        <h1 className="text-2xl font-semibold">{data ? data.name : 'Workflow'}</h1>
         <p className="text-sm text-slate-500 max-w-2xl">
-          Configure the estimate approval workflow — its stages and the role-gated transitions
-          between them. Estimates route through this workflow; transitions can require the smart
-          checklist to pass (FR-24).
+          {data?.key && <span className="font-mono text-xs text-slate-400">{data.key}</span>}
+          {data?.description ? ` · ${data.description}` : ''}
+          <br />
+          Configure this workflow — its stages and the role-gated transitions between them.
+          Transitions can require the smart checklist to pass (FR-24).
         </p>
       </div>
 
@@ -242,6 +249,7 @@ function TransitionsSection({
   const [to, setTo] = useState('');
   const [role, setRole] = useState('ESTIMATOR');
   const [label, setLabel] = useState('');
+  const [desc, setDesc] = useState('');
   const [requires, setRequires] = useState(true);
 
   function add() {
@@ -252,6 +260,7 @@ function TransitionsSection({
         toStageKey: to,
         allowedRole: role,
         label: label.trim(),
+        description: desc.trim() || undefined,
         requiresChecklistPass: requires,
       },
       {
@@ -259,6 +268,7 @@ function TransitionsSection({
           setFrom('');
           setTo('');
           setLabel('');
+          setDesc('');
           setRequires(true);
         },
       },
@@ -270,8 +280,10 @@ function TransitionsSection({
       <table className="w-full text-sm">
         <thead className="text-slate-500 text-left">
           <tr>
+            <th className="px-2 py-1">Key</th>
             <th className="px-2 py-1">From → To</th>
             <th className="px-2 py-1">Button label</th>
+            <th className="px-2 py-1">Context</th>
             <th className="px-2 py-1">Allowed role</th>
             <th className="px-2 py-1 text-center">Needs checklist</th>
             {isAdmin && <th className="px-2 py-1"></th>}
@@ -280,6 +292,9 @@ function TransitionsSection({
         <tbody>
           {wf.transitions.map((t) => (
             <tr key={t.id} className="border-t border-slate-100">
+              <td className="px-2 py-1 font-mono text-xs text-slate-400 whitespace-nowrap">
+                {t.key}
+              </td>
               <td className="px-2 py-1 whitespace-nowrap">
                 {labelOf(t.fromStageKey)} <span className="text-slate-400">→</span>{' '}
                 {labelOf(t.toStageKey)}
@@ -299,6 +314,24 @@ function TransitionsSection({
                   />
                 ) : (
                   t.label
+                )}
+              </td>
+              <td className="px-2 py-1">
+                {isAdmin ? (
+                  <input
+                    defaultValue={t.description ?? ''}
+                    placeholder="add context…"
+                    onBlur={(e) => {
+                      if (e.target.value !== (t.description ?? ''))
+                        a.updateTransition.mutate({
+                          id: t.id,
+                          body: { description: e.target.value },
+                        });
+                    }}
+                    className="border border-slate-200 rounded px-2 py-0.5 w-44"
+                  />
+                ) : (
+                  (t.description ?? '—')
                 )}
               </td>
               <td className="px-2 py-1">
@@ -392,6 +425,12 @@ function TransitionsSection({
             onChange={(e) => setLabel(e.target.value)}
             className="border border-slate-300 rounded px-2 py-1 text-sm w-40"
             placeholder="Button label"
+          />
+          <input
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            className="border border-slate-300 rounded px-2 py-1 text-sm w-44"
+            placeholder="Context (optional)"
           />
           <label className="text-xs text-slate-600 flex items-center gap-1">
             <input

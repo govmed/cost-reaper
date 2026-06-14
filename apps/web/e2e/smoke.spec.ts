@@ -137,15 +137,20 @@ test('FX rates show last-updated time and a refresh button (FR-17)', async ({ pa
   await expect(page.getByRole('button', { name: 'Refresh rates' })).toBeVisible();
 });
 
-test('Workflow admin page shows the configurable default workflow (FR-24)', async ({ page }) => {
+test('Workflow repo lists workflows and opens the editor (FR-24)', async ({ page }) => {
   await login(page);
-  await page.getByRole('link', { name: 'Workflow', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Workflow' })).toBeVisible();
-  await expect(page.getByText('Default Approval Workflow')).toBeVisible();
-  // Seeded stages + a seeded transition render (read-only assertions — no mutation).
+  await page.getByRole('link', { name: 'Workflows', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Workflows' })).toBeVisible();
+  // The default workflow's system key renders as text (the label is an editable input for admins).
+  await expect(page.getByText('WF-DEFAULT')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create workflow' })).toBeVisible();
+  // Open the default workflow's stage/transition editor.
+  await page
+    .getByRole('link', { name: /Edit stages/ })
+    .first()
+    .click();
   await expect(page.getByRole('cell', { name: 'DRAFT', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Transitions' })).toBeVisible();
-  // Admin sees the authoring controls.
   await expect(page.getByRole('button', { name: 'Add stage' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Add transition' })).toBeVisible();
 });

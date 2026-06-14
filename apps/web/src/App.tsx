@@ -13,6 +13,7 @@ import ReferenceDataPage from './pages/ReferenceDataPage';
 import FxRatesPage from './pages/FxRatesPage';
 import HelpPage from './pages/HelpPage';
 import WorkflowPage from './pages/WorkflowPage';
+import WorkflowsRepoPage from './pages/WorkflowsRepoPage';
 import ChecklistRulesPage from './pages/ChecklistRulesPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
@@ -24,7 +25,7 @@ const NAV_ITEMS: { to: string; label: string; admin?: boolean }[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/', label: 'Estimates' },
   { to: '/rate-cards', label: 'Rate Cards' },
-  { to: '/workflow', label: 'Workflow', admin: true },
+  { to: '/workflows', label: 'Workflows', admin: true },
   { to: '/checklist-rules', label: 'Checklist Rules', admin: true },
   { to: '/reference-data', label: 'Reference Data', admin: true },
   { to: '/cloud-prices', label: 'Cloud Prices' },
@@ -182,7 +183,15 @@ export default function App() {
             }
           />
           <Route
-            path="/workflow"
+            path="/workflows"
+            element={
+              <Protected>
+                <WorkflowsRepoPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/workflows/:id"
             element={
               <Protected>
                 <WorkflowPage />

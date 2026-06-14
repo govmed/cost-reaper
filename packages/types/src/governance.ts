@@ -15,6 +15,9 @@ export type WorkflowStageDto = z.infer<typeof WorkflowStageDto>;
 
 export const WorkflowTransitionDto = z.object({
   id: z.string().uuid(),
+  /** System-assigned stable key. */
+  key: z.string(),
+  description: z.string().nullable(),
   fromStageKey: z.string(),
   toStageKey: z.string(),
   allowedRole: Role,
@@ -25,13 +28,42 @@ export type WorkflowTransitionDto = z.infer<typeof WorkflowTransitionDto>;
 
 export const WorkflowDefinitionDto = z.object({
   id: z.string().uuid(),
+  /** System-assigned stable key (e.g. WF-A1B2C3). */
+  key: z.string(),
   name: z.string(),
+  description: z.string().nullable(),
   isDefault: z.boolean(),
   isActive: z.boolean(),
   stages: z.array(WorkflowStageDto),
   transitions: z.array(WorkflowTransitionDto),
 });
 export type WorkflowDefinitionDto = z.infer<typeof WorkflowDefinitionDto>;
+
+/** One entry in the workflow repo (list view). */
+export const WorkflowSummaryDto = z.object({
+  id: z.string().uuid(),
+  key: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  isDefault: z.boolean(),
+  isActive: z.boolean(),
+  stageCount: z.number().int(),
+  transitionCount: z.number().int(),
+});
+export type WorkflowSummaryDto = z.infer<typeof WorkflowSummaryDto>;
+
+export const CreateWorkflowRequest = z.object({
+  name: z.string().min(1).max(80),
+  description: z.string().max(500).optional(),
+});
+export type CreateWorkflowRequest = z.infer<typeof CreateWorkflowRequest>;
+
+export const UpdateWorkflowRequest = z.object({
+  name: z.string().min(1).max(80).optional(),
+  description: z.string().max(500).optional(),
+  isActive: z.boolean().optional(),
+});
+export type UpdateWorkflowRequest = z.infer<typeof UpdateWorkflowRequest>;
 
 export const TransitionRequest = z.object({
   toStageKey: z.string().min(1),
@@ -70,6 +102,7 @@ export const CreateTransitionRequest = z.object({
   toStageKey: z.string().min(1),
   allowedRole: Role,
   label: z.string().min(1).max(80),
+  description: z.string().max(500).optional(),
   requiresChecklistPass: z.boolean().optional(),
 });
 export type CreateTransitionRequest = z.infer<typeof CreateTransitionRequest>;
@@ -77,6 +110,7 @@ export type CreateTransitionRequest = z.infer<typeof CreateTransitionRequest>;
 export const UpdateTransitionRequest = z.object({
   allowedRole: Role.optional(),
   label: z.string().min(1).max(80).optional(),
+  description: z.string().max(500).optional(),
   requiresChecklistPass: z.boolean().optional(),
 });
 export type UpdateTransitionRequest = z.infer<typeof UpdateTransitionRequest>;
