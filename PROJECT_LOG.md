@@ -370,3 +370,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/pages/EstimateEditorPage.tsx
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). Live: rebuilt web; empty-state string compiled into the bundle, /help 200, api healthy.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-13 — Sticky top navigation (tab strip pinned on scroll)
+- **Action:** Made the top nav header sticky — added `sticky top-0 z-30 ... shadow-sm` to the `<header>` in App.tsx so the Navigator tab strip (Estimates/Dashboard/Rate cards/Cloud prices/Help/…) stays pinned at the top instead of scrolling away. Existing deep-link `scroll-mt-20/24` offsets already clear the ~48px header. Stays `print:hidden`.
+- **Why:** User asked for the navigator tab strip not to scroll up.
+- **Files touched:** apps/web/src/App.tsx
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). Live: rebuilt web; `position:sticky` in the generated CSS + class in the bundle, web 200.
+- **Next:** commit → PR → CI-green → merge.

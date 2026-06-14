@@ -428,3 +428,9 @@ Add a "How?" deep-link from the empty-state when no checklist items match
 
 ### [2026-06-13 18:20 UTC] — AGENT
 Added a panel empty-state to the smart checklist ("No checklist items match this estimate yet." + a How? deep-link to /help#uc-smart-checklist), and made every failing item's How? link fall back to that general guide when its rule key has no specific use case. Hid the click-an-item tip when empty. Pipeline green; empty-state compiled into the live bundle. Committing → PR → merge.
+
+### [2026-06-13 18:40 UTC] — USER
+Can we make the Navigator Tab Strip not to scroll up?
+
+### [2026-06-13 18:40 UTC] — AGENT
+Made the top navigation header sticky (`sticky top-0 z-30 shadow-sm`) so the tab strip stays pinned when the page scrolls. Deep-link scroll offsets already clear the header height. Pipeline green; verified position:sticky compiled into the live CSS. Committing → PR → merge.
