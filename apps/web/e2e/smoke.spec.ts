@@ -23,6 +23,8 @@ test('login → create estimate → add a line → see totals', async ({ page })
   await page.getByPlaceholder('amount').fill('1000');
   await page.getByRole('button', { name: 'Add non-labor' }).click();
   await expect(page.getByRole('cell', { name: 'Licenses' })).toBeVisible();
+  // Billing period renders its DB-driven label ("One-time"), not the raw code (FR-29).
+  await expect(page.getByRole('cell', { name: 'One-time', exact: true })).toBeVisible();
 
   // The governance checklist panel renders (FR-25)
   await expect(page.getByRole('heading', { name: 'Smart checklist' })).toBeVisible();

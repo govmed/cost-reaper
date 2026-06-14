@@ -1,11 +1,14 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEstimate } from '../lib/queries';
+import { useRefLabeler } from '../lib/refLabels';
 import type { EngineResult } from '../lib/types';
 
 /** Printable, read-only estimate summary (FR-10, FE-23). Reuses the detail payload. */
 export default function PrintSummaryPage() {
   const { id } = useParams<{ id: string }>();
   const { data: est, isLoading, error } = useEstimate(id);
+  const billing = useRefLabeler('BILLING_PERIOD');
+  const provider = useRefLabeler('CLOUD_PROVIDER');
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
   if (error) return <p className="text-rose-700">{(error as Error).message}</p>;
@@ -51,7 +54,7 @@ export default function PrintSummaryPage() {
             l.quantity,
             l.units,
             l.rateSnapshot,
-            l.billingPeriod,
+            billing.label(l.billingPeriod),
             l.sdlcPhase ?? '—',
             l.lineTotal,
           ])}
@@ -64,7 +67,7 @@ export default function PrintSummaryPage() {
           rows={est.nonLaborItems.map((n) => [
             n.category,
             n.amount,
-            n.billingPeriod,
+            billing.label(n.billingPeriod),
             n.sdlcPhase ?? '—',
             n.lineTotal,
           ])}
@@ -75,7 +78,7 @@ export default function PrintSummaryPage() {
           title="Cloud compute"
           head={['Provider / Instance', 'Qty', 'Hrs/mo', 'Unit price', 'Phase', 'Line total']}
           rows={est.cloudItems.map((c) => [
-            `${c.provider} · ${c.skuOrInstance} (${c.region})`,
+            `${provider.label(c.provider)} · ${c.skuOrInstance} (${c.region})`,
             c.quantity,
             c.usageHoursPerMonth,
             c.unitPriceSnapshot,
