@@ -51,13 +51,35 @@ export const USER_GUIDE: GuideSection[] = [
     id: 'building',
     title: 'Building an estimate',
     body: [
-      'Create an estimate, attach a rate card, then add line items. Labor lines price effort by role × quantity × units at a snapshotted rate. Non-labor lines capture fixed or recurring costs. Cloud lines price compute from the AWS/GCP/Azure catalog with the unit price snapshotted onto the line, so refreshing the catalog never changes a saved estimate.',
+      'Create an estimate, attach a rate card, then add line items. Labor lines price effort by role × quantity × units at a snapshotted rate. Non-labor lines capture fixed or recurring costs. Cloud lines price resources from the categorized AWS/GCP/Azure catalog (see “Cloud resources & categories” below), with the unit price snapshotted onto the line so refreshing the catalog never changes a saved estimate.',
       'Record assumptions and notes as you go so the numbers can be defended later.',
     ],
     links: [
       { label: 'Create an estimate', to: '/help#uc-create-estimate' },
       { label: 'Choose a rate card', to: '/help#uc-choose-rate-card' },
       { label: 'Add a labor line', to: '/help#uc-add-labor-line' },
+      { label: 'Add a cloud line', to: '/help#uc-add-cloud-line' },
+    ],
+  },
+  {
+    id: 'cloud-categories',
+    title: 'Cloud resources & categories',
+    body: [
+      'The cloud catalog covers everything an enterprise architect needs to model a full cloud build across AWS, GCP, and Azure — not just compute. Every price is organized into a category, so you can browse, filter, and group resources as you assemble a cost model. On the Cloud Prices screen, filter by Category; in the estimate’s cloud-line picker, options are grouped by category.',
+    ],
+    bullets: [
+      'Compute — VMs and instance families (general-purpose, compute/memory/storage-optimized, and GPU/accelerated).',
+      'Storage — object tiers (hot/cool/archive), block & file storage, and managed disks.',
+      'Networking — egress/bandwidth, load balancers, NAT, CDN, DNS, and VPN / interconnect.',
+      'Database — managed SQL, NoSQL (DynamoDB/Firestore/Cosmos), and in-memory caches.',
+      'Containers & Serverless — functions, container runtimes (Fargate/Cloud Run/ACI), and Kubernetes (EKS/GKE/AKS).',
+      'Analytics & Big Data — query/scan engines, streaming, and data pipelines.',
+      'AI & Machine Learning — training/inference compute and foundation-model APIs.',
+      'Security & Tools — WAF, key management, secrets, and cloud security posture.',
+      'Management & Monitoring — metrics, logs, and observability.',
+    ],
+    links: [
+      { label: 'Browse the Cloud Prices catalog', to: '/cloud-prices' },
       { label: 'Add a cloud line', to: '/help#uc-add-cloud-line' },
     ],
   },

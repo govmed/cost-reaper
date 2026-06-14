@@ -468,3 +468,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/prisma/{schema.prisma,seed.ts,migrations/20260614000000_…}, apps/api/src/modules/cloud-pricing/cloud-prices.service.ts, packages/types/src/cloud-pricing.ts, apps/web/src/lib/types.ts, apps/web/src/pages/{CloudPricesPage.tsx,EstimateEditorPage.tsx}
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Migration verified (fresh-deploy + no-drift). Live: migrate deploy + reseed → **256** prices across **9 categories** (Compute 171, Networking 20, Storage 20, Database 13, Containers 11, Security 7, Analytics 6, AI/ML 5, Monitoring 3); all 5 units (HOUR/MONTH/GB_MONTH/GB/REQUEST); `?category=Networking` filter → 20.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-14 — User Guide: add the cloud categories (NFR-12)
+- **Action:** Added a "Cloud resources & categories" section to the in-app User Guide (`/guide`) describing the 9 enterprise categories (Compute, Storage, Networking, Database, Containers & Serverless, Analytics & Big Data, AI & ML, Security & Tools, Management & Monitoring), how to filter by Category on Cloud Prices, and that the cloud-line picker groups by category; links to /cloud-prices + the add-cloud-line use case. Tweaked the "Building an estimate" section to point at it ("price resources from the categorized AWS/GCP/Azure catalog").
+- **Why:** User: update the User Guide with the new cloud categories.
+- **Files touched:** apps/web/src/lib/user-guide-content.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). Live: /guide serves; "Cloud resources & categories" in bundle.
+- **Next:** commit → PR → merge.
