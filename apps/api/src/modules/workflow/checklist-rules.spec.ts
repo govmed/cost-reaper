@@ -86,6 +86,25 @@ describe('evaluateChecklist', () => {
     // A N/A blocker does not block.
     expect(r.blocking).toBe(false);
   });
+
+  it('shows nothing green on a brand-new estimate — defaults are N/A, not passes', () => {
+    const ALL: ChecklistRuleDef[] = [
+      ...RULES,
+      { key: 'upcharge_set', description: 'Upcharge', severity: 'WARNING', scope: 'ESTIMATE' },
+      {
+        key: 'contingency_set',
+        description: 'Contingency',
+        severity: 'WARNING',
+        scope: 'ESTIMATE',
+      },
+    ];
+    const r = evaluateChecklist(ALL, empty);
+    // No item is a green pass — each is either failing (todo) or N/A (nothing to check).
+    expect(r.items.filter((i) => i.applicable && i.passed)).toEqual([]);
+    // Upcharge/contingency default to 0 but show as N/A, not a vacuous green.
+    expect(r.items.find((i) => i.key === 'upcharge_set')?.applicable).toBe(false);
+    expect(r.items.find((i) => i.key === 'contingency_set')?.applicable).toBe(false);
+  });
 });
 
 describe('resource_capacity rule (FR-27)', () => {
