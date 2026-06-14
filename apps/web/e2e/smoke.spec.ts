@@ -125,6 +125,15 @@ test('Help guide lists use cases and deep-links by anchor', async ({ page }) => 
   ).toHaveCount(0);
 });
 
+test('FX rates show last-updated time and a refresh button (FR-17)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'FX rates' }).click();
+  await expect(page.getByRole('heading', { name: 'FX rates' })).toBeVisible();
+  await expect(page.getByText('Last updated (local)')).toBeVisible();
+  // Admin sees a refresh control. Not clicked here — it makes a live network call.
+  await expect(page.getByRole('button', { name: 'Refresh rates' })).toBeVisible();
+});
+
 test('Dashboard summarizes estimates (FR-18)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Dashboard' }).click();

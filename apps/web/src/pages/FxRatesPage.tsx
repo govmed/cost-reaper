@@ -1,15 +1,32 @@
 import { useState } from 'react';
 import { useAuth } from '../lib/auth';
-import { useFxMutation, useFxRates } from '../lib/queries';
+import { useFxMutation, useFxRates, useFxRefresh } from '../lib/queries';
+
+/** Format an ISO datetime as MM/DD/CCYY HH:MM:SS in local time, or em-dash. */
+function fmtDateTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const p = (n: number) => String(n).padStart(2, '0');
+  const date = `${p(d.getMonth() + 1)}/${p(d.getDate())}/${d.getFullYear()}`;
+  const time = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  return `${date} ${time}`;
+}
 
 /** Admin management of FX rates for multi-currency roll-ups (FR-17, FE-12). */
 export default function FxRatesPage() {
   const { user } = useAuth();
   const { data, isLoading, error } = useFxRates();
   const fx = useFxMutation();
+  const refresh = useFxRefresh();
   const isAdmin = user?.role === 'ADMIN';
   const [newCur, setNewCur] = useState('');
   const [newRate, setNewRate] = useState('');
+
+  // Most recent update across all rates — shown as the overall "last updated".
+  const lastUpdated = (data ?? []).reduce<string | null>(
+    (acc, r) => (r.updatedAt && (!acc || r.updatedAt > acc) ? r.updatedAt : acc),
+    null,
+  );
 
   function addRate() {
     const cur = newCur.trim().toUpperCase();
@@ -27,13 +44,37 @@ export default function FxRatesPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-semibold">FX rates</h1>
-        <p className="text-sm text-slate-500">
-          Exchange rates vs the base currency (USD) — base units per 1 unit of the currency. Used to
-          roll multi-currency estimates up to a base total (FR-17).
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold">FX rates</h1>
+          <p className="text-sm text-slate-500 max-w-xl">
+            Exchange rates vs the base currency (USD) — base units per 1 unit of the currency. Used
+            to roll multi-currency estimates up to a base total (FR-17).
+          </p>
+        </div>
+        <div className="text-right space-y-1.5">
+          <div className="text-xs text-slate-500">
+            Last updated (local)
+            <div className="font-medium text-slate-700 tabular-nums whitespace-nowrap">
+              {fmtDateTime(lastUpdated)}
+            </div>
+          </div>
+          {isAdmin && (
+            <button
+              onClick={() => refresh.mutate()}
+              disabled={refresh.isPending}
+              className="bg-brand text-white rounded px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+            >
+              {refresh.isPending ? 'Refreshing…' : 'Refresh rates'}
+            </button>
+          )}
+        </div>
       </div>
+      {refresh.isError && (
+        <p className="text-rose-700 text-sm" role="alert">
+          Couldn’t refresh rates: {(refresh.error as Error).message}
+        </p>
+      )}
 
       {isLoading && <p className="text-slate-500">Loading…</p>}
       {error && <p className="text-rose-700">{(error as Error).message}</p>}
@@ -68,9 +109,9 @@ export default function FxRatesPage() {
                     r.rateToBase
                   )}
                 </td>
-                <td className="px-4 py-2 text-xs text-slate-500">
+                <td className="px-4 py-2 text-xs text-slate-500 whitespace-nowrap">
                   {r.updatedByEmail ?? '—'}
-                  {r.updatedAt ? ` · ${new Date(r.updatedAt).toLocaleDateString()}` : ''}
+                  {r.updatedAt ? ` · ${fmtDateTime(r.updatedAt)}` : ''}
                 </td>
                 {isAdmin && <td className="px-4 py-2"></td>}
               </tr>

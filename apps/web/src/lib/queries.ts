@@ -286,3 +286,14 @@ export function useFxMutation() {
     },
   });
 }
+
+export function useFxRefresh() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api('/fx-rates/refresh', { method: 'POST' }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['fx-rates'] });
+      void qc.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}

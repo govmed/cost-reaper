@@ -48,6 +48,8 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_PRICING_REGION: ${AWS_PRICING_REGION:-us-east-1}
       GCP_BILLING_API_KEY: ${GCP_BILLING_API_KEY:-}
+      # Public, no-auth FX source for the FX-rates "Refresh" button (FR-17).
+      FX_RATES_ENDPOINT: ${FX_RATES_ENDPOINT:-https://api.frankfurter.app/latest}
     ports:
       - '${API_PORT:-8000}:8000'
     healthcheck:
