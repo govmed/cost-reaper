@@ -276,6 +276,18 @@ export interface ChecklistResult {
   items: ChecklistItem[];
 }
 
+// ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
+export interface ChecklistRuleAdmin {
+  id: string;
+  key: string;
+  description: string;
+  severity: string;
+  scope: string;
+  isActive: boolean;
+  isBuiltin: boolean;
+  hasLogic: boolean;
+}
+
 export interface AvailableTransition {
   toStageKey: string;
   toStageLabel: string;

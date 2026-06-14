@@ -147,6 +147,15 @@ test('Workflow admin page shows the configurable default workflow (FR-24)', asyn
   await expect(page.getByRole('button', { name: 'Add transition' })).toBeVisible();
 });
 
+test('Checklist-rules admin page lists the rules (FR-25)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Checklist rules', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Checklist rules' })).toBeVisible();
+  // A seeded built-in rule renders (read-only assertions — no mutation of shared rules).
+  await expect(page.getByText('rate_card_selected')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add rule' })).toBeVisible();
+});
+
 test('Dashboard summarizes estimates (FR-18)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Dashboard' }).click();

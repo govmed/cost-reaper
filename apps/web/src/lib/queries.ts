@@ -3,6 +3,7 @@ import { api } from './api';
 import type {
   Baseline,
   ChecklistResult,
+  ChecklistRuleAdmin,
   CloudPrice,
   DashboardSummary,
   EstimateDetail,
@@ -165,6 +166,48 @@ export function useChecklist(id: string | undefined) {
     queryFn: () => api<ChecklistResult>(`/estimates/${id}/checklist`),
     enabled: Boolean(id),
   });
+}
+
+// ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
+
+export function useChecklistRules() {
+  return useQuery({
+    queryKey: ['checklist-rules'],
+    queryFn: () => api<ChecklistRuleAdmin[]>('/checklist-rules'),
+  });
+}
+
+export interface ChecklistRuleInput {
+  key?: string;
+  description?: string;
+  severity?: string;
+  scope?: string;
+  isActive?: boolean;
+}
+
+export function useChecklistRuleMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => {
+    void qc.invalidateQueries({ queryKey: ['checklist-rules'] });
+    // Estimate checklists re-evaluate against the changed rule set.
+    void qc.invalidateQueries({ queryKey: ['checklist'] });
+  };
+  return {
+    create: useMutation({
+      mutationFn: (body: ChecklistRuleInput) =>
+        api('/checklist-rules', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    update: useMutation({
+      mutationFn: (v: { id: string; body: ChecklistRuleInput }) =>
+        api(`/checklist-rules/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => api(`/checklist-rules/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
 }
 
 export function useCloudPrices() {

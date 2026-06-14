@@ -449,3 +449,9 @@ Pick the next polish item and build it
 
 ### [2026-06-14 01:10 UTC] — AGENT
 Built the Workflow authoring UI (FR-24/FE-43): admin can configure the approval workflow's stages and role-gated transitions via a new /workflow page, backed by admin-only CRUD endpoints (single-initial enforced; stage deletes guarded against in-use/history; dup/self-loop transition guards; audited). Added types, query hooks, a deep-linkable Help use case, and a read-only e2e. Pipeline green (test 58); live CRUD round-trip verified and the seeded workflow restored. Committing → PR → merge.
+
+### [2026-06-14 01:35 UTC] — USER
+Take the next one.
+
+### [2026-06-14 01:35 UTC] — AGENT
+Built the Checklist-rule authoring UI (FR-25/FE-44): admin /checklist-rules page + admin CRUD endpoints to toggle/re-tune built-in rules (severity, active, description) and add/delete custom advisory rules, with a hasLogic flag distinguishing built-in checks from always-pass advisory rules. Built-ins can't be deleted; custom keys validated; audited. Added types, query hooks, a deep-linkable Help use case, and a read-only e2e. Pipeline green (test 58); live CRUD + guards verified and seeded rules restored. Committing → PR → merge.

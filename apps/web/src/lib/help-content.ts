@@ -714,6 +714,30 @@ export const HELP_USE_CASES: UseCase[] = [
     related: ['tag-sdlc-phase', 'approval-workflow'],
   },
   {
+    id: 'manage-checklist-rules',
+    title: 'Configure the smart-checklist rules',
+    category: 'Administration',
+    persona: 'Administrator',
+    goal: 'Toggle, re-tune, or add the rules that validate estimates and gate transitions.',
+    featureIds: ['FR-25', 'FE-44'],
+    route: '/checklist-rules',
+    keywords: ['checklist', 'rules', 'validation', 'severity', 'blocker', 'gate', 'configure'],
+    steps: [
+      { text: 'Open “Checklist rules” (Admin only) from the top navigation.' },
+      {
+        text: 'Toggle a rule Active on/off, change its Severity (Blocker / Warning / Info), or edit its description.',
+        detail:
+          'Severity matters: a failing Blocker stops an estimate from advancing through the workflow; Warning/Info are advisory.',
+      },
+      {
+        text: 'Add a custom advisory rule with a key, description, scope, and severity.',
+        detail:
+          'Custom rules have no built-in check logic, so they always pass — they act as reminders. Built-in rules can be deactivated or re-tuned but not deleted.',
+      },
+    ],
+    related: ['smart-checklist', 'manage-workflow', 'approval-workflow'],
+  },
+  {
     id: 'manage-workflow',
     title: 'Configure the approval workflow',
     category: 'Administration',
