@@ -101,6 +101,40 @@ export const ChecklistItemResult = z.object({
 });
 export type ChecklistItemResult = z.infer<typeof ChecklistItemResult>;
 
+// ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
+
+export const ChecklistRuleDto = z.object({
+  id: z.string().uuid(),
+  key: z.string(),
+  description: z.string(),
+  severity: ChecklistSeverity,
+  scope: ChecklistScope,
+  isActive: z.boolean(),
+  isBuiltin: z.boolean(),
+  /** true when the rule key has built-in evaluation logic; false = advisory (always passes). */
+  hasLogic: z.boolean(),
+});
+export type ChecklistRuleDto = z.infer<typeof ChecklistRuleDto>;
+
+export const CreateChecklistRuleRequest = z.object({
+  key: z
+    .string()
+    .min(1)
+    .max(60)
+    .regex(/^[a-z][a-z0-9_]*$/, 'Key must be lower_snake_case (a–z, 0–9, _)'),
+  description: z.string().min(1).max(200),
+  severity: ChecklistSeverity,
+  scope: ChecklistScope,
+});
+export type CreateChecklistRuleRequest = z.infer<typeof CreateChecklistRuleRequest>;
+
+export const UpdateChecklistRuleRequest = z.object({
+  description: z.string().min(1).max(200).optional(),
+  severity: ChecklistSeverity.optional(),
+  isActive: z.boolean().optional(),
+});
+export type UpdateChecklistRuleRequest = z.infer<typeof UpdateChecklistRuleRequest>;
+
 export const ChecklistResult = z.object({
   /** true when no BLOCKER-severity rule failed. */
   passed: z.boolean(),

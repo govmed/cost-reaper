@@ -146,6 +146,9 @@ const EVALUATORS: Record<string, Evaluator> = {
   },
 };
 
+/** Rule keys that have built-in evaluation logic; others are advisory (always pass). */
+export const EVALUATOR_KEYS: string[] = Object.keys(EVALUATORS);
+
 export function evaluateChecklist(
   rules: ChecklistRuleDef[],
   e: ChecklistEstimate,

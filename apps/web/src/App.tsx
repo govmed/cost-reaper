@@ -13,6 +13,7 @@ import ReferenceDataPage from './pages/ReferenceDataPage';
 import FxRatesPage from './pages/FxRatesPage';
 import HelpPage from './pages/HelpPage';
 import WorkflowPage from './pages/WorkflowPage';
+import ChecklistRulesPage from './pages/ChecklistRulesPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -57,6 +58,9 @@ export default function App() {
                   </Link>
                   <Link to="/workflow" className="hover:underline">
                     Workflow
+                  </Link>
+                  <Link to="/checklist-rules" className="hover:underline">
+                    Checklist rules
                   </Link>
                   <Link to="/fx-rates" className="hover:underline">
                     FX rates
@@ -165,6 +169,14 @@ export default function App() {
             element={
               <Protected>
                 <WorkflowPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/checklist-rules"
+            element={
+              <Protected>
+                <ChecklistRulesPage />
               </Protected>
             }
           />
