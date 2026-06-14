@@ -582,3 +582,16 @@ Confirmed PR #55 (checklist rule sets) merged; synced local main (removed a corr
 - `sow` API module (CRUD + issue/revert) reusing exported EstimatesService for pricing; new web list/editor/print pages + nav + routes + help use case + e2e.
 - Local gates green: API + web typecheck, prettier (16 files). Committing → PR → merge C (gated on green).
 ---
+
+---
+### [2026-06-14 18:50 UTC] — USER
+On the Navigator/menu strip - they don't professoional. Can you make them fit and look very professional.
+
+### [2026-06-14 19:05 UTC] — AGENT
+Redesigned the top navigation: 3 primary links + 4 tidy dropdown menus (Pricing/Governance/Admin/Docs) via a new `TopNav` component, with active-route highlighting, hover states, click-outside close, admin-gating, and a polished header (role pill + bordered Log out). Updated 8 e2e tests to open the parent menu first.
+**Actions taken:**
+- Rewrote nav in apps/web/src/App.tsx (grouped NAV + TopNav component + header polish).
+- Updated apps/web/e2e/smoke.spec.ts for the grouped links.
+- Local gates green: web typecheck, ESLint, prettier. Committing → PR → merge (gated on green).
+- Confirmed PRs #54/#55/#56 (workflow repo / checklist rule sets / SOW→PDF) all merged earlier this session.
+---

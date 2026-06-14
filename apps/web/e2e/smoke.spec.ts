@@ -93,6 +93,7 @@ test('SDLC phase breakdown (FR-28), resource capacity guard (FR-27) + stage gate
 
 test('Reference data admin page serves DB-driven values (FR-29)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Admin' }).click();
   await page.getByRole('link', { name: 'Reference Data' }).click();
   await expect(page.getByRole('heading', { name: 'Reference data' })).toBeVisible();
   // The seeded SDLC_PHASE type and its values render (default selection).
@@ -104,6 +105,7 @@ test('Reference data admin page serves DB-driven values (FR-29)', async ({ page 
 
 test('Help guide lists use cases and deep-links by anchor', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Docs' }).click();
   await page.getByRole('link', { name: 'Help', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Help & use cases' })).toBeVisible();
   // A known meta-tagged use case renders with its steps.
@@ -130,6 +132,7 @@ test('Help guide lists use cases and deep-links by anchor', async ({ page }) => 
 
 test('FX rates show last-updated time and a refresh button (FR-17)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Pricing' }).click();
   await page.getByRole('link', { name: 'FX Rates' }).click();
   await expect(page.getByRole('heading', { name: 'FX rates' })).toBeVisible();
   await expect(page.getByText('Last updated (local)')).toBeVisible();
@@ -139,6 +142,7 @@ test('FX rates show last-updated time and a refresh button (FR-17)', async ({ pa
 
 test('Workflow repo lists workflows and opens the editor (FR-24)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Governance' }).click();
   await page.getByRole('link', { name: 'Workflows', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Workflows' })).toBeVisible();
   // The default workflow's system key renders as text (the label is an editable input for admins).
@@ -157,6 +161,7 @@ test('Workflow repo lists workflows and opens the editor (FR-24)', async ({ page
 
 test('Checklist rule-set repo lists sets and opens the rule editor (FR-25)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Governance' }).click();
   await page.getByRole('link', { name: 'Checklist Rules', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Checklist rule sets' })).toBeVisible();
   // The default set's system key renders as text (the label is an editable input for admins).
@@ -174,6 +179,7 @@ test('Checklist rule-set repo lists sets and opens the rule editor (FR-25)', asy
 
 test('User Guide page renders and deep-links by section (NFR-12)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Docs' }).click();
   await page.getByRole('link', { name: 'User Guide', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'User Guide' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Building an estimate' })).toBeVisible();
@@ -184,6 +190,7 @@ test('User Guide page renders and deep-links by section (NFR-12)', async ({ page
 
 test('Estimation Guide renders and deep-links by section (NFR-12)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Docs' }).click();
   await page.getByRole('link', { name: 'Estimation Guide', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Estimation Guide' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Estimation techniques' })).toBeVisible();
@@ -193,6 +200,7 @@ test('Estimation Guide renders and deep-links by section (NFR-12)', async ({ pag
 
 test('Roles & permissions page shows the capability matrix (FR-2/NFR-16)', async ({ page }) => {
   await login(page);
+  await page.getByRole('button', { name: 'Governance' }).click();
   await page.getByRole('link', { name: 'Roles', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Roles & permissions' })).toBeVisible();
   await expect(page.getByRole('cell', { name: 'Create & edit estimates' })).toBeVisible();
