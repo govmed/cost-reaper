@@ -518,3 +518,9 @@ Also include the Cloud storage, network devices, and tools as well. and categori
 
 ### [2026-06-14 04:35 UTC] — AGENT
 Built a categorized enterprise cloud catalog: added a CloudPrice.category + a GB unit (migration, additive, drift-free), a SERVICE_CATEGORY map, and ~80 new non-compute rows across 9 categories (Storage, Networking, Database, Containers & Serverless, Analytics, AI & ML, Security & Tools, Management & Monitoring) for AWS/GCP/Azure. Cloud Prices page got a Category filter + column; the cloud-line picker now groups by category. Pipeline green (test 69); migrate+reseed → 256 prices across 9 categories, all 5 units. Committing → PR → merge.
+
+### [2026-06-14 04:45 UTC] — USER
+Update the User Guide with the new cloud categories
+
+### [2026-06-14 04:45 UTC] — AGENT
+Added a "Cloud resources & categories" section to the /guide handbook listing the 9 enterprise categories and how to filter/group by them, with links to Cloud Prices and the add-cloud-line use case; updated the Building section to reference it. Pipeline green; /guide live. Committing → PR → merge.
