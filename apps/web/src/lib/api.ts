@@ -71,17 +71,21 @@ export async function login(email: string, password: string): Promise<LoginRespo
 
 // ── Single Sign-On (FR-26) ───────────────────────────────────────────────────
 export interface SsoStatus {
+  /** Active identity system: LOCAL (built-in) or an external SSO protocol. */
+  mode: string;
   enabled: boolean;
   protocol: string | null;
   displayName: string | null;
+  /** When true, the built-in password form is hidden (SSO is the only option). */
+  forceSso: boolean;
 }
 
-/** Public: whether SSO is configured, and the button label. Never throws. */
+/** Public: which identity system is active, and the SSO button label. Never throws. */
 export async function getSsoStatus(): Promise<SsoStatus> {
   try {
     return await api<SsoStatus>('/auth/sso', {}, false);
   } catch {
-    return { enabled: false, protocol: null, displayName: null };
+    return { mode: 'LOCAL', enabled: false, protocol: null, displayName: null, forceSso: false };
   }
 }
 
