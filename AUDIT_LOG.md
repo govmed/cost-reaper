@@ -455,3 +455,9 @@ Take the next one.
 
 ### [2026-06-14 01:35 UTC] — AGENT
 Built the Checklist-rule authoring UI (FR-25/FE-44): admin /checklist-rules page + admin CRUD endpoints to toggle/re-tune built-in rules (severity, active, description) and add/delete custom advisory rules, with a hasLogic flag distinguishing built-in checks from always-pass advisory rules. Built-ins can't be deleted; custom keys validated; audited. Added types, query hooks, a deep-linkable Help use case, and a read-only e2e. Pipeline green (test 58); live CRUD + guards verified and seeded rules restored. Committing → PR → merge.
+
+### [2026-06-14 01:55 UTC] — USER
+Take the next one.
+
+### [2026-06-14 01:55 UTC] — AGENT
+Upgraded the Excel export from an HTML-table .xls to a real native .xlsx (Office Open XML), built dependency-free with a small OOXML writer (CRC32 + ZIP via Node zlib + SpreadsheetML parts; numeric cells as numbers, others inline strings). Shared the export row matrix between CSV and XLSX. Correct content-type/extension; web saves .xlsx. Added 6 unit tests (CRC32 vector, zip round-trip, parts/cell encoding). Pipeline green (test 64). Live-verified the downloaded file is a valid OOXML workbook (python zipfile integrity OK, all parts present, data round-trips). Committing → PR → merge.
