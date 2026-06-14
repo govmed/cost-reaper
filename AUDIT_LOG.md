@@ -509,3 +509,6 @@ Menu should have Title case and it should be in this order: Dashboard Estimates 
 
 ### [2026-06-14 04:10 UTC] — AGENT
 Acknowledged — will reorder and Title-Case the top nav to: Dashboard, Estimates, Rate Cards, Workflow, Checklist Rules, Reference Data, Cloud Prices, FX Rates, Users, Roles, User Guide, Help (admin-only items shown in-position), right after the catalog expansion merges.
+
+### [2026-06-14 04:20 UTC] — AGENT
+Reordered + Title-Cased the top nav to the exact requested order (Dashboard, Estimates, Rate Cards, Workflow, Checklist Rules, Reference Data, Cloud Prices, FX Rates, Users, Roles, User Guide, Help) via a data-driven NAV_ITEMS list; admin-only items show in-position for Admins. Fixed the 3 e2e nav assertions whose case changed. Pipeline green. Committing → PR → merge, then the categorized enterprise catalog.
