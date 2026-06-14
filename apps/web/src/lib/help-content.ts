@@ -1,5 +1,5 @@
 /**
- * Help guide — a catalog of step-by-step use cases for KerdosSOW.
+ * Help guide — a catalog of step-by-step use cases for Kerdos.
  *
  * Each use case is **meta-tagged** (feature IDs, the route it happens on, the
  * smart-checklist rule keys it resolves, and free-text keywords) so the app can
@@ -65,7 +65,7 @@ export const HELP_USE_CASES: UseCase[] = [
   // ── Getting started ────────────────────────────────────────────────────────
   {
     id: 'sign-in',
-    title: 'Sign in to KerdosSOW',
+    title: 'Sign in to Kerdos',
     category: 'Getting started',
     persona: 'Everyone',
     goal: 'Authenticate and land on your estimates.',

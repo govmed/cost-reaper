@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './lib/auth';
+import BrandLogo from './components/BrandLogo';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import EstimatesPage from './pages/EstimatesPage';
@@ -169,8 +170,14 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       <header className="sticky top-0 z-30 bg-brand text-white px-5 py-2.5 flex items-center justify-between gap-4 shadow-sm print:hidden">
         <div className="flex items-center gap-5 min-w-0">
-          <Link to="/" className="font-semibold text-lg tracking-tight whitespace-nowrap">
-            KerdosSOW
+          <Link to="/" className="flex items-center gap-2 whitespace-nowrap">
+            <BrandLogo className="h-7 w-7" />
+            <span className="leading-tight">
+              <span className="block text-lg font-semibold tracking-tight">Kerdos</span>
+              <span className="block text-[0.6rem] font-medium uppercase tracking-[0.18em] text-white/70">
+                Veridion LLC
+              </span>
+            </span>
           </Link>
           {user && <TopNav isAdmin={user.role === 'ADMIN'} />}
         </div>
@@ -356,6 +363,10 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <footer className="mt-8 border-t border-slate-200 py-4 text-center text-xs text-slate-400 print:hidden">
+        <span className="font-medium text-slate-500">Kerdos</span> — Project Cost Estimator · &copy;{' '}
+        {new Date().getFullYear()} Veridion LLC
+      </footer>
     </div>
   );
 }
