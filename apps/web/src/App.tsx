@@ -15,6 +15,7 @@ import HelpPage from './pages/HelpPage';
 import WorkflowPage from './pages/WorkflowPage';
 import WorkflowsRepoPage from './pages/WorkflowsRepoPage';
 import ChecklistRulesPage from './pages/ChecklistRulesPage';
+import ChecklistRuleSetsPage from './pages/ChecklistRuleSetsPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
 import UserGuidePage from './pages/UserGuidePage';
@@ -200,6 +201,14 @@ export default function App() {
           />
           <Route
             path="/checklist-rules"
+            element={
+              <Protected>
+                <ChecklistRuleSetsPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/checklist-rules/:id"
             element={
               <Protected>
                 <ChecklistRulesPage />

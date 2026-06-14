@@ -4,6 +4,7 @@ import type {
   Baseline,
   ChecklistResult,
   ChecklistRuleAdmin,
+  ChecklistRuleSet,
   CloudPrice,
   DashboardStageEstimate,
   DashboardSummary,
@@ -194,12 +195,45 @@ export function useChecklist(id: string | undefined) {
   });
 }
 
+// ── Checklist rule sets (FR-25, admin) — a repo of named rule collections ─────
+
+export function useChecklistRuleSets() {
+  return useQuery({
+    queryKey: ['checklist-rule-sets'],
+    queryFn: () => api<ChecklistRuleSet[]>('/checklist-rule-sets'),
+  });
+}
+
+export function useChecklistRuleSetMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => void qc.invalidateQueries({ queryKey: ['checklist-rule-sets'] });
+  return {
+    create: useMutation({
+      mutationFn: (body: { name: string; description?: string }) =>
+        api('/checklist-rule-sets', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    update: useMutation({
+      mutationFn: (v: {
+        id: string;
+        body: { name?: string; description?: string; isActive?: boolean };
+      }) => api(`/checklist-rule-sets/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => api(`/checklist-rule-sets/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
+}
+
 // ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
 
-export function useChecklistRules() {
+export function useChecklistRules(ruleSetId?: string) {
+  const qs = ruleSetId ? `?ruleSetId=${encodeURIComponent(ruleSetId)}` : '';
   return useQuery({
-    queryKey: ['checklist-rules'],
-    queryFn: () => api<ChecklistRuleAdmin[]>('/checklist-rules'),
+    queryKey: ['checklist-rules', ruleSetId ?? 'all'],
+    queryFn: () => api<ChecklistRuleAdmin[]>(`/checklist-rules${qs}`),
   });
 }
 
@@ -209,12 +243,14 @@ export interface ChecklistRuleInput {
   severity?: string;
   scope?: string;
   isActive?: boolean;
+  ruleSetId?: string;
 }
 
 export function useChecklistRuleMutations() {
   const qc = useQueryClient();
   const onSuccess = () => {
     void qc.invalidateQueries({ queryKey: ['checklist-rules'] });
+    void qc.invalidateQueries({ queryKey: ['checklist-rule-sets'] });
     // Estimate checklists re-evaluate against the changed rule set.
     void qc.invalidateQueries({ queryKey: ['checklist'] });
   };

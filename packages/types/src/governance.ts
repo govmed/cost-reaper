@@ -135,6 +135,34 @@ export const ChecklistItemResult = z.object({
 });
 export type ChecklistItemResult = z.infer<typeof ChecklistItemResult>;
 
+// ── Checklist rule sets (FR-25, admin) — a repo of named rule collections ─────
+
+/** One entry in the rule-set repo (list view). */
+export const ChecklistRuleSetDto = z.object({
+  id: z.string().uuid(),
+  /** System-assigned stable key (e.g. RS-A1B2C3). */
+  key: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  isDefault: z.boolean(),
+  isActive: z.boolean(),
+  ruleCount: z.number().int(),
+});
+export type ChecklistRuleSetDto = z.infer<typeof ChecklistRuleSetDto>;
+
+export const CreateChecklistRuleSetRequest = z.object({
+  name: z.string().min(1).max(80),
+  description: z.string().max(500).optional(),
+});
+export type CreateChecklistRuleSetRequest = z.infer<typeof CreateChecklistRuleSetRequest>;
+
+export const UpdateChecklistRuleSetRequest = z.object({
+  name: z.string().min(1).max(80).optional(),
+  description: z.string().max(500).optional(),
+  isActive: z.boolean().optional(),
+});
+export type UpdateChecklistRuleSetRequest = z.infer<typeof UpdateChecklistRuleSetRequest>;
+
 // ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
 
 export const ChecklistRuleDto = z.object({
@@ -145,6 +173,8 @@ export const ChecklistRuleDto = z.object({
   scope: ChecklistScope,
   isActive: z.boolean(),
   isBuiltin: z.boolean(),
+  /** The rule set this rule belongs to. */
+  ruleSetId: z.string().uuid(),
   /** true when the rule key has built-in evaluation logic; false = advisory (always passes). */
   hasLogic: z.boolean(),
 });
@@ -159,6 +189,8 @@ export const CreateChecklistRuleRequest = z.object({
   description: z.string().min(1).max(200),
   severity: ChecklistSeverity,
   scope: ChecklistScope,
+  /** Target rule set; defaults to the default set when omitted. */
+  ruleSetId: z.string().uuid().optional(),
 });
 export type CreateChecklistRuleRequest = z.infer<typeof CreateChecklistRuleRequest>;
 

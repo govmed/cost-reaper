@@ -385,6 +385,24 @@ model WorkflowTransitionEvent {
   @@map("workflow_transition_events")
 }
 
+// A named, system-keyed collection of checklist rules (FR-25). The default set
+// drives evaluation for every estimate; admins can curate alternates.
+model ChecklistRuleSet {
+  id          String   @id @default(uuid()) @db.Uuid
+  /// System-assigned stable key (e.g. RS-A1B2C3); the user-facing label is `name`.
+  key         String   @unique
+  name        String
+  description String?
+  isDefault   Boolean  @default(false) @map("is_default")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  rules ChecklistRule[]
+
+  @@map("checklist_rule_sets")
+}
+
 model ChecklistRule {
   id          String            @id @default(uuid()) @db.Uuid
   key         String            @unique
@@ -394,7 +412,10 @@ model ChecklistRule {
   isActive    Boolean           @default(true) @map("is_active")
   isBuiltin   Boolean           @default(true) @map("is_builtin")
   configJson  Json?             @map("config_json")
+  ruleSetId   String            @map("rule_set_id") @db.Uuid
+  ruleSet     ChecklistRuleSet  @relation(fields: [ruleSetId], references: [id], onDelete: Restrict)
 
+  @@index([ruleSetId])
   @@map("checklist_rules")
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { useChecklistRules, useChecklistRuleMutations } from '../lib/queries';
+import { useChecklistRules, useChecklistRuleMutations, useChecklistRuleSets } from '../lib/queries';
 import type { ChecklistRuleAdmin } from '../lib/types';
 
 const SEVERITIES = ['BLOCKER', 'WARNING', 'INFO'];
@@ -12,19 +13,28 @@ const severityClass: Record<string, string> = {
   INFO: 'text-slate-600 bg-slate-100',
 };
 
-/** Admin authoring of the smart-checklist rules (FR-25, FE-44). */
+/** Admin authoring of the smart-checklist rules in one rule set (FR-25, FE-44). */
 export default function ChecklistRulesPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const { data, isLoading, error } = useChecklistRules();
+  const { id: ruleSetId } = useParams();
+  const { data, isLoading, error } = useChecklistRules(ruleSetId);
+  const { data: sets } = useChecklistRuleSets();
   const m = useChecklistRuleMutations();
+  const set = sets?.find((s) => s.id === ruleSetId);
 
   const mutationError = (m.create.error || m.update.error || m.remove.error) ?? null;
 
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold">Checklist rules</h1>
+        <Link to="/checklist-rules" className="text-brand hover:underline text-sm">
+          ← Rule sets
+        </Link>
+        <h1 className="text-2xl font-semibold mt-1">
+          {set ? set.name : 'Checklist rules'}
+          {set && <span className="ml-2 font-mono text-sm text-slate-400">{set.key}</span>}
+        </h1>
         <p className="text-sm text-slate-500 max-w-2xl">
           Configure the smart checklist that validates estimates and gates workflow transitions
           (FR-25). Toggle a rule on/off, change its severity, or add an advisory rule. A failing{' '}
@@ -63,7 +73,7 @@ export default function ChecklistRulesPage() {
               ))}
             </tbody>
           </table>
-          {isAdmin && <AddRuleRow m={m} />}
+          {isAdmin && <AddRuleRow m={m} ruleSetId={ruleSetId} />}
           <p className="text-xs text-slate-400">
             “Advisory” rules have no built-in check, so they always pass — useful as reminders.
             Built-in rules can be deactivated or re-tuned but not deleted.
@@ -152,7 +162,7 @@ function RuleRow({ r, isAdmin, m }: { r: ChecklistRuleAdmin; isAdmin: boolean; m
   );
 }
 
-function AddRuleRow({ m }: { m: Mutations }) {
+function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
   const [key, setKey] = useState('');
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState('WARNING');
@@ -162,7 +172,7 @@ function AddRuleRow({ m }: { m: Mutations }) {
     const k = key.trim().toLowerCase();
     if (!k || !description.trim()) return;
     m.create.mutate(
-      { key: k, description: description.trim(), severity, scope },
+      { key: k, description: description.trim(), severity, scope, ruleSetId },
       {
         onSuccess: () => {
           setKey('');
