@@ -40,7 +40,7 @@ export default function LoginPage() {
       className="max-w-sm mx-auto mt-16 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4"
     >
       <div className="flex items-center gap-3 text-brand">
-        <BrandLogo className="h-9 w-9" />
+        <BrandLogo className="h-9" />
         <div>
           <div className="text-2xl font-bold leading-none tracking-tight">Kerdos</div>
           <p className="text-xs font-medium text-slate-400">
