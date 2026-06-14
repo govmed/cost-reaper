@@ -170,8 +170,8 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       <header className="sticky top-0 z-30 bg-brand text-white px-5 py-2.5 flex items-center justify-between gap-4 shadow-sm print:hidden">
         <div className="flex items-center gap-5 min-w-0">
-          <Link to="/" className="flex items-center gap-2 whitespace-nowrap">
-            <BrandLogo className="h-7 w-7" />
+          <Link to="/" className="flex items-center gap-2.5 whitespace-nowrap">
+            <BrandLogo className="h-7" />
             <span className="leading-tight">
               <span className="block text-lg font-semibold tracking-tight">Kerdos</span>
               <span className="block text-[0.6rem] font-medium uppercase tracking-[0.18em] text-white/70">
