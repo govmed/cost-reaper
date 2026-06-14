@@ -158,6 +158,16 @@ test('Checklist-rules admin page lists the rules (FR-25)', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add rule' })).toBeVisible();
 });
 
+test('User Guide page renders and deep-links by section (NFR-12)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'User Guide', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'User Guide' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Building an estimate' })).toBeVisible();
+  // Deep-link by section anchor.
+  await page.goto('/guide#administration');
+  await expect(page.getByRole('heading', { name: 'Administration' })).toBeVisible();
+});
+
 test('Roles & permissions page shows the capability matrix (FR-2/NFR-16)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Roles', exact: true }).click();
