@@ -20,3 +20,13 @@ export interface DashboardSummary {
     updatedAt: string;
   }[];
 }
+
+/** One estimate in a workflow-stage drill-down (FR-18) — click a stage to see these. */
+export interface DashboardStageEstimate {
+  id: string;
+  name: string;
+  status: EstimateStatus;
+  currency: string;
+  grandTotal: string;
+  updatedAt: string;
+}
