@@ -13,7 +13,7 @@ bypass, no half-enabled IdP), without adding heavy third-party dependencies.
 - A single, flat **config block** (`SSO_ENABLED`, `SSO_PROTOCOL`, `SSO_DISPLAY_NAME`,
   plus a tiny per-protocol section). A pure `resolveSsoConfig(env)` **dispatcher**
   reads the env and decides which provider is active; it **fails closed** (disabled
-  + a reason) when off or misconfigured. Unit-tested.
+  - a reason) when off or misconfigured. Unit-tested.
 - A pluggable `SsoProvider` strategy (NFR-15) with one implementation per protocol,
   built by `createSsoProvider(config)`. Endpoints: `GET /auth/sso` (status),
   `GET /auth/sso/login` (redirect to IdP), `GET|POST /auth/sso/callback`
