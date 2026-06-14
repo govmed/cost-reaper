@@ -1,26 +1,24 @@
 /**
- * Veridion brand mark — a stylized "V" that rises into a growth arrow (Kerdos =
- * Greek for "profit/gain"). Drawn with `currentColor` so it adapts to its
- * context: white on the teal header, teal on the white login card.
+ * Veridion / Kerdos brand mark — a two-tone upward arrow: growth and gain
+ * (Kerdos = Greek for "profit/gain"), its notched tail nodding to the "V" of
+ * Veridion. Drawn as filled facets with `currentColor` (+ a lighter trailing
+ * facet) so it adapts to its context — white on the teal header, teal on the
+ * white login card — and stays crisp at any size.
  *
- * To swap in the official Veridion logo later, replace the SVG paths here (or
- * point this at an <img src="/veridion-logo.svg" />) — the call sites won't change.
+ * Single swap point: to use the official Veridion artwork, replace these paths
+ * (or render an <img src="/veridion-logo.svg" />) and every call site updates.
  */
 export default function BrandLogo({ className = 'h-6 w-6' }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
       className={className}
       role="img"
       aria-label="Veridion"
+      fill="currentColor"
     >
-      <path d="M4 6 L10 18 L20 4" />
-      <path d="M20 4 L13.5 4 M20 4 L20 10.5" />
+      <path d="M12 2.5 L20.5 20 L12 15.5 Z" />
+      <path d="M12 2.5 L12 15.5 L3.5 20 Z" fillOpacity={0.5} />
     </svg>
   );
 }
