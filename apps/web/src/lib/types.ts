@@ -299,3 +299,29 @@ export interface EstimateWorkflow {
   availableTransitions: AvailableTransition[];
   history: WorkflowEvent[];
 }
+
+// ── Workflow authoring (FR-24, admin) ────────────────────────────────────────
+export interface WorkflowStageDef {
+  id: string;
+  key: string;
+  label: string;
+  sortOrder: number;
+  isInitial: boolean;
+  isTerminal: boolean;
+}
+export interface WorkflowTransitionDef {
+  id: string;
+  fromStageKey: string;
+  toStageKey: string;
+  allowedRole: Role;
+  label: string;
+  requiresChecklistPass: boolean;
+}
+export interface WorkflowDefinition {
+  id: string;
+  name: string;
+  isDefault: boolean;
+  isActive: boolean;
+  stages: WorkflowStageDef[];
+  transitions: WorkflowTransitionDef[];
+}

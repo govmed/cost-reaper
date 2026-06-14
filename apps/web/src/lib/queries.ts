@@ -16,6 +16,7 @@ import type {
   ReferenceValue,
   Scenario,
   UserDto,
+  WorkflowDefinition,
 } from './types';
 
 export function useEstimates(params: { q?: string; status?: string }) {
@@ -89,6 +90,73 @@ export function useWorkflow(id: string | undefined) {
     queryFn: () => api<EstimateWorkflow>(`/estimates/${id}/workflow`),
     enabled: Boolean(id),
   });
+}
+
+// ── Workflow authoring (FR-24, admin) ────────────────────────────────────────
+
+export function useDefaultWorkflow() {
+  return useQuery({
+    queryKey: ['workflow-default'],
+    queryFn: () => api<WorkflowDefinition>('/workflows/default'),
+  });
+}
+
+export interface StageInput {
+  key?: string;
+  label?: string;
+  sortOrder?: number;
+  isInitial?: boolean;
+  isTerminal?: boolean;
+}
+export interface TransitionInput {
+  fromStageKey?: string;
+  toStageKey?: string;
+  allowedRole?: string;
+  label?: string;
+  requiresChecklistPass?: boolean;
+}
+
+export function useWorkflowAuthoring() {
+  const qc = useQueryClient();
+  const onSuccess = () => {
+    void qc.invalidateQueries({ queryKey: ['workflow-default'] });
+  };
+  return {
+    addStage: useMutation({
+      mutationFn: (body: StageInput) =>
+        api('/workflows/default/stages', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    updateStage: useMutation({
+      mutationFn: (v: { id: string; body: StageInput }) =>
+        api(`/workflows/default/stages/${v.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(v.body),
+        }),
+      onSuccess,
+    }),
+    deleteStage: useMutation({
+      mutationFn: (id: string) => api(`/workflows/default/stages/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+    addTransition: useMutation({
+      mutationFn: (body: TransitionInput) =>
+        api('/workflows/default/transitions', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    updateTransition: useMutation({
+      mutationFn: (v: { id: string; body: TransitionInput }) =>
+        api(`/workflows/default/transitions/${v.id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(v.body),
+        }),
+      onSuccess,
+    }),
+    deleteTransition: useMutation({
+      mutationFn: (id: string) => api(`/workflows/default/transitions/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
 }
 
 export function useChecklist(id: string | undefined) {

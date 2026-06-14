@@ -12,6 +12,7 @@ import CloudPricesPage from './pages/CloudPricesPage';
 import ReferenceDataPage from './pages/ReferenceDataPage';
 import FxRatesPage from './pages/FxRatesPage';
 import HelpPage from './pages/HelpPage';
+import WorkflowPage from './pages/WorkflowPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -53,6 +54,9 @@ export default function App() {
                   </Link>
                   <Link to="/reference-data" className="hover:underline">
                     Reference data
+                  </Link>
+                  <Link to="/workflow" className="hover:underline">
+                    Workflow
                   </Link>
                   <Link to="/fx-rates" className="hover:underline">
                     FX rates
@@ -153,6 +157,14 @@ export default function App() {
             element={
               <Protected>
                 <HelpPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/workflow"
+            element={
+              <Protected>
+                <WorkflowPage />
               </Protected>
             }
           />

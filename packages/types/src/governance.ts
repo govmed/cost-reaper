@@ -39,6 +39,48 @@ export const TransitionRequest = z.object({
 });
 export type TransitionRequest = z.infer<typeof TransitionRequest>;
 
+// ── Workflow authoring (FR-24, admin) ────────────────────────────────────────
+
+/** Stage key convention: UPPER_SNAKE_CASE (e.g. IN_REVIEW), matching the seed. */
+const StageKey = z
+  .string()
+  .min(1)
+  .max(40)
+  .regex(/^[A-Z][A-Z0-9_]*$/, 'Key must be UPPER_SNAKE_CASE (A–Z, 0–9, _)');
+
+export const CreateStageRequest = z.object({
+  key: StageKey,
+  label: z.string().min(1).max(80),
+  sortOrder: z.number().int().min(0).optional(),
+  isInitial: z.boolean().optional(),
+  isTerminal: z.boolean().optional(),
+});
+export type CreateStageRequest = z.infer<typeof CreateStageRequest>;
+
+export const UpdateStageRequest = z.object({
+  label: z.string().min(1).max(80).optional(),
+  sortOrder: z.number().int().min(0).optional(),
+  isInitial: z.boolean().optional(),
+  isTerminal: z.boolean().optional(),
+});
+export type UpdateStageRequest = z.infer<typeof UpdateStageRequest>;
+
+export const CreateTransitionRequest = z.object({
+  fromStageKey: z.string().min(1),
+  toStageKey: z.string().min(1),
+  allowedRole: Role,
+  label: z.string().min(1).max(80),
+  requiresChecklistPass: z.boolean().optional(),
+});
+export type CreateTransitionRequest = z.infer<typeof CreateTransitionRequest>;
+
+export const UpdateTransitionRequest = z.object({
+  allowedRole: Role.optional(),
+  label: z.string().min(1).max(80).optional(),
+  requiresChecklistPass: z.boolean().optional(),
+});
+export type UpdateTransitionRequest = z.infer<typeof UpdateTransitionRequest>;
+
 // ── Automated smart checklist (FR-25) ────────────────────────────────────────
 
 export const ChecklistSeverity = z.enum(['BLOCKER', 'WARNING', 'INFO']);
