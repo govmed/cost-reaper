@@ -249,3 +249,23 @@ test('Statement of Work: create from an approved estimate, edit, open PDF (BR-7)
   await expect(page.getByRole('button', { name: /Print/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: '5. Pricing' })).toBeVisible();
 });
+
+test('a freshly created estimate has no green checklist items (FR-25)', async ({ page }) => {
+  await login(page);
+
+  // Just create an estimate — touch nothing else.
+  const name = `E2E Fresh Checklist ${Date.now()}`;
+  await page.getByPlaceholder('Q3 Platform build').fill(name);
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByRole('heading', { name })).toBeVisible();
+
+  const checklist = page.locator('section:has(h2:has-text("Smart checklist"))');
+  await expect(checklist).toBeVisible();
+  // Untouched estimate → 0% complete and NOTHING green (no ✓ anywhere in the panel).
+  await expect(checklist.getByText('0% complete')).toBeVisible();
+  await expect(checklist.getByText('✓')).toHaveCount(0);
+  // The real to-dos are flagged; per-line rules read N/A, not a pass.
+  await expect(checklist.getByText('Select a rate card for the estimate.')).toBeVisible();
+  await expect(checklist.getByText('Add at least one line item.')).toBeVisible();
+  await expect(checklist.getByText('N/A').first()).toBeVisible();
+});
