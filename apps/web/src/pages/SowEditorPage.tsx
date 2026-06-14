@@ -35,6 +35,7 @@ export default function SowEditorPage() {
   const { data: sow, isLoading, error } = useSow(id);
   const m = useSowMutations(id ?? '');
   const [form, setForm] = useState<Form | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
     if (!sow) return;
@@ -51,6 +52,7 @@ export default function SowEditorPage() {
       assumptions: sow.assumptions,
       termsAndConditions: sow.termsAndConditions,
     });
+    setDirty(false);
   }, [sow?.id, sow?.updatedAt]);
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
@@ -59,7 +61,12 @@ export default function SowEditorPage() {
 
   const issued = sow.status === 'ISSUED';
   const locked = issued || !canEdit;
-  const set = (k: keyof Form, v: string) => setForm({ ...form, [k]: v });
+  const set = (k: keyof Form, v: string) => {
+    setForm({ ...form, [k]: v });
+    setDirty(true);
+  };
+  const save = () => m.update.mutate(form, { onSuccess: () => setDirty(false) });
+  const savedAt = new Date(sow.updatedAt).toLocaleString();
   const mutationError = (m.update.error || m.issue.error || m.revert.error) ?? null;
 
   return (
@@ -80,7 +87,7 @@ export default function SowEditorPage() {
         </div>
         <p className="text-sm text-slate-500">
           <span className="font-mono">{sow.number}</span> · from estimate “{sow.estimateName}” ·{' '}
-          {sow.currency}
+          {sow.currency} · last saved {savedAt}
         </p>
       </div>
 
@@ -96,11 +103,11 @@ export default function SowEditorPage() {
       <div className="flex flex-wrap gap-2 items-center">
         {canEdit && !issued && (
           <button
-            onClick={() => m.update.mutate(form)}
-            disabled={m.update.isPending}
+            onClick={save}
+            disabled={m.update.isPending || !dirty}
             className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm disabled:opacity-50"
           >
-            Save changes
+            {m.update.isPending ? 'Saving…' : 'Save changes'}
           </button>
         )}
         {canEdit && !issued && (
@@ -130,6 +137,17 @@ export default function SowEditorPage() {
         >
           Open PDF view
         </Link>
+        {canEdit && !issued && (
+          <span className="text-sm" aria-live="polite">
+            {m.update.isPending ? (
+              <span className="text-slate-500">Saving…</span>
+            ) : dirty ? (
+              <span className="text-amber-600">● Unsaved changes</span>
+            ) : m.update.isSuccess ? (
+              <span className="text-emerald-700">✓ Saved</span>
+            ) : null}
+          </span>
+        )}
       </div>
 
       {issued && (
