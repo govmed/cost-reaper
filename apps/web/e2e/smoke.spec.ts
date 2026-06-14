@@ -169,6 +169,15 @@ test('User Guide page renders and deep-links by section (NFR-12)', async ({ page
   await expect(page.getByRole('heading', { name: 'Administration' })).toBeVisible();
 });
 
+test('Estimation Guide renders and deep-links by section (NFR-12)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Estimation Guide', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Estimation Guide' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Estimation techniques' })).toBeVisible();
+  await page.goto('/estimation-guide#glossary');
+  await expect(page.getByRole('heading', { name: 'Glossary' })).toBeVisible();
+});
+
 test('Roles & permissions page shows the capability matrix (FR-2/NFR-16)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Roles', exact: true }).click();

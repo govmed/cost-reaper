@@ -489,3 +489,11 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/prisma/{schema.prisma,migrations/20260614020000_…}, apps/api/src/modules/estimates/{estimates.service.ts,engine-mapping.ts}, apps/web/src/pages/EstimateEditorPage.tsx
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4); migration verified. Live: an estimate with an S3 Storage line + a Datadog SaaS line → totals.categories = Storage $23/mo, SaaS $150/mo (cloud categories reflected); "Cost by category" section in the web bundle.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-14 — Estimation Guide (methodology & training) (NFR-12)
+- **Action:** Added an "Estimation Guide" menu page (`/estimation-guide`) — a methodology/training handbook on *how to estimate well* (vs the User Guide's *how to use the tool*). 11 sections: why estimate, techniques (analogous/parametric/bottom-up/three-point-PERT), sizing, uncertainty & contingency, cost→price, build vs run cost (TCO), assumptions, baselines & re-estimation, pitfalls & biases, a worked example, and a glossary — each cross-linked to the matching app feature (PERT, contingency, assumptions, baselines, billing period, category breakdown) via `/help#uc-…` and `/guide`. Reuses the `GuideSection` type + sticky-TOC/hash-deeplink pattern. Nav link added after "User Guide"; reciprocal link from the User Guide; e2e (render + section deep-link). Web-only, no migration.
+- **Why:** User asked whether the app has estimating training/materials → yes for using the tool, but no methodology content; user said build the Estimation Guide.
+- **Files touched:** apps/web/src/lib/estimation-guide-content.ts (new), apps/web/src/pages/EstimationGuidePage.tsx (new), apps/web/src/App.tsx, apps/web/src/lib/user-guide-content.ts, apps/web/e2e/smoke.spec.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). Live: /estimation-guide serves; content in bundle.
+- **Note:** earlier PR #51 (category breakdown) merged with a red e2e (my script merged unconditionally on unprotected main); forward-fixed in PR #52 (scoped the duplicate "Licenses" cell). Going forward, gate merges on all-green.
+- **Next:** commit → PR → CI-green → merge.
