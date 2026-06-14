@@ -22,7 +22,7 @@ export const USER_GUIDE: GuideSection[] = [
     id: 'welcome',
     title: 'Welcome',
     body: [
-      'cost-reaper turns scattered spreadsheets into consistent, auditable project cost estimates. You build an estimate from a governed rate card plus AWS/GCP/Azure cloud pricing, apply markup and contingency, see monthly and yearly costs, route it through an approval workflow, and export a professional summary.',
+      'KerdosSOW turns scattered spreadsheets into consistent, auditable project cost estimates. You build an estimate from a governed rate card plus AWS/GCP/Azure cloud pricing, apply markup and contingency, see monthly and yearly costs, route it through an approval workflow, and export a professional summary.',
       'This guide is a readable overview. For numbered, click-by-click instructions, use the Help guide — every topic here links to the matching step-by-step use case. For estimating technique and best practices, see the Estimation Guide.',
     ],
     links: [
