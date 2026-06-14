@@ -158,6 +158,16 @@ test('Checklist-rules admin page lists the rules (FR-25)', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add rule' })).toBeVisible();
 });
 
+test('Roles & permissions page shows the capability matrix (FR-2/NFR-16)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Roles', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Roles & permissions' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Create & edit estimates' })).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'Manage users & roles' })).toBeVisible();
+  // The three role columns render.
+  await expect(page.getByRole('columnheader', { name: 'Estimator' })).toBeVisible();
+});
+
 test('Dashboard summarizes estimates and drills into a stage (FR-18)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Dashboard' }).click();

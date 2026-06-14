@@ -623,6 +623,38 @@ export const HELP_USE_CASES: UseCase[] = [
 
   // ── Administration ───────────────────────────────────────────────────────────
   {
+    id: 'roles-permissions',
+    title: 'Understand roles & permissions',
+    category: 'Administration',
+    persona: 'All users',
+    goal: 'See exactly what Admin, Estimator, and Viewer can and cannot do.',
+    featureIds: ['FR-2', 'FR-26', 'NFR-16'],
+    route: '/roles',
+    keywords: [
+      'roles',
+      'permissions',
+      'rbac',
+      'access',
+      'admin',
+      'estimator',
+      'viewer',
+      'can',
+      'cannot',
+    ],
+    steps: [
+      { text: 'Open “Roles” from the top navigation.' },
+      {
+        text: 'Read the per-role summary cards (your current role is highlighted).',
+      },
+      {
+        text: 'Scan the capability matrix — a ✓/✕ per capability for each role, grouped by area.',
+        detail:
+          'Access is deny-by-default and enforced on the server, so the matrix reflects what each role is actually allowed to do.',
+      },
+    ],
+    related: ['manage-users', 'sign-in'],
+  },
+  {
     id: 'manage-users',
     title: 'Manage users & roles',
     category: 'Administration',

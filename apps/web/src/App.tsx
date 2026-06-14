@@ -15,6 +15,7 @@ import HelpPage from './pages/HelpPage';
 import WorkflowPage from './pages/WorkflowPage';
 import ChecklistRulesPage from './pages/ChecklistRulesPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
+import RolesPage from './pages/RolesPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -48,6 +49,9 @@ export default function App() {
               </Link>
               <Link to="/help" className="hover:underline">
                 Help
+              </Link>
+              <Link to="/roles" className="hover:underline">
+                Roles
               </Link>
               {user.role === 'ADMIN' && (
                 <>
@@ -163,6 +167,14 @@ export default function App() {
             element={
               <Protected>
                 <HelpPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/roles"
+            element={
+              <Protected>
+                <RolesPage />
               </Protected>
             }
           />

@@ -426,3 +426,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/src/modules/auth/sso/{sso-config.ts(+spec),sso-providers.ts,sso.service.ts,sso.controller.ts}, apps/api/src/modules/auth/{auth.service.ts,auth.module.ts}, apps/web/src/lib/{api.ts,auth.tsx}, apps/web/src/pages/{LoginPage.tsx,SsoCallbackPage.tsx}, apps/web/src/App.tsx, .env.example, docker-compose.yml, docs/adr/0008-…
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, **test 69** incl. 5 SSO config tests, build 4/4). Live: default disabled (status enabled:false, password login intact). With SAML config → `/login` 302s to the IdP with a SAMLRequest. With OIDC (Google issuer) → live discovery built the correct authorize URL. .env restored.
 - **Next:** commit → PR → merge; then the two new asks — role can/cannot-do feature + online User Guide in the menu.
+
+### 2026-06-14 — Roles & permissions page (FR-2 / NFR-16) — what each role can and cannot do
+- **Action:** Added a "Roles" menu item + page showing exactly what Admin/Estimator/Viewer can and cannot do. `apps/web/src/lib/roleCapabilities.ts` holds a 13-capability matrix across 5 categories (Estimates, Reference & pricing, Governance configuration, Administration, Insights), mirroring the server `@Roles` guards (verified by enumerating every controller). `RolesPage.tsx` renders per-role summary cards + a ✓/✕ matrix, highlighting the signed-in user's role column. Nav link visible to all logged-in users; Help use case `roles-permissions` (deep-linkable); e2e asserts the matrix.
+- **Why:** User asked to think through what each role can/cannot do and add a feature for it.
+- **Files touched:** apps/web/src/lib/roleCapabilities.ts (new), apps/web/src/pages/RolesPage.tsx (new), apps/web/src/App.tsx, apps/web/src/lib/help-content.ts, apps/web/e2e/smoke.spec.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: /roles serves, matrix in bundle.
+- **Next:** commit → PR → merge; then the online User Guide menu feature.

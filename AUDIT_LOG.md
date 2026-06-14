@@ -485,3 +485,6 @@ Lets think about what each role can and cannot do. Start to add another feature 
 
 ### [2026-06-14 03:00 UTC] — AGENT
 Acknowledged — will build these next, after shipping SSO: (1) a Roles & permissions capability matrix (what Admin/Estimator/Viewer can and cannot do) surfaced in the app, and (2) an online User Guide page wired into the nav menu.
+
+### [2026-06-14 03:25 UTC] — AGENT
+Built the Roles & permissions feature (FR-2/NFR-16): a "Roles" menu page with a 13-capability ✓/✕ matrix (mirroring the actual server @Roles guards) across 5 categories, per-role summary cards, and the current user's role highlighted. Help use case + e2e added. Pipeline green (test 69); /roles live. Next: the online User Guide menu feature. Committing → PR → merge.
