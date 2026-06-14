@@ -630,7 +630,7 @@ export const HELP_USE_CASES: UseCase[] = [
     route: '/sow',
     keywords: ['sow', 'statement of work', 'contract', 'legal', 'pdf', 'official', 'issue'],
     steps: [
-      { text: 'Open “Statements of Work” from the top navigation.' },
+      { text: 'Open “SOW” from the top navigation.' },
       {
         text: 'Pick a source estimate and click “New SOW from estimate”.',
         detail:
