@@ -551,3 +551,16 @@ New Feature give the flexibility to create a repo of several workflows. ... syst
 
 ### [2026-06-14 06:00 UTC] — AGENT
 Plan: (A) workflow + transition repo [done], (B) checklist rule sets repo, (C) editable SOW→PDF menu item. Shipped A: WorkflowDefinition + WorkflowTransition gain a system key + description (migration, drift-free); a Workflows repo page (admin create/edit/delete with system key + label + description) + per-workflow stage/transition editor (transitions show system key + editable description). Pipeline green (test 69); live-verified create/edit/transition/delete + guards. Committing → PR → merge, then B and C.
+
+---
+### [2026-06-14 06:30 UTC] — USER
+Confirm it merged and build B
+
+### [2026-06-14 06:40 UTC] — AGENT
+Honest confirmation: PR #54 had NOT merged — its e2e check was red (the gated merge correctly held). Diagnosed: the Workflows repo renders the workflow name in an editable input for admins, so `getByText('Default Approval Workflow')` found nothing; switched the assertion to the system key `WF-DEFAULT`. Pushed → CI all-green → **merged #54** (squash, branch deleted). Then built **B — checklist rule sets repo**: `ChecklistRuleSet` (system key `RS-xxxxxx` + label + description, admin CRUD) grouping `ChecklistRule`s via a new `rule_set_id` FK; default `RS-DEFAULT` drives evaluation; repo page `/checklist-rules` → per-set editor `/checklist-rules/:id`.
+**Actions taken:**
+- Fixed + merged PR #54 (workflow + transition repo).
+- Schema + migration `20260614040000_checklist_rule_sets` (data-preserving); verified fresh-deploy + no-drift + seed (RS-DEFAULT, 9 rules) in Docker.
+- API rule-set CRUD + `/checklist-rule-sets` controller; web repo page + scoped rule editor; types/queries/help/e2e updated.
+- Local gates green: API + web typecheck, prettier (12 files). Committing → PR → merge B (gated on green).
+---

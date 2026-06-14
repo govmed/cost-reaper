@@ -286,6 +286,17 @@ export interface ChecklistResult {
   items: ChecklistItem[];
 }
 
+// ── Checklist rule sets (FR-25, admin) — a repo of named rule collections ─────
+export interface ChecklistRuleSet {
+  id: string;
+  key: string;
+  name: string;
+  description: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+  ruleCount: number;
+}
+
 // ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
 export interface ChecklistRuleAdmin {
   id: string;
@@ -295,6 +306,7 @@ export interface ChecklistRuleAdmin {
   scope: string;
   isActive: boolean;
   isBuiltin: boolean;
+  ruleSetId: string;
   hasLogic: boolean;
 }
 

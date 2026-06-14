@@ -833,6 +833,17 @@ const CHECKLIST_RULES = [
 ];
 
 async function seedChecklistRules() {
+  // The default rule set is the home for the built-in rules and drives evaluation (FR-25).
+  const defaultSet = await prisma.checklistRuleSet.upsert({
+    where: { key: 'RS-DEFAULT' },
+    update: {},
+    create: {
+      key: 'RS-DEFAULT',
+      name: 'Default checklist',
+      description: 'Baseline smart-checklist rules applied to every estimate.',
+      isDefault: true,
+    },
+  });
   for (const r of CHECKLIST_RULES) {
     await prisma.checklistRule.upsert({
       where: { key: r.key },
@@ -843,6 +854,7 @@ async function seedChecklistRules() {
         severity: r.severity,
         scope: r.scope,
         isBuiltin: true,
+        ruleSetId: defaultSet.id,
       },
     });
   }

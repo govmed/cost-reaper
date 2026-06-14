@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   type AuthUser,
@@ -19,8 +19,8 @@ export class ChecklistRulesController {
 
   @Get()
   @Roles('ADMIN')
-  list() {
-    return this.checklist.listRules();
+  list(@Query('ruleSetId') ruleSetId?: string) {
+    return this.checklist.listRules(ruleSetId);
   }
 
   @Post()

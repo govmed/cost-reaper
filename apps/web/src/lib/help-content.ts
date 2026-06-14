@@ -747,15 +747,32 @@ export const HELP_USE_CASES: UseCase[] = [
   },
   {
     id: 'manage-checklist-rules',
-    title: 'Configure the smart-checklist rules',
+    title: 'Manage checklist rule sets & rules',
     category: 'Administration',
     persona: 'Administrator',
-    goal: 'Toggle, re-tune, or add the rules that validate estimates and gate transitions.',
+    goal: 'Keep a repo of rule sets and author the rules that validate estimates and gate transitions.',
     featureIds: ['FR-25', 'FE-44'],
     route: '/checklist-rules',
-    keywords: ['checklist', 'rules', 'validation', 'severity', 'blocker', 'gate', 'configure'],
+    keywords: [
+      'checklist',
+      'rules',
+      'rule set',
+      'validation',
+      'severity',
+      'blocker',
+      'gate',
+      'configure',
+    ],
     steps: [
-      { text: 'Open “Checklist rules” (Admin only) from the top navigation.' },
+      { text: 'Open “Checklist Rules” (Admin only) from the top navigation.' },
+      {
+        text: 'Each row is a rule set with a system-assigned key (e.g. RS-A1B2C3); type a label and description for context.',
+        detail:
+          'The default set validates every estimate and gates workflow transitions. Use “Create rule set” to add another.',
+      },
+      {
+        text: 'Click “Edit rules →” on a set to author its rules.',
+      },
       {
         text: 'Toggle a rule Active on/off, change its Severity (Blocker / Warning / Info), or edit its description.',
         detail:
