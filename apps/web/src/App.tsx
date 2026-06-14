@@ -170,7 +170,7 @@ export default function App() {
       <header className="sticky top-0 z-30 bg-brand text-white px-5 py-2.5 flex items-center justify-between gap-4 shadow-sm print:hidden">
         <div className="flex items-center gap-5 min-w-0">
           <Link to="/" className="font-semibold text-lg tracking-tight whitespace-nowrap">
-            cost-reaper
+            KerdosSOW
           </Link>
           {user && <TopNav isAdmin={user.role === 'ADMIN'} />}
         </div>

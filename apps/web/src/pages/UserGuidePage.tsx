@@ -25,7 +25,7 @@ export default function UserGuidePage() {
       <div>
         <h1 className="text-2xl font-semibold">User Guide</h1>
         <p className="text-sm text-slate-500 max-w-2xl">
-          A readable walkthrough of cost-reaper. For numbered, click-by-click steps, use the{' '}
+          A readable walkthrough of KerdosSOW. For numbered, click-by-click steps, use the{' '}
           <Link to="/help" className="text-brand hover:underline">
             Help guide
           </Link>

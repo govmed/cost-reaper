@@ -10,6 +10,8 @@ test('login → create estimate → add a line → see totals', async ({ page })
   await page.getByLabel('Password').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByRole('heading', { name: 'Estimates' })).toBeVisible();
+  // Brand: the app shell shows the KerdosSOW name.
+  await expect(page.getByRole('link', { name: 'KerdosSOW' })).toBeVisible();
 
   // Create an estimate (FR-4)
   const name = `E2E Estimate ${Date.now()}`;
