@@ -447,3 +447,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/lib/user-guide-content.ts (new), apps/web/src/pages/UserGuidePage.tsx (new), apps/web/src/App.tsx, apps/web/e2e/smoke.spec.ts
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: /guide serves, content in bundle.
 - **Next:** commit → PR → merge. (All three of this batch's asks — SSO, LOCAL switch, roles, user guide — then complete.)
+
+### 2026-06-14 — Expanded the cloud compute catalog (FR-21) — full AWS/GCP/Azure families
+- **Action:** Grew the seeded cloud price catalog from ~10 to **180** entries across AWS (78), GCP (52), Azure (50). Added a `catalogRows([sku,price])` builder in seed.ts and comprehensive compute families: AWS EC2 general-purpose (T3/T4g/M5/M6i/M7i/M7g), compute (C5/C6i/C7g), memory (R5/R6i/X2idn), storage (I3/I4i/D3) and accelerated (G4dn/G5/P3/P4d/Inf2/Trn1) + S3/EBS; GCP Compute Engine E2/N1/N2/N2D/T2D/C2/C3/highmem/highcpu/M1/M2 + A2(A100)/G2(L4) + Cloud Storage; Azure VMs B/D(v3,v5,AMD)/F/E/M/L/N(GPU) + Blob/Managed Disks; plus alternate-region samples (eu-west-1, europe-west1, westeurope). Extended `GCP_MACHINE_SPECS` (E2/N2/N2D/T2D/N1 standard sizes) so the live refresh can price more of them. Existing keys preserved (idempotent upsert).
+- **Why:** User: more compute "appliances" are needed; pull a full list from Google/Azure/AWS.
+- **Files touched:** apps/api/prisma/seed.ts, apps/api/src/modules/cloud-pricing/price-mappers.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: re-seeded → 180 prices (AWS 78 / GCP 52 / AZURE 50), GPU/accelerated + 6 regions confirmed.
+- **Next:** commit → PR → merge; then reorder + Title-Case the nav menu.

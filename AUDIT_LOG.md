@@ -497,3 +497,15 @@ Made the identity selector one switch over LOCAL | OIDC | SAML | WSFED. SSO_PROT
 
 ### [2026-06-14 03:55 UTC] — AGENT
 Built the online User Guide (NFR-12): a "User Guide" menu page at /guide — a 12-section in-app handbook with a sticky TOC, hash deep-linking, and links into the Help use cases and app screens. e2e added. Pipeline green (test 69); /guide live. This completes the queued asks (SSO + LOCAL switch + Roles & permissions + User Guide). Committing → PR → merge.
+
+### [2026-06-14 04:10 UTC] — USER
+There are a lot more appliances that are needed for the compute area of product/project building. Make sure you are pulling a full list from Google, Azure, AWS.
+
+### [2026-06-14 04:10 UTC] — AGENT
+Expanded the seeded cloud compute catalog from ~10 to 180 entries across AWS (78), GCP (52), Azure (50) — full general-purpose, compute/memory/storage-optimized, and accelerated (GPU/ML) instance families per provider, plus storage and alternate regions. Added a catalogRows builder + extended GCP live-fetch specs. Pipeline green (test 69); re-seeded and verified 180 prices with GPU coverage across 6 regions. Committing → PR → merge, then the menu reorder.
+
+### [2026-06-14 04:10 UTC] — USER
+Menu should have Title case and it should be in this order: Dashboard Estimates Rate Cards Workflow Checklist rules Reference Data Cloud Prices FX Rates Users Roles User Guide Help
+
+### [2026-06-14 04:10 UTC] — AGENT
+Acknowledged — will reorder and Title-Case the top nav to: Dashboard, Estimates, Rate Cards, Workflow, Checklist Rules, Reference Data, Cloud Prices, FX Rates, Users, Roles, User Guide, Help (admin-only items shown in-position), right after the catalog expansion merges.
