@@ -92,7 +92,7 @@ test('SDLC phase breakdown (FR-28), resource capacity guard (FR-27) + stage gate
 
 test('Reference data admin page serves DB-driven values (FR-29)', async ({ page }) => {
   await login(page);
-  await page.getByRole('link', { name: 'Reference data' }).click();
+  await page.getByRole('link', { name: 'Reference Data' }).click();
   await expect(page.getByRole('heading', { name: 'Reference data' })).toBeVisible();
   // The seeded SDLC_PHASE type and its values render (default selection).
   await page.getByRole('button', { name: /SDLC Phase/ }).click();
@@ -129,7 +129,7 @@ test('Help guide lists use cases and deep-links by anchor', async ({ page }) => 
 
 test('FX rates show last-updated time and a refresh button (FR-17)', async ({ page }) => {
   await login(page);
-  await page.getByRole('link', { name: 'FX rates' }).click();
+  await page.getByRole('link', { name: 'FX Rates' }).click();
   await expect(page.getByRole('heading', { name: 'FX rates' })).toBeVisible();
   await expect(page.getByText('Last updated (local)')).toBeVisible();
   // Admin sees a refresh control. Not clicked here — it makes a live network call.
@@ -151,7 +151,7 @@ test('Workflow admin page shows the configurable default workflow (FR-24)', asyn
 
 test('Checklist-rules admin page lists the rules (FR-25)', async ({ page }) => {
   await login(page);
-  await page.getByRole('link', { name: 'Checklist rules', exact: true }).click();
+  await page.getByRole('link', { name: 'Checklist Rules', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Checklist rules' })).toBeVisible();
   // A seeded built-in rule renders (read-only assertions — no mutation of shared rules).
   await expect(page.getByText('rate_card_selected')).toBeVisible();

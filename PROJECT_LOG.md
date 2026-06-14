@@ -454,3 +454,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/prisma/seed.ts, apps/api/src/modules/cloud-pricing/price-mappers.ts
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: re-seeded → 180 prices (AWS 78 / GCP 52 / AZURE 50), GPU/accelerated + 6 regions confirmed.
 - **Next:** commit → PR → merge; then reorder + Title-Case the nav menu.
+
+### 2026-06-14 — Reorder + Title-Case the top nav (UX)
+- **Action:** Replaced the ad-hoc nav with a data-driven `NAV_ITEMS` list rendered in the requested order with Title Case: Dashboard, Estimates, Rate Cards, Workflow, Checklist Rules, Reference Data, Cloud Prices, FX Rates, Users, Roles, User Guide, Help. Admin-only items (Workflow, Checklist Rules, Reference Data, FX Rates, Users) render in-position only for Admins. Updated the 3 e2e nav-link assertions whose labels changed case (Reference Data, FX Rates, Checklist Rules); page headings unchanged.
+- **Why:** User specified the exact menu order + Title Case.
+- **Files touched:** apps/web/src/App.tsx, apps/web/e2e/smoke.spec.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). e2e validated in CI.
+- **Next:** commit → PR → merge; then the categorized enterprise cloud catalog (storage/network/database/containers/tools).

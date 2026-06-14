@@ -18,6 +18,22 @@ import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
 import UserGuidePage from './pages/UserGuidePage';
 
+/** Top navigation, in display order. `admin: true` items show only for Admins. */
+const NAV_ITEMS: { to: string; label: string; admin?: boolean }[] = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/', label: 'Estimates' },
+  { to: '/rate-cards', label: 'Rate Cards' },
+  { to: '/workflow', label: 'Workflow', admin: true },
+  { to: '/checklist-rules', label: 'Checklist Rules', admin: true },
+  { to: '/reference-data', label: 'Reference Data', admin: true },
+  { to: '/cloud-prices', label: 'Cloud Prices' },
+  { to: '/fx-rates', label: 'FX Rates', admin: true },
+  { to: '/users', label: 'Users', admin: true },
+  { to: '/roles', label: 'Roles' },
+  { to: '/guide', label: 'User Guide' },
+  { to: '/help', label: 'Help' },
+];
+
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const location = useLocation();
@@ -36,46 +52,11 @@ export default function App() {
           </Link>
           {user && (
             <nav className="flex items-center gap-4 text-sm">
-              <Link to="/" className="hover:underline">
-                Estimates
-              </Link>
-              <Link to="/dashboard" className="hover:underline">
-                Dashboard
-              </Link>
-              <Link to="/rate-cards" className="hover:underline">
-                Rate cards
-              </Link>
-              <Link to="/cloud-prices" className="hover:underline">
-                Cloud prices
-              </Link>
-              <Link to="/guide" className="hover:underline">
-                User Guide
-              </Link>
-              <Link to="/help" className="hover:underline">
-                Help
-              </Link>
-              <Link to="/roles" className="hover:underline">
-                Roles
-              </Link>
-              {user.role === 'ADMIN' && (
-                <>
-                  <Link to="/users" className="hover:underline">
-                    Users
-                  </Link>
-                  <Link to="/reference-data" className="hover:underline">
-                    Reference data
-                  </Link>
-                  <Link to="/workflow" className="hover:underline">
-                    Workflow
-                  </Link>
-                  <Link to="/checklist-rules" className="hover:underline">
-                    Checklist rules
-                  </Link>
-                  <Link to="/fx-rates" className="hover:underline">
-                    FX rates
-                  </Link>
-                </>
-              )}
+              {NAV_ITEMS.filter((i) => !i.admin || user.role === 'ADMIN').map((i) => (
+                <Link key={i.to} to={i.to} className="hover:underline">
+                  {i.label}
+                </Link>
+              ))}
             </nav>
           )}
         </div>
