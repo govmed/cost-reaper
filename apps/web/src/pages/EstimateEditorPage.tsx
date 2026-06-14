@@ -862,7 +862,7 @@ function CloudSection({
           <tr>
             <Th>Provider / Instance</Th>
             <Th right>Qty</Th>
-            <Th right>Hrs/mo</Th>
+            <Th right>Usage/mo</Th>
             <Th right>Unit price</Th>
             <Th>Phase</Th>
             <Th right>Line total</Th>
@@ -934,7 +934,8 @@ function CloudSection({
           onChange={(e) => setHours(e.target.value)}
           type="number"
           className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
-          placeholder="hrs/mo"
+          placeholder="usage/mo"
+          title="Usage units per month — hours for compute, or GB / requests / seats / 1 month for other units"
         />
         <SdlcSelect value={phase} onChange={setPhase} />
         <button

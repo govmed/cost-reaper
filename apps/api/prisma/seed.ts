@@ -161,12 +161,26 @@ function catalogRows(
   service: string,
   unit: CloudPriceUnit,
   entries: [string, string][],
+  categoryOverride?: string,
 ): SeedPrice[] {
-  const category = categoryFor(service);
+  const category = categoryOverride ?? categoryFor(service);
   return entries.map(([skuOrInstance, unitPrice]) => ({
     provider,
     category,
     region,
+    service,
+    skuOrInstance,
+    unit,
+    unitPrice,
+  }));
+}
+
+/** Third-party SaaS subscriptions (provider SAAS, region-agnostic). */
+function saasRows(entries: [string, string, string, CloudPriceUnit][]): SeedPrice[] {
+  return entries.map(([service, skuOrInstance, unitPrice, unit]) => ({
+    provider: CloudProvider.SAAS,
+    category: 'SaaS',
+    region: 'global',
     service,
     skuOrInstance,
     unit,
@@ -591,6 +605,61 @@ const CLOUD_PRICES: SeedPrice[] = [
   ]),
   ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Monitor', GB, [
     ['Log Ingestion', '2.300000'],
+  ]),
+
+  // ═══ Managed Services (cloud-vendor managed offerings) ═══
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Amazon MSK', HOUR, [['kafka.m5.large broker', '0.210000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Amazon MQ', HOUR, [['mq.m5.large', '0.300000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Amazon MWAA', HOUR, [['Small Environment', '0.490000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'Managed Grafana', MONTH, [['Active User', '9.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'AWS Backup', GB_MONTH, [['Backup Storage', '0.050000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'AWS Support', MONTH, [['Business (minimum)', '100.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Composer', HOUR, [['Small Environment', '0.074000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Anthos', MONTH, [['Per vCPU', '6.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Apigee', REQUEST, [['API Calls (per 1M)', '20.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Backup for GKE', GB_MONTH, [['Protected Data', '0.080000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Google Cloud Support', MONTH, [['Standard (minimum)', '29.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Backup', MONTH, [['Protected Instance', '5.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Site Recovery', MONTH, [['Protected Instance', '25.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'API Management', HOUR, [['Standard (per unit)', '0.952000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Arc', MONTH, [['Managed Server', '6.000000']], 'Managed Services'), // prettier-ignore
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Azure Support', MONTH, [['Standard (minimum)', '100.000000']], 'Managed Services'), // prettier-ignore
+
+  // ═══ SaaS (third-party subscriptions; provider SAAS, region-agnostic) ═══
+  ...saasRows([
+    // Observability & operations
+    ['Datadog', 'Pro (per host/mo)', '15.000000', MONTH],
+    ['New Relic', 'Standard (per user/mo)', '49.000000', MONTH],
+    ['Grafana Cloud', 'Pro (per user/mo)', '8.000000', MONTH],
+    ['PagerDuty', 'Professional (per user/mo)', '21.000000', MONTH],
+    ['Splunk Cloud', 'Ingest (per GB/mo)', '2.000000', GB_MONTH],
+    // Data & analytics
+    ['Snowflake', 'Standard (per credit)', '2.000000', REQUEST],
+    ['Databricks', 'Jobs Compute (per DBU)', '0.150000', REQUEST],
+    ['MongoDB Atlas', 'M10 Dedicated', '0.080000', HOUR],
+    ['Confluent Cloud', 'Standard (per CKU/hr)', '2.250000', HOUR],
+    // Identity & security
+    ['Okta', 'SSO (per user/mo)', '2.000000', MONTH],
+    ['Auth0', 'B2B Essentials (base/mo)', '150.000000', MONTH],
+    ['1Password', 'Business (per user/mo)', '7.990000', MONTH],
+    ['CrowdStrike Falcon', 'Pro (per endpoint/mo)', '8.000000', MONTH],
+    ['Cloudflare', 'Business (per domain/mo)', '200.000000', MONTH],
+    // Productivity & collaboration
+    ['Microsoft 365', 'E3 (per user/mo)', '36.000000', MONTH],
+    ['Google Workspace', 'Business Standard (per user/mo)', '12.000000', MONTH],
+    ['Slack', 'Business+ (per user/mo)', '12.500000', MONTH],
+    ['Zoom', 'Business (per user/mo)', '18.320000', MONTH],
+    // Developer & project
+    ['GitHub Enterprise', 'Per user/mo', '21.000000', MONTH],
+    ['GitLab', 'Ultimate (per user/mo)', '99.000000', MONTH],
+    ['Atlassian Jira', 'Standard (per user/mo)', '8.150000', MONTH],
+    ['Atlassian Confluence', 'Standard (per user/mo)', '6.050000', MONTH],
+    // Business
+    ['Salesforce', 'Enterprise (per user/mo)', '165.000000', MONTH],
+    ['HubSpot', 'Professional (base/mo)', '800.000000', MONTH],
+    // Communications
+    ['Twilio', 'SMS (per message)', '0.007900', REQUEST],
+    ['SendGrid', 'Pro (base/mo)', '89.950000', MONTH],
   ]),
 ];
 

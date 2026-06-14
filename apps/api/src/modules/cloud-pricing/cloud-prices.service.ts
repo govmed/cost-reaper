@@ -43,8 +43,10 @@ export class CloudPricesService {
       : (['AWS', 'GCP', 'AZURE'] as const);
     const now = new Date();
     for (const pv of providers) {
-      const current = await this.prisma.cloudPrice.findMany({ where: { provider: pv } });
       const strategy = PRICING_PROVIDERS[pv];
+      // SaaS / catalog-only providers have no live pricing source — skip them.
+      if (!strategy) continue;
+      const current = await this.prisma.cloudPrice.findMany({ where: { provider: pv } });
       const rows: CatalogRow[] = current.map((c) => ({
         provider: c.provider,
         region: c.region,
