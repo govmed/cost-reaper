@@ -714,6 +714,39 @@ export const HELP_USE_CASES: UseCase[] = [
     related: ['tag-sdlc-phase', 'approval-workflow'],
   },
   {
+    id: 'manage-workflow',
+    title: 'Configure the approval workflow',
+    category: 'Administration',
+    persona: 'Administrator',
+    goal: 'Author the estimate workflow — its stages and role-gated transitions.',
+    featureIds: ['FR-24', 'FE-43'],
+    route: '/workflow',
+    keywords: [
+      'workflow',
+      'stages',
+      'transitions',
+      'approval',
+      'review',
+      'role',
+      'gate',
+      'configure',
+    ],
+    steps: [
+      { text: 'Open “Workflow” (Admin only) from the top navigation.' },
+      {
+        text: 'Under Stages, add/rename stages, set their order, and mark one as Initial and any as Terminal.',
+        detail:
+          'Only one stage can be Initial — new estimates start there. A stage in use by an estimate or referenced in transition history can’t be deleted.',
+      },
+      {
+        text: 'Under Transitions, add a transition by choosing From → To, the allowed role, a button label, and whether it requires the smart checklist to pass.',
+        detail:
+          'These transitions are exactly what appears on each estimate’s Approval workflow panel, gated by role and (optionally) the checklist.',
+      },
+    ],
+    related: ['approval-workflow', 'smart-checklist', 'manage-reference-data'],
+  },
+  {
     id: 'manage-fx-rates',
     title: 'Manage currencies & FX rates',
     category: 'Administration',

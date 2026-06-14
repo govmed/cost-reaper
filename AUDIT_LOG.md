@@ -443,3 +443,9 @@ Put a date and time that the FX rates were last updated and also add a button to
 
 ### [2026-06-13 18:55 UTC] — AGENT
 Cloud Prices "last pulled" now shows date+time (local). FX Rates now shows an overall "Last updated (local)" date+time and per-row date+time, plus an admin "Refresh rates" button backed by a live pull from frankfurter.app (pure tested 1/rate mapper, 12s timeout + graceful fallback, re-stamps non-USD rows, USD stays 1, audited; POST /fx-rates/refresh). Pipeline green (test 58); live refresh returned HTTP 201 with fresh rates + moved timestamps. Committing → PR → merge.
+
+### [2026-06-14 01:10 UTC] — USER
+Pick the next polish item and build it
+
+### [2026-06-14 01:10 UTC] — AGENT
+Built the Workflow authoring UI (FR-24/FE-43): admin can configure the approval workflow's stages and role-gated transitions via a new /workflow page, backed by admin-only CRUD endpoints (single-initial enforced; stage deletes guarded against in-use/history; dup/self-loop transition guards; audited). Added types, query hooks, a deep-linkable Help use case, and a read-only e2e. Pipeline green (test 58); live CRUD round-trip verified and the seeded workflow restored. Committing → PR → merge.

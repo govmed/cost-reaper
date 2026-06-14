@@ -134,6 +134,19 @@ test('FX rates show last-updated time and a refresh button (FR-17)', async ({ pa
   await expect(page.getByRole('button', { name: 'Refresh rates' })).toBeVisible();
 });
 
+test('Workflow admin page shows the configurable default workflow (FR-24)', async ({ page }) => {
+  await login(page);
+  await page.getByRole('link', { name: 'Workflow', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Workflow' })).toBeVisible();
+  await expect(page.getByText('Default Approval Workflow')).toBeVisible();
+  // Seeded stages + a seeded transition render (read-only assertions — no mutation).
+  await expect(page.getByRole('cell', { name: 'DRAFT', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Transitions' })).toBeVisible();
+  // Admin sees the authoring controls.
+  await expect(page.getByRole('button', { name: 'Add stage' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add transition' })).toBeVisible();
+});
+
 test('Dashboard summarizes estimates (FR-18)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Dashboard' }).click();
