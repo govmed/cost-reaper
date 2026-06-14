@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useCloudPrices, useCloudSync, useLastPulled } from '../lib/queries';
 
-const PROVIDERS = ['', 'AWS', 'GCP', 'AZURE'];
+const PROVIDERS = ['', 'AWS', 'GCP', 'AZURE', 'SAAS'];
 
 /**
  * Format an ISO datetime as MM/DD/CCYY HH:MM:SS in the viewer's local time

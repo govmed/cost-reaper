@@ -33,6 +33,7 @@ enum CloudProvider {
   AWS
   GCP
   AZURE
+  SAAS
 }
 
 enum CloudPriceUnit {

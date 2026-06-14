@@ -77,6 +77,8 @@ export const USER_GUIDE: GuideSection[] = [
       'AI & Machine Learning — training/inference compute and foundation-model APIs.',
       'Security & Tools — WAF, key management, secrets, and cloud security posture.',
       'Management & Monitoring — metrics, logs, and observability.',
+      'Managed Services — cloud-vendor managed offerings (managed streaming/Kafka, backup, API management, support).',
+      'SaaS — third-party subscriptions (observability, identity & security, productivity, dev tools, data platforms), billed per user or per month.',
     ],
     links: [
       { label: 'Browse the Cloud Prices catalog', to: '/cloud-prices' },

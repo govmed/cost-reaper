@@ -39,7 +39,7 @@ export type RateUnit = z.infer<typeof RateUnit>;
 export const EstimateStatus = z.string().max(40);
 export type EstimateStatus = z.infer<typeof EstimateStatus>;
 
-export const CloudProvider = z.enum(['AWS', 'GCP', 'AZURE']);
+export const CloudProvider = z.enum(['AWS', 'GCP', 'AZURE', 'SAAS']);
 export type CloudProvider = z.infer<typeof CloudProvider>;
 
 /** ISO 4217 currency code; single currency per estimate in MVP. */

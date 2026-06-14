@@ -524,3 +524,9 @@ Update the User Guide with the new cloud categories
 
 ### [2026-06-14 04:45 UTC] — AGENT
 Added a "Cloud resources & categories" section to the /guide handbook listing the 9 enterprise categories and how to filter/group by them, with links to Cloud Prices and the add-cloud-line use case; updated the Building section to reference it. Pipeline green; /guide live. Committing → PR → merge.
+
+### [2026-06-14 05:00 UTC] — USER
+Add managed services and SaaS line items too
+
+### [2026-06-14 05:00 UTC] — AGENT
+Added Managed Services (16, under the cloud providers) and SaaS (26, under a new SAAS provider via an additive migration) to the catalog — now 298 prices across 11 categories. Guarded sync against the no-strategy SAAS provider; added SAAS to the provider filter; relabeled the cloud-usage field to "Usage/mo" for the now-diverse units; updated the User Guide. Pipeline green (test 69); migration drift-free; verified a SaaS line (M365 ×25 seats) computes $900/mo. Committing → PR → merge.
