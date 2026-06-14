@@ -60,90 +60,266 @@ async function seedRateCard(adminId: string) {
   });
 }
 
-const CLOUD_PRICES = [
-  // AWS — us-east-1
-  {
-    provider: CloudProvider.AWS,
-    region: 'us-east-1',
-    service: 'EC2',
-    skuOrInstance: 't3.medium',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.041600',
-  },
-  {
-    provider: CloudProvider.AWS,
-    region: 'us-east-1',
-    service: 'EC2',
-    skuOrInstance: 'm5.large',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.096000',
-  },
-  {
-    provider: CloudProvider.AWS,
-    region: 'us-east-1',
-    service: 'EC2',
-    skuOrInstance: 'c5.xlarge',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.170000',
-  },
-  {
-    provider: CloudProvider.AWS,
-    region: 'us-east-1',
-    service: 'S3',
-    skuOrInstance: 'Standard Storage',
-    unit: CloudPriceUnit.GB_MONTH,
-    unitPrice: '0.023000',
-  },
-  // GCP — us-central1
-  {
-    provider: CloudProvider.GCP,
-    region: 'us-central1',
-    service: 'Compute Engine',
-    skuOrInstance: 'e2-standard-2',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.067006',
-  },
-  {
-    provider: CloudProvider.GCP,
-    region: 'us-central1',
-    service: 'Compute Engine',
-    skuOrInstance: 'n2-standard-4',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.194240',
-  },
-  {
-    provider: CloudProvider.GCP,
-    region: 'us-central1',
-    service: 'Cloud Storage',
-    skuOrInstance: 'Standard Storage',
-    unit: CloudPriceUnit.GB_MONTH,
-    unitPrice: '0.020000',
-  },
-  // Azure — eastus
-  {
-    provider: CloudProvider.AZURE,
-    region: 'eastus',
-    service: 'Virtual Machines',
-    skuOrInstance: 'B2ms',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.083200',
-  },
-  {
-    provider: CloudProvider.AZURE,
-    region: 'eastus',
-    service: 'Virtual Machines',
-    skuOrInstance: 'D2s_v5',
-    unit: CloudPriceUnit.HOUR,
-    unitPrice: '0.096000',
-  },
-  {
-    provider: CloudProvider.AZURE,
-    region: 'eastus',
-    service: 'Blob Storage',
-    skuOrInstance: 'Hot LRS',
-    unit: CloudPriceUnit.GB_MONTH,
-    unitPrice: '0.018400',
-  },
+interface SeedPrice {
+  provider: CloudProvider;
+  region: string;
+  service: string;
+  skuOrInstance: string;
+  unit: CloudPriceUnit;
+  unitPrice: string;
+}
+
+/** Expand `[sku, price]` pairs into catalog rows for a provider/region/service. */
+function catalogRows(
+  provider: CloudProvider,
+  region: string,
+  service: string,
+  unit: CloudPriceUnit,
+  entries: [string, string][],
+): SeedPrice[] {
+  return entries.map(([skuOrInstance, unitPrice]) => ({
+    provider,
+    region,
+    service,
+    skuOrInstance,
+    unit,
+    unitPrice,
+  }));
+}
+
+const HOUR = CloudPriceUnit.HOUR;
+const GB_MONTH = CloudPriceUnit.GB_MONTH;
+
+// A broad compute catalog (FR-21) across AWS / GCP / Azure — general purpose,
+// compute/memory/storage optimized, and accelerated (GPU/ML) families, plus
+// representative storage. Prices are approximate on-demand USD; an admin "Refresh"
+// (FR-21a) re-stamps live prices without touching saved estimate snapshots.
+const CLOUD_PRICES: SeedPrice[] = [
+  // ── AWS EC2 — us-east-1 (Linux on-demand, USD/hr) ──
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'EC2', HOUR, [
+    // General purpose — burstable (T3 / T4g Graviton)
+    ['t3.micro', '0.010400'],
+    ['t3.small', '0.020800'],
+    ['t3.medium', '0.041600'],
+    ['t3.large', '0.083200'],
+    ['t3.xlarge', '0.166400'],
+    ['t3.2xlarge', '0.332800'],
+    ['t4g.medium', '0.033600'],
+    ['t4g.large', '0.067200'],
+    // General purpose — M5 / M6i / M7i / M7g
+    ['m5.large', '0.096000'],
+    ['m5.xlarge', '0.192000'],
+    ['m5.2xlarge', '0.384000'],
+    ['m5.4xlarge', '0.768000'],
+    ['m5.8xlarge', '1.536000'],
+    ['m5.12xlarge', '2.304000'],
+    ['m5.16xlarge', '3.072000'],
+    ['m5.24xlarge', '4.608000'],
+    ['m6i.large', '0.096000'],
+    ['m6i.xlarge', '0.192000'],
+    ['m6i.2xlarge', '0.384000'],
+    ['m6i.4xlarge', '0.768000'],
+    ['m6i.8xlarge', '1.536000'],
+    ['m7i.large', '0.100800'],
+    ['m7i.xlarge', '0.201600'],
+    ['m7i.2xlarge', '0.403200'],
+    ['m7g.large', '0.081600'],
+    ['m7g.xlarge', '0.163200'],
+    // Compute optimized — C5 / C6i / C7g
+    ['c5.large', '0.085000'],
+    ['c5.xlarge', '0.170000'],
+    ['c5.2xlarge', '0.340000'],
+    ['c5.4xlarge', '0.680000'],
+    ['c5.9xlarge', '1.530000'],
+    ['c5.12xlarge', '2.040000'],
+    ['c5.18xlarge', '3.060000'],
+    ['c5.24xlarge', '4.080000'],
+    ['c6i.large', '0.085000'],
+    ['c6i.xlarge', '0.170000'],
+    ['c6i.2xlarge', '0.340000'],
+    ['c6i.4xlarge', '0.680000'],
+    ['c7g.large', '0.072500'],
+    ['c7g.xlarge', '0.145000'],
+    // Memory optimized — R5 / R6i / X2idn
+    ['r5.large', '0.126000'],
+    ['r5.xlarge', '0.252000'],
+    ['r5.2xlarge', '0.504000'],
+    ['r5.4xlarge', '1.008000'],
+    ['r5.8xlarge', '2.016000'],
+    ['r5.12xlarge', '3.024000'],
+    ['r5.16xlarge', '4.032000'],
+    ['r5.24xlarge', '6.048000'],
+    ['r6i.large', '0.126000'],
+    ['r6i.xlarge', '0.252000'],
+    ['r6i.2xlarge', '0.504000'],
+    ['x2idn.16xlarge', '6.668160'],
+    ['x2idn.32xlarge', '13.336320'],
+    // Storage optimized — I3 / I4i / D3
+    ['i3.large', '0.156000'],
+    ['i3.xlarge', '0.312000'],
+    ['i3.2xlarge', '0.624000'],
+    ['i3.4xlarge', '1.248000'],
+    ['i4i.large', '0.171600'],
+    ['i4i.xlarge', '0.343200'],
+    ['d3.xlarge', '0.499000'],
+    ['d3.2xlarge', '0.998000'],
+    // Accelerated computing — GPU / ML (G / P / Inf / Trn)
+    ['g4dn.xlarge', '0.526000'],
+    ['g4dn.2xlarge', '0.752000'],
+    ['g4dn.12xlarge', '3.912000'],
+    ['g5.xlarge', '1.006000'],
+    ['g5.2xlarge', '1.212000'],
+    ['g5.12xlarge', '5.672000'],
+    ['p3.2xlarge', '3.060000'],
+    ['p3.8xlarge', '12.240000'],
+    ['p4d.24xlarge', '32.772600'],
+    ['inf2.xlarge', '0.758200'],
+    ['trn1.2xlarge', '1.343800'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'S3', GB_MONTH, [
+    ['Standard Storage', '0.023000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'us-east-1', 'EBS', GB_MONTH, [
+    ['gp3 SSD', '0.080000'],
+    ['io2 SSD', '0.125000'],
+  ]),
+  ...catalogRows(CloudProvider.AWS, 'eu-west-1', 'EC2', HOUR, [
+    ['t3.medium', '0.047040'],
+    ['m5.large', '0.107000'],
+    ['c5.xlarge', '0.192000'],
+  ]),
+
+  // ── GCP Compute Engine — us-central1 (on-demand, USD/hr) ──
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Compute Engine', HOUR, [
+    // General purpose — E2
+    ['e2-micro', '0.008376'],
+    ['e2-small', '0.016751'],
+    ['e2-medium', '0.033503'],
+    ['e2-standard-2', '0.067006'],
+    ['e2-standard-4', '0.134012'],
+    ['e2-standard-8', '0.268024'],
+    ['e2-standard-16', '0.536048'],
+    ['e2-standard-32', '1.072096'],
+    // General purpose — N1
+    ['n1-standard-1', '0.047500'],
+    ['n1-standard-2', '0.095000'],
+    ['n1-standard-4', '0.190000'],
+    ['n1-standard-8', '0.380000'],
+    ['n1-standard-16', '0.760000'],
+    ['n1-standard-32', '1.520000'],
+    // General purpose — N2 / N2D / T2D
+    ['n2-standard-2', '0.097118'],
+    ['n2-standard-4', '0.194240'],
+    ['n2-standard-8', '0.388480'],
+    ['n2-standard-16', '0.776960'],
+    ['n2-standard-32', '1.553920'],
+    ['n2-standard-64', '3.107840'],
+    ['n2d-standard-2', '0.084528'],
+    ['n2d-standard-4', '0.169056'],
+    ['n2d-standard-8', '0.338112'],
+    ['t2d-standard-2', '0.075738'],
+    ['t2d-standard-4', '0.151476'],
+    ['t2d-standard-8', '0.302952'],
+    // Compute optimized — C2 / C3
+    ['c2-standard-4', '0.208800'],
+    ['c2-standard-8', '0.417600'],
+    ['c2-standard-16', '0.835200'],
+    ['c2-standard-30', '1.566000'],
+    ['c2-standard-60', '3.132000'],
+    ['c3-standard-4', '0.209840'],
+    ['c3-standard-8', '0.419680'],
+    ['c3-standard-22', '1.154120'],
+    // Memory optimized / high-cpu
+    ['n2-highmem-2', '0.131036'],
+    ['n2-highmem-4', '0.262072'],
+    ['n2-highmem-8', '0.524144'],
+    ['n2-highcpu-4', '0.143488'],
+    ['n2-highcpu-8', '0.286976'],
+    ['n2-highcpu-16', '0.573952'],
+    ['m1-megamem-96', '10.674000'],
+    ['m1-ultramem-40', '6.303850'],
+    ['m2-ultramem-208', '42.186380'],
+    // Accelerated — A100 / L4
+    ['a2-highgpu-1g', '3.673385'],
+    ['a2-highgpu-2g', '7.346770'],
+    ['g2-standard-4', '0.850330'],
+    ['g2-standard-8', '1.022350'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'us-central1', 'Cloud Storage', GB_MONTH, [
+    ['Standard Storage', '0.020000'],
+    ['SSD Persistent Disk', '0.170000'],
+    ['Balanced PD', '0.100000'],
+  ]),
+  ...catalogRows(CloudProvider.GCP, 'europe-west1', 'Compute Engine', HOUR, [
+    ['e2-standard-2', '0.073700'],
+    ['n2-standard-4', '0.213660'],
+  ]),
+
+  // ── Azure Virtual Machines — eastus (Linux pay-as-you-go, USD/hr) ──
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Virtual Machines', HOUR, [
+    // Burstable B
+    ['B1s', '0.010400'],
+    ['B1ms', '0.020700'],
+    ['B2s', '0.041600'],
+    ['B2ms', '0.083200'],
+    ['B4ms', '0.166000'],
+    ['B8ms', '0.333000'],
+    // General purpose D-series (v5 / v3 / AMD as_v5)
+    ['D2s_v5', '0.096000'],
+    ['D4s_v5', '0.192000'],
+    ['D8s_v5', '0.384000'],
+    ['D16s_v5', '0.768000'],
+    ['D32s_v5', '1.536000'],
+    ['D48s_v5', '2.304000'],
+    ['D64s_v5', '3.072000'],
+    ['D2s_v3', '0.096000'],
+    ['D4s_v3', '0.192000'],
+    ['D8s_v3', '0.384000'],
+    ['D16s_v3', '0.768000'],
+    ['D2as_v5', '0.086000'],
+    ['D4as_v5', '0.172000'],
+    ['D8as_v5', '0.344000'],
+    // Compute optimized F
+    ['F2s_v2', '0.084600'],
+    ['F4s_v2', '0.169000'],
+    ['F8s_v2', '0.338000'],
+    ['F16s_v2', '0.676000'],
+    ['F32s_v2', '1.352000'],
+    ['F64s_v2', '2.704000'],
+    // Memory optimized E / M
+    ['E2s_v5', '0.126000'],
+    ['E4s_v5', '0.252000'],
+    ['E8s_v5', '0.504000'],
+    ['E16s_v5', '1.008000'],
+    ['E32s_v5', '2.016000'],
+    ['E64s_v5', '4.032000'],
+    ['E2as_v5', '0.113400'],
+    ['E4as_v5', '0.226800'],
+    ['M64s', '8.111000'],
+    ['M128s', '16.222000'],
+    // Storage optimized L
+    ['L8s_v3', '0.624000'],
+    ['L16s_v3', '1.248000'],
+    ['L32s_v3', '2.496000'],
+    // GPU N-series
+    ['NC4as_T4_v3', '0.526000'],
+    ['NC8as_T4_v3', '0.752000'],
+    ['NC24ads_A100_v4', '3.672600'],
+    ['ND96asr_A100_v4', '27.197000'],
+    ['NV6', '1.140000'],
+    ['NV12', '2.280000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Blob Storage', GB_MONTH, [
+    ['Hot LRS', '0.018400'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'eastus', 'Managed Disks', GB_MONTH, [
+    ['Premium SSD', '0.135000'],
+    ['Standard SSD', '0.075000'],
+  ]),
+  ...catalogRows(CloudProvider.AZURE, 'westeurope', 'Virtual Machines', HOUR, [
+    ['B2ms', '0.091500'],
+    ['D2s_v5', '0.105000'],
+  ]),
 ];
 
 async function seedCloudPrices() {

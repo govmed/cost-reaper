@@ -112,11 +112,27 @@ export interface GcpSku {
 }
 
 /** vCPU + RAM(GiB) per machine type — GCP prices core & ram SKUs separately. */
+// Standard predefined families price as cores × Core-SKU + ramGb × RAM-SKU.
+// E2/N2/N2D/T2D standard = 4 GB/core; N1 predefined = 3.75 GB/core.
 const GCP_MACHINE_SPECS: Record<string, { family: string; cores: number; ramGb: number }> = {
   'e2-standard-2': { family: 'E2', cores: 2, ramGb: 8 },
   'e2-standard-4': { family: 'E2', cores: 4, ramGb: 16 },
+  'e2-standard-8': { family: 'E2', cores: 8, ramGb: 32 },
+  'e2-standard-16': { family: 'E2', cores: 16, ramGb: 64 },
   'n2-standard-2': { family: 'N2', cores: 2, ramGb: 8 },
   'n2-standard-4': { family: 'N2', cores: 4, ramGb: 16 },
+  'n2-standard-8': { family: 'N2', cores: 8, ramGb: 32 },
+  'n2-standard-16': { family: 'N2', cores: 16, ramGb: 64 },
+  'n2-standard-32': { family: 'N2', cores: 32, ramGb: 128 },
+  'n2d-standard-2': { family: 'N2D', cores: 2, ramGb: 8 },
+  'n2d-standard-4': { family: 'N2D', cores: 4, ramGb: 16 },
+  'n2d-standard-8': { family: 'N2D', cores: 8, ramGb: 32 },
+  't2d-standard-2': { family: 'T2D', cores: 2, ramGb: 8 },
+  't2d-standard-4': { family: 'T2D', cores: 4, ramGb: 16 },
+  'n1-standard-1': { family: 'N1 Predefined', cores: 1, ramGb: 3.75 },
+  'n1-standard-2': { family: 'N1 Predefined', cores: 2, ramGb: 7.5 },
+  'n1-standard-4': { family: 'N1 Predefined', cores: 4, ramGb: 15 },
+  'n1-standard-8': { family: 'N1 Predefined', cores: 8, ramGb: 30 },
 };
 
 function gcpUnitPrice(sku: GcpSku): number | null {
