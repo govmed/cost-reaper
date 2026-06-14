@@ -129,7 +129,12 @@ export default function EstimateEditorPage() {
   const { data: rateCards } = useRateCards();
   const { data: cloudPrices } = useCloudPrices();
   const { data: workflow } = useWorkflow(id);
-  const { data: checklist } = useChecklist(id);
+  const {
+    data: checklist,
+    refetch: refetchChecklist,
+    dataUpdatedAt: checklistCheckedAt,
+    isFetching: checklistFetching,
+  } = useChecklist(id);
   const { data: statuses } = useReferenceValues('ESTIMATE_STATUS');
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
@@ -216,7 +221,14 @@ export default function EstimateEditorPage() {
       <CategoryBreakdownSection categories={t.categories} cur={cur} />
       <PhaseBreakdownSection phases={t.phases} cur={cur} />
 
-      <GovernanceSection workflow={workflow} checklist={checklist} m={m} />
+      <GovernanceSection
+        workflow={workflow}
+        checklist={checklist}
+        m={m}
+        onRecheck={() => refetchChecklist()}
+        checkedAt={checklistCheckedAt}
+        rechecking={checklistFetching}
+      />
 
       <ScenariosSection est={est} m={m} />
 
@@ -280,10 +292,16 @@ function GovernanceSection({
   workflow,
   checklist,
   m,
+  onRecheck,
+  checkedAt,
+  rechecking,
 }: {
   workflow: EstimateWorkflow | undefined;
   checklist: ChecklistResult | undefined;
   m: Mutations;
+  onRecheck: () => void;
+  checkedAt: number;
+  rechecking: boolean;
 }) {
   return (
     <div className="grid md:grid-cols-2 gap-4">
@@ -331,13 +349,24 @@ function GovernanceSection({
       <Section title="Smart checklist">
         {checklist && (
           <>
-            <div className="text-sm">
+            <div className="text-sm flex items-center gap-2 flex-wrap">
               <span className={checklist.blocking ? 'text-rose-700' : 'text-emerald-700'}>
                 {checklist.blocking ? 'Blocking items present' : 'All blocking checks pass'}
-              </span>{' '}
+              </span>
               <span className="text-slate-400">
                 · {Math.round(checklist.completeness * 100)}% complete
               </span>
+              <span className="ml-auto text-xs text-slate-400">
+                {checkedAt > 0 ? `checked ${new Date(checkedAt).toLocaleTimeString()}` : ''}
+              </span>
+              <button
+                onClick={onRecheck}
+                disabled={rechecking}
+                title="Re-evaluate the checklist now"
+                className="text-xs text-brand hover:underline disabled:opacity-50"
+              >
+                {rechecking ? 'Re-checking…' : '↻ Re-check'}
+              </button>
             </div>
             {checklist.items.length === 0 && (
               <div className="text-sm text-slate-500 flex items-center gap-2">
@@ -353,6 +382,23 @@ function GovernanceSection({
             )}
             <ul className="text-sm space-y-1">
               {checklist.items.map((i) => {
+                // A rule with nothing to check yet (no lines of its type) is N/A —
+                // shown muted, not as a (vacuous) green pass and with nothing to fix.
+                if (!i.applicable) {
+                  return (
+                    <li
+                      key={i.key}
+                      className="flex items-start gap-2 px-1 py-0.5 text-slate-400"
+                      title="Nothing to check yet"
+                    >
+                      <span className="text-slate-300">–</span>
+                      <span>{i.message}</span>
+                      <span className="ml-auto text-[10px] uppercase tracking-wide text-slate-300">
+                        N/A
+                      </span>
+                    </li>
+                  );
+                }
                 // Failing items deep-link to their specific guide; if no guide
                 // matches the rule key, fall back to the general checklist guide.
                 const guide = !i.passed
