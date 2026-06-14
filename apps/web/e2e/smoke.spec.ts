@@ -216,3 +216,29 @@ test('Dashboard summarizes estimates and drills into a stage (FR-18)', async ({ 
   await firstStage.click();
   await expect(firstStage).toHaveAttribute('aria-expanded', 'true');
 });
+
+test('Statement of Work: create from estimate, edit, open PDF (BR-7)', async ({ page }) => {
+  await login(page);
+
+  // A SOW is composed from an estimate — create one first.
+  const estName = `E2E SOW Estimate ${Date.now()}`;
+  await page.getByPlaceholder('Q3 Platform build').fill(estName);
+  await page.getByRole('button', { name: 'Create' }).click();
+  await expect(page.getByRole('heading', { name: estName })).toBeVisible();
+
+  // Compose a SOW from that estimate.
+  await page.getByRole('link', { name: 'Statements of Work', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Statements of Work' })).toBeVisible();
+  await page.locator('select[title="Source estimate"]').selectOption({ label: estName });
+  await page.getByRole('button', { name: 'New SOW from estimate' }).click();
+
+  // Lands on the editor — a system SOW number + editable title + Save.
+  await expect(page.getByText(/SOW-/).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Save changes' })).toBeVisible();
+
+  // Open the official PDF view (browser print-to-PDF).
+  await page.getByRole('link', { name: 'Open PDF view' }).click();
+  await expect(page.getByRole('heading', { name: 'Statement of Work', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Print/ })).toBeVisible();
+  await expect(page.getByText('Pricing')).toBeVisible();
+});

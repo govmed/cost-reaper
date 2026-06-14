@@ -8,3 +8,4 @@ export * from './governance';
 export * from './reference';
 export * from './dashboard';
 export * from './fx';
+export * from './sow';

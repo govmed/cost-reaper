@@ -16,6 +16,9 @@ import WorkflowPage from './pages/WorkflowPage';
 import WorkflowsRepoPage from './pages/WorkflowsRepoPage';
 import ChecklistRulesPage from './pages/ChecklistRulesPage';
 import ChecklistRuleSetsPage from './pages/ChecklistRuleSetsPage';
+import SowListPage from './pages/SowListPage';
+import SowEditorPage from './pages/SowEditorPage';
+import SowPrintPage from './pages/SowPrintPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
 import UserGuidePage from './pages/UserGuidePage';
@@ -25,6 +28,7 @@ import EstimationGuidePage from './pages/EstimationGuidePage';
 const NAV_ITEMS: { to: string; label: string; admin?: boolean }[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/', label: 'Estimates' },
+  { to: '/sow', label: 'Statements of Work' },
   { to: '/rate-cards', label: 'Rate Cards' },
   { to: '/workflows', label: 'Workflows', admin: true },
   { to: '/checklist-rules', label: 'Checklist Rules', admin: true },
@@ -212,6 +216,30 @@ export default function App() {
             element={
               <Protected>
                 <ChecklistRulesPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/sow"
+            element={
+              <Protected>
+                <SowListPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/sow/:id"
+            element={
+              <Protected>
+                <SowEditorPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/sow/:id/print"
+            element={
+              <Protected>
+                <SowPrintPage />
               </Protected>
             }
           />

@@ -564,3 +564,21 @@ Honest confirmation: PR #54 had NOT merged — its e2e check was red (the gated 
 - API rule-set CRUD + `/checklist-rule-sets` controller; web repo page + scoped rule editor; types/queries/help/e2e updated.
 - Local gates green: API + web typecheck, prettier (12 files). Committing → PR → merge B (gated on green).
 ---
+
+---
+### [2026-06-14 17:30 UTC] — USER
+(1) "I approve using all the Bash commands. Please update that." (2) "I approve all cd commands"
+
+### [2026-06-14 17:35 UTC] — AGENT
+Updated .claude/settings.local.json to add a blanket `"Bash"` allow rule (covers all Bash incl. cd) plus `"Bash(cd *)"`. Note: the permission-persistence layer rewrote the file mid-session and dropped the bare rule once; re-applied it.
+
+### [2026-06-14 17:10 UTC] — USER
+(continuing) build C — official/legal Statement of Work PDF as a separate, editable menu item.
+
+### [2026-06-14 18:00 UTC] — AGENT
+Confirmed PR #55 (checklist rule sets) merged; synced local main (removed a corrupt macOS `Icon` git ref that was blocking fetch). Built **C — Statement of Work**: a persisted, editable SOW composed from an estimate, printed to PDF in-browser; system `SOW-xxxxxx` number; Issue locks + snapshots pricing; new "Statements of Work" menu → list → section editor → official print view with signature blocks.
+**Actions taken:**
+- StatementOfWork model + migration `20260614050000` (additive); verified fresh-deploy + no-drift in Docker.
+- `sow` API module (CRUD + issue/revert) reusing exported EstimatesService for pricing; new web list/editor/print pages + nav + routes + help use case + e2e.
+- Local gates green: API + web typecheck, prettier (16 files). Committing → PR → merge C (gated on green).
+---
