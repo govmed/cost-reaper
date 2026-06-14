@@ -4,13 +4,18 @@ import { useCloudPrices, useCloudSync, useLastPulled } from '../lib/queries';
 
 const PROVIDERS = ['', 'AWS', 'GCP', 'AZURE'];
 
-/** Format an ISO datetime as MM/DD/CCYY (FR-21b), or em-dash when never pulled. */
+/**
+ * Format an ISO datetime as MM/DD/CCYY HH:MM:SS in the viewer's local time
+ * (FR-21b — date and time of the last pull), or em-dash when never pulled.
+ * Stored value is UTC; shown localized per NFR-13.
+ */
 function fmtPulled(iso: string | null): string {
   if (!iso) return '—';
   const d = new Date(iso);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${mm}/${dd}/${d.getFullYear()}`;
+  const p = (n: number) => String(n).padStart(2, '0');
+  const date = `${p(d.getMonth() + 1)}/${p(d.getDate())}/${d.getFullYear()}`;
+  const time = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  return `${date} ${time}`;
 }
 
 export default function CloudPricesPage() {
@@ -39,7 +44,7 @@ export default function CloudPricesPage() {
       </p>
 
       {/* Per-provider freshness — last pulled (FR-21b) */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2 max-w-md">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-2 max-w-lg">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-brand">Price freshness</h2>
           {user?.role === 'ADMIN' && (
@@ -56,7 +61,7 @@ export default function CloudPricesPage() {
           <thead className="text-slate-500 text-left">
             <tr>
               <th className="py-1">Provider</th>
-              <th className="py-1">Last pulled</th>
+              <th className="py-1">Last pulled (local)</th>
               <th className="py-1 text-right">Prices</th>
             </tr>
           </thead>
@@ -64,7 +69,7 @@ export default function CloudPricesPage() {
             {(freshness ?? []).map((f) => (
               <tr key={f.provider} className="border-t border-slate-100">
                 <td className="py-1 font-medium">{f.provider}</td>
-                <td className="py-1 tabular-nums">{fmtPulled(f.lastPulled)}</td>
+                <td className="py-1 tabular-nums whitespace-nowrap">{fmtPulled(f.lastPulled)}</td>
                 <td className="py-1 text-right tabular-nums">{f.priceCount}</td>
               </tr>
             ))}

@@ -377,3 +377,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/App.tsx
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, build 4/4). Live: rebuilt web; `position:sticky` in the generated CSS + class in the bundle, web 200.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-13 — Freshness timestamps: cloud "last pulled" + FX "last updated" with a live FX refresh
+- **Action:** (1) Cloud Prices "last pulled" now shows **date + time** (MM/DD/CCYY HH:MM:SS, local) instead of date only (`fmtPulled`, header "Last pulled (local)"). (2) FX Rates page now shows the overall **"Last updated (local)"** date+time (max `updatedAt`) and each row's updated-at as date+time, plus an admin **"Refresh rates"** button. (3) New backend: pure `mapFxRates` (foreign-per-USD → rateToBase = 1/rate, 6dp) + 2 unit tests; `FxService.refresh()` pulls live rates from a public no-auth source (frankfurter.app, `FX_RATES_ENDPOINT` env, 12s timeout + graceful fallback), re-stamps non-USD rows (USD stays 1), audits `REFRESH:<n>updated`; `POST /fx-rates/refresh` (admin); `useFxRefresh` hook. compose + .env.example wired; e2e asserts the FX timestamp + button (no click → no live call in CI).
+- **Why:** User asked to show date+time of last pull on Cloud prices, and to show FX last-updated date+time + a refresh button.
+- **Files touched:** apps/web/src/pages/CloudPricesPage.tsx, apps/web/src/pages/FxRatesPage.tsx, apps/web/src/lib/queries.ts, apps/web/e2e/smoke.spec.ts, apps/api/src/modules/fx/{fx-rates.mapper.ts(+spec),fx.service.ts,fx.controller.ts}, docker-compose.yml, .env.example
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, **test 58**, build 4/4). Live: rebuilt api+web; `POST /fx-rates/refresh` → HTTP 201 pulled fresh frankfurter rates (EUR 1.1→1.157, JPY 0.0067→0.00624), timestamps moved, USD untouched at 1; new UI strings confirmed in the web bundle.
+- **Next:** commit → PR → CI-green → merge.

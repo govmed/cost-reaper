@@ -434,3 +434,12 @@ Can we make the Navigator Tab Strip not to scroll up?
 
 ### [2026-06-13 18:40 UTC] — AGENT
 Made the top navigation header sticky (`sticky top-0 z-30 shadow-sm`) so the tab strip stays pinned when the page scrolls. Deep-link scroll offsets already clear the header height. Pipeline green; verified position:sticky compiled into the live CSS. Committing → PR → merge.
+
+### [2026-06-13 18:55 UTC] — USER
+Cloud prices put the date and time of last pulled.
+
+### [2026-06-13 18:55 UTC] — USER
+Put a date and time that the FX rates were last updated and also add a button to refresh
+
+### [2026-06-13 18:55 UTC] — AGENT
+Cloud Prices "last pulled" now shows date+time (local). FX Rates now shows an overall "Last updated (local)" date+time and per-row date+time, plus an admin "Refresh rates" button backed by a live pull from frankfurter.app (pure tested 1/rate mapper, 12s timeout + graceful fallback, re-stamps non-USD rows, USD stays 1, audited; POST /fx-rates/refresh). Pipeline green (test 58); live refresh returned HTTP 201 with fresh rates + moved timestamps. Committing → PR → merge.
