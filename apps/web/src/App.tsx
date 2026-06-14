@@ -16,6 +16,7 @@ import WorkflowPage from './pages/WorkflowPage';
 import ChecklistRulesPage from './pages/ChecklistRulesPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
+import UserGuidePage from './pages/UserGuidePage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -46,6 +47,9 @@ export default function App() {
               </Link>
               <Link to="/cloud-prices" className="hover:underline">
                 Cloud prices
+              </Link>
+              <Link to="/guide" className="hover:underline">
+                User Guide
               </Link>
               <Link to="/help" className="hover:underline">
                 Help
@@ -175,6 +179,14 @@ export default function App() {
             element={
               <Protected>
                 <RolesPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/guide"
+            element={
+              <Protected>
+                <UserGuidePage />
               </Protected>
             }
           />

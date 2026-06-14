@@ -440,3 +440,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/src/modules/auth/sso/{sso-config.ts(+spec),sso.service.ts}, apps/web/src/lib/api.ts, apps/web/src/pages/LoginPage.tsx, .env.example, docker-compose.yml
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: default → mode LOCAL; SSO_ENABLED=true+SSO_PROTOCOL=LOCAL → LOCAL; OIDC+SSO_FORCE=true → mode OIDC, enabled, forceSso true; restored → LOCAL.
 - **Next:** commit → PR → merge; then the online User Guide menu feature.
+
+### 2026-06-14 — Online User Guide in the menu (NFR-12, FR-12)
+- **Action:** Added a "User Guide" menu item + `/guide` page — a navigable in-app handbook (12 sections: Welcome, Signing in & identity, Roles, Building an estimate, Pricing, SDLC phases & capacity, Review & approval, Scenarios/baselines, Exports, Dashboard, Administration, Getting help) with a sticky table of contents, hash deep-linking (`/guide#<id>` scrolls + highlights), and per-section links into the task-based Help use cases (`/help#uc-…`) and app routes. Content in `apps/web/src/lib/user-guide-content.ts`; page in `UserGuidePage.tsx`. Nav link for all logged-in users; e2e asserts render + section deep-link.
+- **Why:** User asked for an online User Guide as part of the menu system.
+- **Files touched:** apps/web/src/lib/user-guide-content.ts (new), apps/web/src/pages/UserGuidePage.tsx (new), apps/web/src/App.tsx, apps/web/e2e/smoke.spec.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: /guide serves, content in bundle.
+- **Next:** commit → PR → merge. (All three of this batch's asks — SSO, LOCAL switch, roles, user guide — then complete.)
