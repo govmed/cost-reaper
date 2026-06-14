@@ -5,6 +5,8 @@ import { login as apiLogin, setTokens } from './api';
 interface AuthContextValue {
   user: AuthUser | null;
   login: (email: string, password: string) => Promise<void>;
+  /** Complete an SSO sign-in from tokens handed back by the IdP callback. */
+  completeSso: (access: string, refresh: string, user: AuthUser) => void;
   logout: () => void;
 }
 
@@ -29,13 +31,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(u);
   }
 
+  function completeSso(access: string, refresh: string, u: AuthUser): void {
+    setTokens(access, refresh);
+    localStorage.setItem('user', JSON.stringify(u));
+    setUser(u);
+  }
+
   function logout(): void {
     setTokens(null, null);
     localStorage.removeItem('user');
     setUser(null);
   }
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, login, completeSso, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth(): AuthContextValue {

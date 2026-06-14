@@ -50,6 +50,25 @@ services:
       GCP_BILLING_API_KEY: ${GCP_BILLING_API_KEY:-}
       # Public, no-auth FX source for the FX-rates "Refresh" button (FR-17).
       FX_RATES_ENDPOINT: ${FX_RATES_ENDPOINT:-https://api.frankfurter.app/latest}
+      # Single Sign-On (FR-26) — off unless configured. Pick ONE protocol.
+      SSO_ENABLED: ${SSO_ENABLED:-false}
+      SSO_PROTOCOL: ${SSO_PROTOCOL:-OIDC}
+      SSO_DISPLAY_NAME: ${SSO_DISPLAY_NAME:-Company SSO}
+      SSO_OIDC_ISSUER: ${SSO_OIDC_ISSUER:-}
+      SSO_OIDC_CLIENT_ID: ${SSO_OIDC_CLIENT_ID:-}
+      SSO_OIDC_CLIENT_SECRET: ${SSO_OIDC_CLIENT_SECRET:-}
+      SSO_OIDC_REDIRECT_URI: ${SSO_OIDC_REDIRECT_URI:-http://localhost:8000/api/v1/auth/sso/callback}
+      SSO_OIDC_SCOPES: ${SSO_OIDC_SCOPES:-openid email profile}
+      SSO_SAML_ENTRY_POINT: ${SSO_SAML_ENTRY_POINT:-}
+      SSO_SAML_ISSUER: ${SSO_SAML_ISSUER:-cost-reaper}
+      SSO_SAML_CALLBACK_URL: ${SSO_SAML_CALLBACK_URL:-http://localhost:8000/api/v1/auth/sso/callback}
+      SSO_SAML_IDP_CERT: ${SSO_SAML_IDP_CERT:-}
+      SSO_SAML_ALLOW_UNVERIFIED: ${SSO_SAML_ALLOW_UNVERIFIED:-false}
+      SSO_WSFED_LOGIN_URL: ${SSO_WSFED_LOGIN_URL:-}
+      SSO_WSFED_REALM: ${SSO_WSFED_REALM:-cost-reaper}
+      SSO_WSFED_REPLY_URL: ${SSO_WSFED_REPLY_URL:-http://localhost:8000/api/v1/auth/sso/callback}
+      SSO_WSFED_IDP_CERT: ${SSO_WSFED_IDP_CERT:-}
+      SSO_WSFED_ALLOW_UNVERIFIED: ${SSO_WSFED_ALLOW_UNVERIFIED:-false}
     ports:
       - '${API_PORT:-8000}:8000'
     healthcheck:

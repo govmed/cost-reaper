@@ -473,3 +473,15 @@ Take the next one.
 
 ### [2026-06-14 02:40 UTC] — AGENT
 Sourced behavioral-enum display labels from reference data (FE-54 tail, FR-29): added a reusable useRefLabeler hook and applied it to billing period (One-time/Monthly/Yearly) and cloud provider (Amazon Web Services/…) across the estimate editor and printable summary, with raw-code fallback. Stored values stay codes; admin renames flow to the UI with no code change. e2e asserts the DB-driven "One-time" label. Pipeline green (test 64); reference labels live-verified. Committing → PR → merge.
+
+### [2026-06-14 03:00 UTC] — USER
+Make it simple and configurable in the config sections for SSO SAML OIDC and WS-FED -- write the related code to read the config and determine which one to use. make the config very simple and straight-forward
+
+### [2026-06-14 03:00 UTC] — AGENT
+Built a config-driven SSO layer (FR-26, ADR-0008): one switch (SSO_ENABLED + SSO_PROTOCOL=OIDC|SAML|WSFED) with a flat per-protocol config; a pure resolveSsoConfig dispatcher (fails closed) + tests; a pluggable SsoProvider strategy with OIDC fully functional (dependency-free discovery + code exchange) and SAML/WS-Fed (redirect + assertion parse + best-effort signature check). Endpoints for status/login/callback; first-time SSO users provisioned as VIEWER. Web login "Sign in with …" button + /sso/callback. Pipeline green (test 69); live-verified SAML + OIDC dispatch (OIDC discovered Google's authorize URL). Off by default. Committing → PR → merge, then the next two asks.
+
+### [2026-06-14 03:00 UTC] — USER
+Lets think about what each role can and cannot do. Start to add another feature for that. And add another feature for a online User Guide as part of the menu system
+
+### [2026-06-14 03:00 UTC] — AGENT
+Acknowledged — will build these next, after shipping SSO: (1) a Roles & permissions capability matrix (what Admin/Estimator/Viewer can and cannot do) surfaced in the app, and (2) an online User Guide page wired into the nav menu.

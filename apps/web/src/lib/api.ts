@@ -69,6 +69,27 @@ export async function login(email: string, password: string): Promise<LoginRespo
   return data.user;
 }
 
+// ── Single Sign-On (FR-26) ───────────────────────────────────────────────────
+export interface SsoStatus {
+  enabled: boolean;
+  protocol: string | null;
+  displayName: string | null;
+}
+
+/** Public: whether SSO is configured, and the button label. Never throws. */
+export async function getSsoStatus(): Promise<SsoStatus> {
+  try {
+    return await api<SsoStatus>('/auth/sso', {}, false);
+  } catch {
+    return { enabled: false, protocol: null, displayName: null };
+  }
+}
+
+/** The API endpoint that redirects the browser to the configured IdP. */
+export function ssoLoginUrl(): string {
+  return `${BASE}/auth/sso/login`;
+}
+
 /** Fetch the CSV with the auth header and trigger a browser download. */
 async function downloadExport(path: string, filename: string): Promise<void> {
   let res = await request(path, {}, true);

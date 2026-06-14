@@ -1,14 +1,23 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
+import { getSsoStatus, ssoLoginUrl, type SsoStatus } from '../lib/api';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    const e = new URLSearchParams(window.location.search).get('sso_error');
+    return e ? `SSO sign-in failed: ${e}` : null;
+  });
   const [busy, setBusy] = useState(false);
+  const [sso, setSso] = useState<SsoStatus | null>(null);
+
+  useEffect(() => {
+    void getSsoStatus().then(setSso);
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -58,6 +67,22 @@ export default function LoginPage() {
       >
         {busy ? 'Signing in…' : 'Sign in'}
       </button>
+
+      {sso?.enabled && (
+        <>
+          <div className="flex items-center gap-3 text-xs text-slate-400">
+            <span className="h-px flex-1 bg-slate-200" />
+            or
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+          <a
+            href={ssoLoginUrl()}
+            className="block text-center w-full border border-brand text-brand rounded py-2 font-medium hover:bg-teal-50"
+          >
+            Sign in with {sso.displayName}
+          </a>
+        </>
+      )}
     </form>
   );
 }
