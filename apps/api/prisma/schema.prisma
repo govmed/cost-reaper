@@ -238,6 +238,8 @@ model CloudComputeLineItem {
   cloudPriceId            String?       @map("cloud_price_id") @db.Uuid
   cloudPrice              CloudPrice?   @relation(fields: [cloudPriceId], references: [id])
   provider                CloudProvider
+  /// Snapshot of the cloud price's enterprise category (Compute / Storage / …).
+  category                String?
   region                  String
   service                 String
   skuOrInstance           String        @map("sku_or_instance")

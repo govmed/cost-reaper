@@ -489,6 +489,7 @@ export class EstimatesService {
         estimateId,
         cloudPriceId: price.id,
         provider: price.provider,
+        category: price.category,
         region: price.region,
         service: price.service,
         skuOrInstance: price.skuOrInstance,
