@@ -536,3 +536,6 @@ Add a category breakdown on the estimate
 
 ### [2026-06-14 05:25 UTC] — AGENT
 Added a "Cost by category" section to the estimate card (one-time/monthly/yearly per category). Cloud lines now break down by their enterprise category (Storage/Networking/SaaS/…) — snapshotted the cloud price's category onto each cloud line (additive migration) and grouped by it in the engine. Pipeline green (test 69); live-verified Storage $23/mo + SaaS $150/mo on a sample estimate. Committing → PR → merge.
+
+### [2026-06-14 05:30 UTC] — AGENT (self-heal)
+PR #51's e2e failed (strict-mode: the new "Cost by category" section adds a second "Licenses" cell) but my script merged it on unprotected main anyway — my error. Forward-fixing: scoped the e2e assertion to #sec-nonlabor. Verified the other cell assertions don't clash. PR → merge to return main green.
