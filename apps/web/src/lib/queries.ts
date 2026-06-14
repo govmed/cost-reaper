@@ -18,6 +18,7 @@ import type {
   ReferenceType,
   ReferenceValue,
   Scenario,
+  SowEligibleEstimate,
   SowSummary,
   StatementOfWork,
   UserDto,
@@ -486,6 +487,14 @@ export function useFxRefresh() {
 
 export function useSows() {
   return useQuery({ queryKey: ['sow'], queryFn: () => api<SowSummary[]>('/sow') });
+}
+
+/** Estimates eligible to be a SOW source (approved/final workflow stage). */
+export function useEligibleEstimates() {
+  return useQuery({
+    queryKey: ['sow-eligible-estimates'],
+    queryFn: () => api<SowEligibleEstimate[]>('/sow/eligible-estimates'),
+  });
 }
 
 export function useSow(id: string | undefined) {

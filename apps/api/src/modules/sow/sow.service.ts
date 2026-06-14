@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import type {
   AuthUser,
   CreateSowRequest,
+  SowEligibleEstimateDto,
   SowSummaryDto,
   StatementOfWorkDto,
   UpdateSowRequest,
@@ -11,6 +12,10 @@ import type {
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { EstimatesService } from '../estimates/estimates.service';
+
+// A SOW can only be built from an estimate that has reached an approval stage in
+// its workflow (those transitions already require the smart checklist to pass).
+const SOW_ELIGIBLE_STAGE_KEYS = ['APPROVED', 'FINAL'];
 
 // Editable default boilerplate for a new SOW — the user tailors these before issuing.
 const DEFAULT_SCOPE =
@@ -126,7 +131,35 @@ export class SowService {
     return this.toDto(sow);
   }
 
+  /** Estimates that have reached an approval stage — the only valid SOW sources. */
+  async eligibleEstimates(): Promise<SowEligibleEstimateDto[]> {
+    const rows = await this.prisma.estimate.findMany({
+      where: { currentStage: { key: { in: SOW_ELIGIBLE_STAGE_KEYS } } },
+      select: { id: true, name: true, currentStage: { select: { key: true, label: true } } },
+      orderBy: { updatedAt: 'desc' },
+    });
+    return rows.map((e) => ({
+      id: e.id,
+      name: e.name,
+      stageKey: e.currentStage?.key ?? '',
+      stageLabel: e.currentStage?.label ?? '',
+    }));
+  }
+
   async create(dto: CreateSowRequest, user: AuthUser): Promise<StatementOfWorkDto> {
+    // A SOW may only be created from an approved estimate (deny-by-default; NFR-16).
+    const stageOf = await this.prisma.estimate.findUnique({
+      where: { id: dto.estimateId },
+      select: { currentStage: { select: { key: true, label: true } } },
+    });
+    if (!stageOf) throw new NotFoundException('Estimate not found');
+    if (!stageOf.currentStage || !SOW_ELIGIBLE_STAGE_KEYS.includes(stageOf.currentStage.key)) {
+      throw new BadRequestException(
+        `A SOW can only be created from an approved estimate (current stage: ${
+          stageOf.currentStage?.label ?? 'none'
+        }).`,
+      );
+    }
     // getDetail throws NotFound if the estimate is missing.
     const detail: any = await this.estimates.getDetail(dto.estimateId);
     const number = `SOW-${randomBytes(3).toString('hex').toUpperCase()}`;

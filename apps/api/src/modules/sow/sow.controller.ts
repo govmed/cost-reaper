@@ -20,6 +20,12 @@ export class SowController {
     return this.sow.list();
   }
 
+  // Static path declared before ':id' so it isn't captured by the param route.
+  @Get('eligible-estimates')
+  eligibleEstimates() {
+    return this.sow.eligibleEstimates();
+  }
+
   @Get(':id')
   get(@Param('id') id: string) {
     return this.sow.get(id);

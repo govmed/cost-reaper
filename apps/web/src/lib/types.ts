@@ -375,6 +375,12 @@ export interface WorkflowSummary {
 }
 
 // ── Statement of Work (BR-7) ─────────────────────────────────────────────────
+export interface SowEligibleEstimate {
+  id: string;
+  name: string;
+  stageKey: string;
+  stageLabel: string;
+}
 export interface SowSummary {
   id: string;
   number: string;
