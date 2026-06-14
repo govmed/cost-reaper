@@ -90,5 +90,5 @@ export function downloadCsv(id: string, name: string): Promise<void> {
 }
 
 export function downloadExcel(id: string, name: string): Promise<void> {
-  return downloadExport(`/estimates/${id}/export-excel`, `${name || 'estimate'}.xls`);
+  return downloadExport(`/estimates/${id}/export-excel`, `${name || 'estimate'}.xlsx`);
 }

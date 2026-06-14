@@ -31,7 +31,8 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { ReferenceService } from '../reference/reference.service';
 import { buildEngineInput, toMappableEstimate } from './engine-mapping';
-import { CsvLine, toCsv, toExcelHtml } from './estimate-csv';
+import { CsvLine, exportRows, toCsv } from './estimate-csv';
+import { buildXlsx } from './xlsx';
 
 const DETAIL_INCLUDE = {
   laborItems: { include: { rateCardRole: true } },
@@ -379,9 +380,12 @@ export class EstimatesService {
     return { filename: `estimate-${id}.csv`, csv: toCsv(meta, lines, totals) };
   }
 
-  async exportExcel(id: string): Promise<{ filename: string; html: string }> {
+  async exportExcel(id: string): Promise<{ filename: string; xlsx: Buffer }> {
     const { meta, lines, totals } = await this.buildExport(id);
-    return { filename: `estimate-${id}.xls`, html: toExcelHtml(meta, lines, totals) };
+    return {
+      filename: `estimate-${id}.xlsx`,
+      xlsx: buildXlsx('Estimate', exportRows(meta, lines, totals)),
+    };
   }
 
   // ── Line items ───────────────────────────────────────────────────────────────

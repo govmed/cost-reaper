@@ -60,10 +60,13 @@ export class EstimatesController {
 
   @Get(':id/export-excel')
   async exportExcel(@Param('id') id: string, @Res() res: Response): Promise<void> {
-    const { filename, html } = await this.estimates.exportExcel(id);
-    res.setHeader('Content-Type', 'application/vnd.ms-excel');
+    const { filename, xlsx } = await this.estimates.exportExcel(id);
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(html);
+    res.send(xlsx);
   }
 
   @Post()
