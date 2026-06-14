@@ -14,6 +14,7 @@ import FxRatesPage from './pages/FxRatesPage';
 import HelpPage from './pages/HelpPage';
 import WorkflowPage from './pages/WorkflowPage';
 import ChecklistRulesPage from './pages/ChecklistRulesPage';
+import SsoCallbackPage from './pages/SsoCallbackPage';
 
 function Protected({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -84,6 +85,7 @@ export default function App() {
       <main className="max-w-6xl mx-auto p-5">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/sso/callback" element={<SsoCallbackPage />} />
           <Route
             path="/"
             element={

@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { randomBytes } from 'node:crypto';
 import * as argon2 from 'argon2';
 import type { AuthUser, LoginRequest, RegisterRequest, TokenPair } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -37,6 +38,30 @@ export class AuthService {
     if (!user || !user.isActive) throw new UnauthorizedException('Invalid credentials');
     const valid = await argon2.verify(user.passwordHash, dto.password);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
+    await this.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+    return { user: this.toAuthUser(user), ...(await this.issueTokens(user)) };
+  }
+
+  /**
+   * Log a user in from a verified SSO identity (FR-26). Provisions a new account
+   * with least privilege (VIEWER) on first sign-in; password login is disabled
+   * for it (random hash). Deactivated accounts are rejected.
+   */
+  async ssoLogin(identity: {
+    email: string;
+    displayName: string | null;
+  }): Promise<{ user: AuthUser } & TokenPair> {
+    const email = identity.email.toLowerCase();
+    let user = (await this.prisma.user.findUnique({
+      where: { email },
+    })) as unknown as UserRecord | null;
+    if (!user) {
+      const passwordHash = await argon2.hash(randomBytes(32).toString('hex'));
+      user = (await this.prisma.user.create({
+        data: { email, passwordHash, displayName: identity.displayName, role: 'VIEWER' },
+      })) as unknown as UserRecord;
+    }
+    if (!user.isActive) throw new UnauthorizedException('Account is deactivated');
     await this.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
     return { user: this.toAuthUser(user), ...(await this.issueTokens(user)) };
   }
