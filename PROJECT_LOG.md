@@ -412,3 +412,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** packages/types/src/dashboard.ts, apps/api/src/modules/dashboard/{dashboard.service.ts,dashboard.controller.ts}, apps/web/src/lib/{types.ts,queries.ts}, apps/web/src/pages/DashboardPage.tsx, apps/web/e2e/smoke.spec.ts
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 64, build 4/4). Live: byStage DRAFT=13/UNASSIGNED=1; GET /dashboard/stage/DRAFT → 13 estimates with totals; unknown stage → 200 empty; web hint string in bundle, /dashboard serves.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-14 — Reference-data labels for behavioral enums (FE-54 tail, FR-29/NFR-17)
+- **Action:** Display labels for behavioral enums now come from the DB reference tables (behavior stays code-coupled). New reusable `useRefLabeler(typeCode)` hook (`apps/web/src/lib/refLabels.ts`) → `{ label(code), options, ready }` over `useReferenceValues`, always falling back to the raw code. Applied **billing period** (BILLING_PERIOD → One-time/Monthly/Yearly) across the estimate editor's labor/non-labor tables + the `PeriodSelect` dropdown, and **cloud provider** (CLOUD_PROVIDER → Amazon Web Services/Google Cloud/Microsoft Azure) on cloud lines — in both the editor and the printable summary. Stored values stay codes; an admin rename in /reference-data flows to the UI with no code change. e2e asserts the DB-driven "One-time" label renders.
+- **Why:** Last optional polish item — finish the FE-54 story by sourcing enum *labels* from reference data.
+- **Files touched:** apps/web/src/lib/refLabels.ts (new), apps/web/src/pages/EstimateEditorPage.tsx, apps/web/src/pages/PrintSummaryPage.tsx, apps/web/e2e/smoke.spec.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 64, build 4/4). Live: reference API returns the labels; web serves. Reusable hook makes the remaining enums (role, severity, scope, unit) one-liners.
+- **Next:** commit → PR → CI-green → merge.

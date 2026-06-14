@@ -14,6 +14,7 @@ import {
 } from '../lib/queries';
 import { SDLC_PHASES } from '../lib/types';
 import { useCaseById, useCaseForChecklistKey } from '../lib/help-content';
+import { useRefLabeler } from '../lib/refLabels';
 import type {
   BillingPeriod,
   CapacityViolation,
@@ -473,15 +474,21 @@ function PeriodSelect({
   value: BillingPeriod;
   onChange: (v: BillingPeriod) => void;
 }) {
+  // Labels come from the DB-driven BILLING_PERIOD reference type (FR-29); the
+  // stored value stays the code. Falls back to the built-in codes.
+  const billing = useRefLabeler('BILLING_PERIOD');
+  const opts = billing.options.length
+    ? billing.options
+    : PERIODS.map((p) => ({ code: p, label: p }));
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as BillingPeriod)}
       className="border border-slate-300 rounded px-2 py-1 text-sm"
     >
-      {PERIODS.map((p) => (
-        <option key={p} value={p}>
-          {p}
+      {opts.map((o) => (
+        <option key={o.code} value={o.code}>
+          {o.label}
         </option>
       ))}
     </select>
@@ -533,6 +540,7 @@ function LaborSection({
   roles: { id: string; label: string }[];
   m: Mutations;
 }) {
+  const billing = useRefLabeler('BILLING_PERIOD');
   const [roleId, setRoleId] = useState('');
   const [units, setUnits] = useState('1');
   const [quantity, setQuantity] = useState('1');
@@ -606,7 +614,7 @@ function LaborSection({
                 <td className="px-3 py-2 text-right tabular-nums">{l.quantity}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.units}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.rateSnapshot}</td>
-                <td className="px-3 py-2">{l.billingPeriod}</td>
+                <td className="px-3 py-2">{billing.label(l.billingPeriod)}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.lineTotal}</td>
                 <td className="px-3 py-2 text-right">
                   <button
@@ -725,6 +733,7 @@ function LaborSection({
 }
 
 function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
+  const billing = useRefLabeler('BILLING_PERIOD');
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<BillingPeriod>('ONE_TIME');
@@ -769,7 +778,7 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
             >
               <td className="px-3 py-2">{n.category}</td>
               <td className="px-3 py-2 text-right tabular-nums">{n.amount}</td>
-              <td className="px-3 py-2">{n.billingPeriod}</td>
+              <td className="px-3 py-2">{billing.label(n.billingPeriod)}</td>
               <td className="px-3 py-2">{n.sdlcPhase ?? '—'}</td>
               <td className="px-3 py-2 text-right tabular-nums">{n.lineTotal}</td>
               <td className="px-3 py-2 text-right">
@@ -828,6 +837,7 @@ function CloudSection({
   prices: CloudPrice[];
   m: Mutations;
 }) {
+  const provider = useRefLabeler('CLOUD_PROVIDER');
   const [priceId, setPriceId] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [hours, setHours] = useState('730');
@@ -867,7 +877,7 @@ function CloudSection({
               className="border-t border-slate-100 scroll-mt-24 transition-colors"
             >
               <td className="px-3 py-2">
-                {c.provider} · {c.skuOrInstance}{' '}
+                {provider.label(c.provider)} · {c.skuOrInstance}{' '}
                 <span className="text-slate-400">({c.region})</span>
               </td>
               <td className="px-3 py-2 text-right tabular-nums">{c.quantity}</td>

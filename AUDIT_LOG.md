@@ -467,3 +467,9 @@ In the Dashboard - By Workflow stage. I would like to click on the line and be a
 
 ### [2026-06-14 02:15 UTC] — AGENT
 Made each Dashboard "By workflow stage" row clickable: it expands inline to list the estimates in that stage (name link, grand total, currency, updated date), backed by a new GET /dashboard/stage/:stageKey endpoint (UNASSIGNED → null stage; engine-computed totals). Added the type, query hook, a StageDetail component, toggle rows (aria-expanded), and extended the e2e. Pipeline green (test 64); live-verified the drill-down returns the stage's estimates. Committing → PR → merge.
+
+### [2026-06-14 02:40 UTC] — USER
+Take the next one.
+
+### [2026-06-14 02:40 UTC] — AGENT
+Sourced behavioral-enum display labels from reference data (FE-54 tail, FR-29): added a reusable useRefLabeler hook and applied it to billing period (One-time/Monthly/Yearly) and cloud provider (Amazon Web Services/…) across the estimate editor and printable summary, with raw-code fallback. Stored values stay codes; admin renames flow to the UI with no code change. e2e asserts the DB-driven "One-time" label. Pipeline green (test 64); reference labels live-verified. Committing → PR → merge.
