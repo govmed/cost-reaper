@@ -17,6 +17,7 @@ import ChecklistRulesPage from './pages/ChecklistRulesPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
 import UserGuidePage from './pages/UserGuidePage';
+import EstimationGuidePage from './pages/EstimationGuidePage';
 
 /** Top navigation, in display order. `admin: true` items show only for Admins. */
 const NAV_ITEMS: { to: string; label: string; admin?: boolean }[] = [
@@ -31,6 +32,7 @@ const NAV_ITEMS: { to: string; label: string; admin?: boolean }[] = [
   { to: '/users', label: 'Users', admin: true },
   { to: '/roles', label: 'Roles' },
   { to: '/guide', label: 'User Guide' },
+  { to: '/estimation-guide', label: 'Estimation Guide' },
   { to: '/help', label: 'Help' },
 ];
 
@@ -168,6 +170,14 @@ export default function App() {
             element={
               <Protected>
                 <UserGuidePage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/estimation-guide"
+            element={
+              <Protected>
+                <EstimationGuidePage />
               </Protected>
             }
           />
