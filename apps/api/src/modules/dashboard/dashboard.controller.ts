@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
 
@@ -12,5 +12,11 @@ export class DashboardController {
   @Get()
   summary() {
     return this.dashboard.summary();
+  }
+
+  // Drill-down: estimates currently in a given workflow stage.
+  @Get('stage/:stageKey')
+  estimatesInStage(@Param('stageKey') stageKey: string) {
+    return this.dashboard.estimatesInStage(stageKey);
   }
 }

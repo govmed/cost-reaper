@@ -405,3 +405,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/src/modules/estimates/{xlsx.ts,xlsx.spec.ts (new),estimate-csv.ts,estimates.service.ts,estimates.controller.ts}, apps/web/src/lib/api.ts
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, **test 64** incl. 6 new xlsx tests, build 4/4). Live: downloaded a real workbook — content-type + .xlsx filename correct, PK magic, **python zipfile integrity OK** (all CRC32 valid), all 5 OOXML parts present, sheet contains the estimate name + numeric grand-total cell.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-14 — Dashboard "By workflow stage" drill-down (FR-18)
+- **Action:** Made each "By workflow stage" row clickable to expand an inline list of the estimates in that stage. Backend: `DashboardService.estimatesInStage(stageKey)` (maps `UNASSIGNED`→`currentStageId: null`, else `currentStage.key`; computes each grandTotal via the engine) + `GET /dashboard/stage/:stageKey` (any authenticated user). Types: `DashboardStageEstimate`. Web: `useStageEstimates(stageKey)` (enabled when open), `StageDetail` component, DashboardPage stage rows are now toggle buttons (▸/▾, aria-expanded) that render the drill-down (name → estimate link, grandTotal, currency, updated date). e2e extended to click a stage and assert it expands.
+- **Why:** User asked to click a workflow-stage line on the Dashboard and see the details.
+- **Files touched:** packages/types/src/dashboard.ts, apps/api/src/modules/dashboard/{dashboard.service.ts,dashboard.controller.ts}, apps/web/src/lib/{types.ts,queries.ts}, apps/web/src/pages/DashboardPage.tsx, apps/web/e2e/smoke.spec.ts
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 64, build 4/4). Live: byStage DRAFT=13/UNASSIGNED=1; GET /dashboard/stage/DRAFT → 13 estimates with totals; unknown stage → 200 empty; web hint string in bundle, /dashboard serves.
+- **Next:** commit → PR → CI-green → merge.

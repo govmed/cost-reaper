@@ -5,6 +5,7 @@ import type {
   ChecklistResult,
   ChecklistRuleAdmin,
   CloudPrice,
+  DashboardStageEstimate,
   DashboardSummary,
   EstimateDetail,
   EstimateSummary,
@@ -337,6 +338,15 @@ export function useDashboard() {
   return useQuery({
     queryKey: ['dashboard'],
     queryFn: () => api<DashboardSummary>('/dashboard'),
+  });
+}
+
+/** Drill-down: the estimates in a given workflow stage (null = not open). */
+export function useStageEstimates(stageKey: string | null) {
+  return useQuery({
+    queryKey: ['dashboard-stage', stageKey],
+    queryFn: () => api<DashboardStageEstimate[]>(`/dashboard/stage/${stageKey}`),
+    enabled: Boolean(stageKey),
   });
 }
 

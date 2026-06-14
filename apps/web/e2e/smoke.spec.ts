@@ -156,11 +156,18 @@ test('Checklist-rules admin page lists the rules (FR-25)', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add rule' })).toBeVisible();
 });
 
-test('Dashboard summarizes estimates (FR-18)', async ({ page }) => {
+test('Dashboard summarizes estimates and drills into a stage (FR-18)', async ({ page }) => {
   await login(page);
   await page.getByRole('link', { name: 'Dashboard' }).click();
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   await expect(page.getByText('Total value')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'By workflow stage' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Recent activity' })).toBeVisible();
+
+  // Click a workflow-stage row to drill into its estimates.
+  const stageSection = page.locator('section:has(h2:has-text("By workflow stage"))');
+  await expect(stageSection.getByText('Click a stage to see its estimates.')).toBeVisible();
+  const firstStage = stageSection.getByRole('button').first();
+  await firstStage.click();
+  await expect(firstStage).toHaveAttribute('aria-expanded', 'true');
 });

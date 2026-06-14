@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { computeEstimate } from '@cost-reaper/engine';
-import type { DashboardSummary } from '@cost-reaper/types';
+import type { DashboardStageEstimate, DashboardSummary } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { buildEngineInput, toMappableEstimate } from '../estimates/engine-mapping';
 import { type DashboardRow, summarizeDashboard } from './dashboard-summary';
@@ -33,5 +33,28 @@ export class DashboardService {
     const fxRates: Record<string, number> = {};
     for (const f of fx) fxRates[f.currency] = Number(f.rateToBase);
     return summarizeDashboard(rows, 5, fxRates);
+  }
+
+  /** Drill-down: the estimates currently in a given workflow stage (FR-18). */
+  async estimatesInStage(stageKey: string): Promise<DashboardStageEstimate[]> {
+    const where =
+      stageKey === 'UNASSIGNED' ? { currentStageId: null } : { currentStage: { key: stageKey } };
+    const estimates = await this.prisma.estimate.findMany({
+      where,
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        laborItems: { include: { rateCardRole: true } },
+        nonLaborItems: true,
+        cloudItems: true,
+      },
+    });
+    return estimates.map((e: any) => ({
+      id: e.id,
+      name: e.name,
+      status: e.status,
+      currency: e.currency,
+      grandTotal: computeEstimate(buildEngineInput(toMappableEstimate(e))).grandTotal,
+      updatedAt: e.updatedAt.toISOString(),
+    }));
   }
 }

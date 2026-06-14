@@ -234,6 +234,15 @@ export interface DashboardSummary {
   }[];
 }
 
+export interface DashboardStageEstimate {
+  id: string;
+  name: string;
+  status: string;
+  currency: string;
+  grandTotal: string;
+  updatedAt: string;
+}
+
 export interface ReferenceType {
   id: string;
   code: string;

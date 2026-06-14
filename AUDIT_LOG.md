@@ -461,3 +461,9 @@ Take the next one.
 
 ### [2026-06-14 01:55 UTC] — AGENT
 Upgraded the Excel export from an HTML-table .xls to a real native .xlsx (Office Open XML), built dependency-free with a small OOXML writer (CRC32 + ZIP via Node zlib + SpreadsheetML parts; numeric cells as numbers, others inline strings). Shared the export row matrix between CSV and XLSX. Correct content-type/extension; web saves .xlsx. Added 6 unit tests (CRC32 vector, zip round-trip, parts/cell encoding). Pipeline green (test 64). Live-verified the downloaded file is a valid OOXML workbook (python zipfile integrity OK, all parts present, data round-trips). Committing → PR → merge.
+
+### [2026-06-14 02:15 UTC] — USER
+In the Dashboard - By Workflow stage. I would like to click on the line and be able to see the details
+
+### [2026-06-14 02:15 UTC] — AGENT
+Made each Dashboard "By workflow stage" row clickable: it expands inline to list the estimates in that stage (name link, grand total, currency, updated date), backed by a new GET /dashboard/stage/:stageKey endpoint (UNASSIGNED → null stage; engine-computed totals). Added the type, query hook, a StageDetail component, toggle rows (aria-expanded), and extended the e2e. Pipeline green (test 64); live-verified the drill-down returns the stage's estimates. Committing → PR → merge.
