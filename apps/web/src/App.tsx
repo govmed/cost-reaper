@@ -24,7 +24,7 @@ export default function App() {
   const { user, logout } = useAuth();
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      <header className="bg-brand text-white px-5 py-3 flex items-center justify-between print:hidden">
+      <header className="sticky top-0 z-30 bg-brand text-white px-5 py-3 flex items-center justify-between shadow-sm print:hidden">
         <div className="flex items-center gap-6">
           <Link to="/" className="font-semibold text-lg">
             cost-reaper
