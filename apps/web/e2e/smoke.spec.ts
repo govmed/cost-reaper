@@ -240,5 +240,5 @@ test('Statement of Work: create from estimate, edit, open PDF (BR-7)', async ({ 
   await page.getByRole('link', { name: 'Open PDF view' }).click();
   await expect(page.getByRole('heading', { name: 'Statement of Work', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /Print/ })).toBeVisible();
-  await expect(page.getByText('Pricing')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '5. Pricing' })).toBeVisible();
 });
