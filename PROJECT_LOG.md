@@ -433,3 +433,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/lib/roleCapabilities.ts (new), apps/web/src/pages/RolesPage.tsx (new), apps/web/src/App.tsx, apps/web/src/lib/help-content.ts, apps/web/e2e/smoke.spec.ts
 - **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: /roles serves, matrix in bundle.
 - **Next:** commit → PR → merge; then the online User Guide menu feature.
+
+### 2026-06-14 — Identity switch includes built-in LOCAL mode (FR-26)
+- **Action:** Made the identity selector a single switch over **LOCAL | OIDC | SAML | WSFED**. `resolveSsoConfig` now returns a `mode` and treats `SSO_PROTOCOL=LOCAL` (or BUILTIN/NONE, or master `SSO_ENABLED=false`, or unset) as the **built-in** username/password identity — the default. External protocols only activate when fully configured (else fall back to LOCAL + reason). Added `SSO_FORCE` (hide the built-in password form so SSO is the only option) → exposed as `forceSso` in `/auth/sso` status. Web: `SsoStatus` gains `mode`+`forceSso`; the login page hides the password form when `forceSso`. `.env.example` + docker-compose default to `SSO_PROTOCOL=LOCAL`. Config tests updated (LOCAL cases).
+- **Why:** User noted the app has its own identity system and wanted the config switch to also select that (built-in) instead of an external IdP.
+- **Files touched:** apps/api/src/modules/auth/sso/{sso-config.ts(+spec),sso.service.ts}, apps/web/src/lib/api.ts, apps/web/src/pages/LoginPage.tsx, .env.example, docker-compose.yml
+- **Result:** Pipeline green (format, lint 0, typecheck 6/6, test 69, build 4/4). Live: default → mode LOCAL; SSO_ENABLED=true+SSO_PROTOCOL=LOCAL → LOCAL; OIDC+SSO_FORCE=true → mode OIDC, enabled, forceSso true; restored → LOCAL.
+- **Next:** commit → PR → merge; then the online User Guide menu feature.

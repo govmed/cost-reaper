@@ -50,9 +50,10 @@ services:
       GCP_BILLING_API_KEY: ${GCP_BILLING_API_KEY:-}
       # Public, no-auth FX source for the FX-rates "Refresh" button (FR-17).
       FX_RATES_ENDPOINT: ${FX_RATES_ENDPOINT:-https://api.frankfurter.app/latest}
-      # Single Sign-On (FR-26) — off unless configured. Pick ONE protocol.
+      # Identity / SSO (FR-26) — one switch: LOCAL (built-in, default) | OIDC | SAML | WSFED.
+      SSO_PROTOCOL: ${SSO_PROTOCOL:-LOCAL}
       SSO_ENABLED: ${SSO_ENABLED:-false}
-      SSO_PROTOCOL: ${SSO_PROTOCOL:-OIDC}
+      SSO_FORCE: ${SSO_FORCE:-false}
       SSO_DISPLAY_NAME: ${SSO_DISPLAY_NAME:-Company SSO}
       SSO_OIDC_ISSUER: ${SSO_OIDC_ISSUER:-}
       SSO_OIDC_CLIENT_ID: ${SSO_OIDC_CLIENT_ID:-}

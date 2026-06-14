@@ -2,9 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { resolveSsoConfig } from './sso-config';
 
 describe('resolveSsoConfig — picks which protocol to use', () => {
-  it('is disabled when SSO_ENABLED is not set', () => {
-    expect(resolveSsoConfig({})).toEqual({ enabled: false });
-    expect(resolveSsoConfig({ SSO_ENABLED: 'false' })).toEqual({ enabled: false });
+  it('uses the built-in LOCAL identity by default / when off / when chosen', () => {
+    expect(resolveSsoConfig({})).toEqual({ enabled: false, mode: 'LOCAL' });
+    expect(resolveSsoConfig({ SSO_ENABLED: 'false' })).toEqual({ enabled: false, mode: 'LOCAL' });
+    // LOCAL wins even with the master switch on.
+    expect(resolveSsoConfig({ SSO_ENABLED: 'true', SSO_PROTOCOL: 'LOCAL' })).toEqual({
+      enabled: false,
+      mode: 'LOCAL',
+    });
   });
 
   it('resolves OIDC with its required fields', () => {

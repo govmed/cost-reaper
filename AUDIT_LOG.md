@@ -488,3 +488,9 @@ Acknowledged — will build these next, after shipping SSO: (1) a Roles & permis
 
 ### [2026-06-14 03:25 UTC] — AGENT
 Built the Roles & permissions feature (FR-2/NFR-16): a "Roles" menu page with a 13-capability ✓/✕ matrix (mirroring the actual server @Roles guards) across 5 categories, per-role summary cards, and the current user's role highlighted. Help use case + e2e added. Pipeline green (test 69); /roles live. Next: the online User Guide menu feature. Committing → PR → merge.
+
+### [2026-06-14 03:45 UTC] — USER
+So I know this also have its own identity management system built it. So the config can also be a switch to use that instead of the other identity management systems ...
+
+### [2026-06-14 03:45 UTC] — AGENT
+Made the identity selector one switch over LOCAL | OIDC | SAML | WSFED. SSO_PROTOCOL=LOCAL (the default) uses the app's built-in username/password identity; OIDC/SAML/WSFED delegate to an external IdP. Added SSO_FORCE to hide the built-in password form when SSO is the only option (surfaced as forceSso; the login page honors it). resolveSsoConfig now returns a mode and fails back to LOCAL. Pipeline green (test 69); live-verified LOCAL / explicit-LOCAL / OIDC+force. Committing → PR → merge, then the User Guide.
