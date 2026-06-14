@@ -234,8 +234,8 @@ test('Statement of Work: create from estimate, edit, open PDF (BR-7)', async ({ 
   await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByRole('heading', { name: estName })).toBeVisible();
 
-  // Compose a SOW from that estimate.
-  await page.getByRole('link', { name: 'Statements of Work', exact: true }).click();
+  // Compose a SOW from that estimate (nav label is "SOW"; the page heading is fuller).
+  await page.getByRole('link', { name: 'SOW', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Statements of Work' })).toBeVisible();
   await page.locator('select[title="Source estimate"]').selectOption({ label: estName });
   await page.getByRole('button', { name: 'New SOW from estimate' }).click();

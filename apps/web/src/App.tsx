@@ -36,7 +36,7 @@ type NavEntry = NavLink | NavGroup;
 const NAV: NavEntry[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/', label: 'Estimates' },
-  { to: '/sow', label: 'Statements of Work' },
+  { to: '/sow', label: 'SOW' },
   {
     label: 'Pricing',
     items: [
