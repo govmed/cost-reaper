@@ -123,14 +123,30 @@ const EVALUATORS: Record<string, Evaluator> = {
       entityIds: bad.map((x) => x.id),
     };
   },
-  upcharge_set: (e) => ({
-    passed: e.globalUpchargePercent != null,
-    message: 'Upcharge percentage is set.',
-  }),
-  contingency_set: (e) => ({
-    passed: e.contingencyPercent != null,
-    message: 'Contingency percentage is set.',
-  }),
+  // Upcharge/contingency only matter once there's something to mark up — until
+  // the estimate has lines they're N/A (not a green pass on the default 0), so a
+  // brand-new estimate shows nothing green. Once there are lines, the message
+  // shows the actual value rather than a vague "is set".
+  upcharge_set: (e) => {
+    const hasLines = e.labor.length + e.nonLabor.length + e.cloud.length > 0;
+    return {
+      applicable: hasLines,
+      passed: e.globalUpchargePercent != null,
+      message: hasLines
+        ? `Global upcharge is ${e.globalUpchargePercent}%.`
+        : 'No lines to apply an upcharge to yet.',
+    };
+  },
+  contingency_set: (e) => {
+    const hasLines = e.labor.length + e.nonLabor.length + e.cloud.length > 0;
+    return {
+      applicable: hasLines,
+      passed: e.contingencyPercent != null,
+      message: hasLines
+        ? `Contingency is ${e.contingencyPercent}%.`
+        : 'No lines to apply contingency to yet.',
+    };
+  },
   totals_reconcile: (e) => {
     const count = e.labor.length + e.nonLabor.length + e.cloud.length;
     return {
