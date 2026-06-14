@@ -22,6 +22,7 @@ export interface MappableNonLabor {
 export interface MappableCloud {
   id: string;
   provider: string;
+  category?: string | null;
   unitPriceSnapshot: string;
   quantity: number;
   usageHoursPerMonth: number;
@@ -69,6 +70,7 @@ export function toMappableEstimate(e: any): MappableEstimate {
     cloud: e.cloudItems.map((c: any) => ({
       id: c.id,
       provider: c.provider,
+      category: c.category ?? null,
       unitPriceSnapshot: c.unitPriceSnapshot.toString(),
       quantity: Number(c.quantity),
       usageHoursPerMonth: Number(c.usageHoursPerMonth),
@@ -111,7 +113,9 @@ export function buildEngineInput(e: MappableEstimate): EngineInput {
   for (const c of e.cloud) {
     lines.push({
       id: c.id,
-      category: `Cloud (${c.provider})`,
+      // Group by the snapshotted enterprise category (e.g. Storage, SaaS);
+      // older lines without a snapshot fall back to the provider.
+      category: c.category ?? `Cloud (${c.provider})`,
       baseAmount: c.unitPriceSnapshot,
       quantity: c.quantity * c.usageHoursPerMonth,
       billingPeriod: c.billingPeriod,

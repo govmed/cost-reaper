@@ -530,3 +530,9 @@ Add managed services and SaaS line items too
 
 ### [2026-06-14 05:00 UTC] — AGENT
 Added Managed Services (16, under the cloud providers) and SaaS (26, under a new SAAS provider via an additive migration) to the catalog — now 298 prices across 11 categories. Guarded sync against the no-strategy SAAS provider; added SAAS to the provider filter; relabeled the cloud-usage field to "Usage/mo" for the now-diverse units; updated the User Guide. Pipeline green (test 69); migration drift-free; verified a SaaS line (M365 ×25 seats) computes $900/mo. Committing → PR → merge.
+
+### [2026-06-14 05:25 UTC] — USER
+Add a category breakdown on the estimate
+
+### [2026-06-14 05:25 UTC] — AGENT
+Added a "Cost by category" section to the estimate card (one-time/monthly/yearly per category). Cloud lines now break down by their enterprise category (Storage/Networking/SaaS/…) — snapshotted the cloud price's category onto each cloud line (additive migration) and grouped by it in the engine. Pipeline green (test 69); live-verified Storage $23/mo + SaaS $150/mo on a sample estimate. Committing → PR → merge.

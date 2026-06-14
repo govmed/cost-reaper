@@ -213,6 +213,7 @@ export default function EstimateEditorPage() {
 
       {est.capacityViolations.length > 0 && <CapacityBanner violations={est.capacityViolations} />}
 
+      <CategoryBreakdownSection categories={t.categories} cur={cur} />
       <PhaseBreakdownSection phases={t.phases} cur={cur} />
 
       <GovernanceSection workflow={workflow} checklist={checklist} m={m} />
@@ -452,6 +453,46 @@ function PhaseBreakdownSection({
               </td>
               <td className="px-3 py-2 text-right tabular-nums">
                 {p.yearly} {cur}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Section>
+  );
+}
+
+function CategoryBreakdownSection({
+  categories,
+  cur,
+}: {
+  categories: EstimateDetail['totals']['categories'];
+  cur: string;
+}) {
+  if (categories.length === 0) return null;
+  return (
+    <Section title="Cost by category">
+      <table className="w-full text-sm">
+        <thead className="text-slate-500">
+          <tr>
+            <Th>Category</Th>
+            <Th right>One-time</Th>
+            <Th right>Monthly</Th>
+            <Th right>Yearly</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {categories.map((c) => (
+            <tr key={c.category} className="border-t border-slate-100">
+              <td className="px-3 py-2 font-medium">{c.category}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {c.oneTime} {cur}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {c.monthly} {cur}
+              </td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {c.yearly} {cur}
               </td>
             </tr>
           ))}
