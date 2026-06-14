@@ -22,7 +22,8 @@ test('login → create estimate → add a line → see totals', async ({ page })
   await page.getByTitle('Cost category').selectOption('Licenses');
   await page.getByPlaceholder('amount').fill('1000');
   await page.getByRole('button', { name: 'Add non-labor' }).click();
-  await expect(page.getByRole('cell', { name: 'Licenses' })).toBeVisible();
+  // Scope to the non-labor section — "Licenses" also appears in the category breakdown.
+  await expect(page.locator('#sec-nonlabor').getByRole('cell', { name: 'Licenses' })).toBeVisible();
   // Billing period renders its DB-driven label ("One-time"), not the raw code (FR-29).
   await expect(page.getByRole('cell', { name: 'One-time', exact: true })).toBeVisible();
 
