@@ -1,10 +1,40 @@
 # Changelog
 
-All notable changes to **cost-reaper** are documented here. Format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses semantic versioning once
-it ships a first release.
+All notable changes to **Kerdos** (by Veridion LLC; repo codename `cost-reaper`) are documented
+here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project uses
+semantic versioning once it ships a first release.
 
 ## [Unreleased]
+
+### Estimate-governance repos — workflows & checklist rule sets (FR-24, FR-25)
+
+#### Added
+- **Workflow + transition repo** (#54): keep a repository of approval workflows. Each `WorkflowDefinition` and `WorkflowTransition` gets a **system-assigned key** (`WF-…` / `TR-…`) behind the scenes plus an admin-typed label + description; add/update/delete is **Admin-only**. New `/workflows` repo page → per-workflow stage/transition editor. Migration `20260614030000` (data-preserving key backfill, verified no drift).
+- **Checklist rule-sets repo** (#55): a `ChecklistRuleSet` (system key `RS-…` + label/description) groups `ChecklistRule`s; Admin CRUD at `/checklist-rules` → per-set rule editor. The **default set** drives evaluation, so behaviour is unchanged. Migration `20260614040000` (seed default set + backfill all rules + FK, verified no drift).
+
+### Statement of Work → official PDF (BR-7)
+
+#### Added
+- **Editable Statement of Work** (#56): a new **SOW** menu item. Compose a SOW from an estimate, edit every section (parties, scope, deliverables, timeline, payment terms, assumptions, terms & conditions), then **Print / Save as PDF** with signature blocks. A system number (`SOW-…`) is assigned; **Issue** locks the document and **snapshots its pricing** (immutable), **Revert** reopens. New `statements_of_work` table (migration `20260614050000`, verified no drift).
+- **Visible save feedback** (#63): the SOW editor shows **"Saving… / ✓ Saved / ● Unsaved changes"** plus a **"last saved"** time, and the Save button disables when there's nothing to save.
+
+#### Changed
+- **Only approved estimates can start a SOW** (#64): the source picker lists only estimates at an **Approved/Final** workflow stage (reaching which already required the smart checklist to pass), and `POST /sow` enforces it **server-side** (deny-by-default). New `GET /sow/eligible-estimates`; an empty-state hint when nothing qualifies; the seed ships one approved sample estimate.
+
+### Smart checklist — honest "N/A" + manual re-check (FR-25)
+
+#### Changed
+- **Per-line rules show "N/A" instead of a vacuous green** (#65): labor / cloud / non-labor / resource / billing-period rules report **"nothing to check yet"** when there are no applicable lines, so a green ✓ means *verified*. N/A items **don't block** and are **excluded from completeness**, so a brand-new estimate no longer looks ~complete — its real blockers (rate card, line items) stay red.
+
+#### Added
+- **"↻ Re-check" button + "last checked" time** on the Smart-checklist panel (#65). The checklist still auto-re-evaluates on every edit; the button adds confidence and picks up shared-data changes (a rule or rate card edited elsewhere).
+
+### Rebrand to Kerdos by Veridion LLC, and professional navigation
+
+#### Changed
+- **Grouped top navigation** (#57): the ~15-item strip became **3 primary links + 4 dropdown menus** (Pricing / Governance / Admin / Docs) with active-route highlighting, hover/click-outside behaviour, admin-gating, and a polished header (role pill + bordered Log out). The Statement-of-Work nav label was shortened to **SOW** (#58).
+- **Product renamed to Kerdos** (#59, #60): dropped the `cost-reaper` codename from the UI — header, login screen, browser title, Swagger title, and the User/Estimation/Help guides now read **Kerdos**, by **Veridion LLC** (subtitle, login lockup, and a new app footer). Repo / package / container names keep `cost-reaper` as the internal codename.
+- **Official Veridion logo** (#61, #62): the brand mark is now the official amber Veridion "V" (transparent PNG sourced from veridion.com) in the header, login, and favicon — adapting cleanly to both the teal header and the white login.
 
 ### Smart-checklist navigation + rate-card selector (FR-25 UX)
 
