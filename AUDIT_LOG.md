@@ -512,3 +512,9 @@ Acknowledged — will reorder and Title-Case the top nav to: Dashboard, Estimate
 
 ### [2026-06-14 04:20 UTC] — AGENT
 Reordered + Title-Cased the top nav to the exact requested order (Dashboard, Estimates, Rate Cards, Workflow, Checklist Rules, Reference Data, Cloud Prices, FX Rates, Users, Roles, User Guide, Help) via a data-driven NAV_ITEMS list; admin-only items show in-position for Admins. Fixed the 3 e2e nav assertions whose case changed. Pipeline green. Committing → PR → merge, then the categorized enterprise catalog.
+
+### [2026-06-14 04:35 UTC] — USER
+Also include the Cloud storage, network devices, and tools as well. and categorize them. everything needed to build an entire cloud enterprise. This is an area where the enterprise architect with use to create that cost model for the project or proposal.
+
+### [2026-06-14 04:35 UTC] — AGENT
+Built a categorized enterprise cloud catalog: added a CloudPrice.category + a GB unit (migration, additive, drift-free), a SERVICE_CATEGORY map, and ~80 new non-compute rows across 9 categories (Storage, Networking, Database, Containers & Serverless, Analytics, AI & ML, Security & Tools, Management & Monitoring) for AWS/GCP/Azure. Cloud Prices page got a Category filter + column; the cloud-line picker now groups by category. Pipeline green (test 69); migrate+reseed → 256 prices across 9 categories, all 5 units. Committing → PR → merge.

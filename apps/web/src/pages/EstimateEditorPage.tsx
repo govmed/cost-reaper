@@ -903,12 +903,24 @@ function CloudSection({
           onChange={(e) => setPriceId(e.target.value)}
           className="border border-slate-300 rounded px-2 py-1 text-sm min-w-72"
         >
-          <option value="">Select cloud instance…</option>
-          {prices.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.provider} · {p.service} {p.skuOrInstance} ({p.region}) — {p.unitPrice}/{p.unit}
-            </option>
-          ))}
+          <option value="">Select cloud resource…</option>
+          {Object.entries(
+            prices.reduce<Record<string, CloudPrice[]>>((acc, p) => {
+              (acc[p.category] ??= []).push(p);
+              return acc;
+            }, {}),
+          )
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([cat, items]) => (
+              <optgroup key={cat} label={cat}>
+                {items.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.provider} · {p.service} {p.skuOrInstance} ({p.region}) — {p.unitPrice}/
+                    {p.unit}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
         </select>
         <input
           value={quantity}

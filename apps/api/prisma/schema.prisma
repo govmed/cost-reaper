@@ -39,6 +39,7 @@ enum CloudPriceUnit {
   HOUR
   MONTH
   GB_MONTH
+  GB
   REQUEST
 }
 
@@ -126,6 +127,8 @@ model RateCardRole {
 model CloudPrice {
   id            String           @id @default(uuid()) @db.Uuid
   provider      CloudProvider
+  /// Enterprise category: Compute, Storage, Networking, Database, Containers & Serverless, Analytics, AI & ML, Security & Tools, Management & Monitoring.
+  category      String           @default("Compute")
   region        String
   service       String
   skuOrInstance String           @map("sku_or_instance")

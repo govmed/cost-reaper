@@ -196,6 +196,7 @@ export interface RateCard {
 export interface CloudPrice {
   id: string;
   provider: string;
+  category: string;
   region: string;
   service: string;
   skuOrInstance: string;

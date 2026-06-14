@@ -24,7 +24,13 @@ export default function CloudPricesPage() {
   const { data: freshness } = useLastPulled();
   const sync = useCloudSync();
   const [provider, setProvider] = useState('');
+  const [category, setCategory] = useState('');
   const [q, setQ] = useState('');
+
+  const categories = useMemo(
+    () => Array.from(new Set((data ?? []).map((p) => p.category))).sort(),
+    [data],
+  );
 
   const rows = useMemo(() => {
     const all = data ?? [];
@@ -32,9 +38,11 @@ export default function CloudPricesPage() {
     return all.filter(
       (p) =>
         (!provider || p.provider === provider) &&
-        (!ql || `${p.region} ${p.service} ${p.skuOrInstance}`.toLowerCase().includes(ql)),
+        (!category || p.category === category) &&
+        (!ql ||
+          `${p.category} ${p.region} ${p.service} ${p.skuOrInstance}`.toLowerCase().includes(ql)),
     );
-  }, [data, provider, q]);
+  }, [data, provider, category, q]);
 
   return (
     <div className="space-y-5">
@@ -92,6 +100,21 @@ export default function CloudPricesPage() {
             ))}
           </select>
         </label>
+        <label className="text-sm">
+          <span className="text-slate-600">Category</span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="mt-1 block border border-slate-300 rounded px-3 py-2"
+          >
+            <option value="">All</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="text-sm flex-1 min-w-48">
           <span className="text-slate-600">Search (region / service / instance)</span>
           <input
@@ -110,6 +133,7 @@ export default function CloudPricesPage() {
           <thead className="bg-slate-100 text-slate-600 text-left">
             <tr>
               <th className="px-4 py-2">Provider</th>
+              <th className="px-4 py-2">Category</th>
               <th className="px-4 py-2">Region</th>
               <th className="px-4 py-2">Service</th>
               <th className="px-4 py-2">Instance / SKU</th>
@@ -122,6 +146,7 @@ export default function CloudPricesPage() {
             {rows.map((p) => (
               <tr key={p.id} className="border-t border-slate-100">
                 <td className="px-4 py-2 font-medium">{p.provider}</td>
+                <td className="px-4 py-2 text-slate-500">{p.category}</td>
                 <td className="px-4 py-2">{p.region}</td>
                 <td className="px-4 py-2">{p.service}</td>
                 <td className="px-4 py-2">{p.skuOrInstance}</td>
@@ -132,7 +157,7 @@ export default function CloudPricesPage() {
             ))}
             {rows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">
+                <td colSpan={8} className="px-4 py-6 text-center text-slate-500">
                   No matching prices.
                 </td>
               </tr>
