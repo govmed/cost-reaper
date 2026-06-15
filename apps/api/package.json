@@ -1,6 +1,6 @@
 {
   "name": "@cost-reaper/api",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "cost-reaper REST API (NestJS + Prisma).",
   "scripts": {

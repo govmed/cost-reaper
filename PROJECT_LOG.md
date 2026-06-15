@@ -570,3 +570,13 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/pages/{UsersPage,RolesPage}.tsx, apps/web/src/App.tsx (new `RolePill`), CHANGELOG.md.
 - **Result:** e2e-safe — the index-based `roleSelect` test targets the labor-line *rate-card role* picker, not the user-role select; the only role-label assertion (columnheader "Estimator") is unchanged (seed + fallback both "Estimator"). Used a block-body arrow for `roleLabel` to dodge prettier's arrow-ternary paren behavior; scoped the pill hook to avoid an unauthenticated reference fetch. node/pnpm unavailable locally → CI gate.
 - **Next:** commit PR B → CI-green → merge. FE-54 enum-label items then complete (workflow stages are entity-driven, out of scope; NonLaborType isn't user-rendered).
+
+## Chapter 9 — Release v1.0.0 (started 2026-06-15)
+**Goal:** Cut the first tagged release of Kerdos (feature-complete: MVP + all post-MVP), then begin new feature work (per the user: "cut a new release - then we will begin on adding more features").
+
+### 2026-06-15 18:40 UTC — Release prep for v1.0.0
+- **Action:** PR B merged (#75 → `main` `2fe94e9`). User: "cut a new release … to the new release version." Bumped the version `0.1.0`→`1.0.0` across all six package.json (root + apps/{api,web} + packages/{config,types,engine}) and the Swagger `setVersion` in `apps/api/src/main.ts`. Promoted the CHANGELOG `[Unreleased]` section to `## [1.0.0] - 2026-06-15` (with a release-summary blurb), added a fresh empty `[Unreleased]`, and updated the bottom link refs (`[Unreleased]` → `compare/v1.0.0...HEAD`, new `[1.0.0]` → release tag). Internal deps are `workspace:*` so the bump is drift-free.
+- **Why:** First shippable release; the CHANGELOG header already noted "semantic versioning once it ships a first release."
+- **Files touched:** package.json (×6), apps/api/src/main.ts, CHANGELOG.md, CLAUDE.md, PROJECT_LOG.md, AUDIT_LOG.md.
+- **Result:** Pending — release-prep PR → CI-green → merge, then annotated tag `v1.0.0` + GitHub release from the CHANGELOG notes. node/pnpm unavailable locally → CI gate.
+- **Next:** open release-prep PR; on green, merge → `git tag -a v1.0.0` → push tag → `gh release create v1.0.0`. Then start new feature work.
