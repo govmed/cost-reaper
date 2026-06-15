@@ -658,3 +658,16 @@ PR A merged (#74). Built PR B — DB-driven Role labels.
 - App.tsx: header role badge extracted into a `RolePill` component so the ROLE fetch only runs when authenticated.
 - Updated CHANGELOG + living docs. Verified e2e-safe. Committing → PR → CI → merge. FE-54 enum-label items complete after this.
 ---
+
+---
+### [2026-06-15 18:35 UTC] — USER
+cut a new release - then we will begin on adding more features.  /  to the new release version
+
+### [2026-06-15 18:40 UTC] — AGENT
+Cutting v1.0.0 (first tagged release; product is feature-complete). Bumped versions and prepared the CHANGELOG; release-prep PR → merge → tag → GitHub release.
+**Actions taken:**
+- Bumped `0.1.0`→`1.0.0` in all six package.json + Swagger `setVersion` (main.ts).
+- CHANGELOG: `[Unreleased]` → `## [1.0.0] - 2026-06-15` + fresh empty Unreleased + compare link refs.
+- Updated CLAUDE.md Current State + PROJECT_LOG Chapter 9.
+- Next: release-prep PR → CI-green → merge → `git tag -a v1.0.0` (push) → `gh release create v1.0.0`. Then begin new features.
+---

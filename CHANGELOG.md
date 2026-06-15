@@ -6,6 +6,17 @@ semantic versioning once it ships a first release.
 
 ## [Unreleased]
 
+_Nothing yet — next feature work lands here._
+
+## [1.0.0] - 2026-06-15
+
+First tagged release. **Kerdos** is feature-complete: the full MVP plus every
+post-MVP roadmap item (PERT, margin/tax, scenarios, versioning/baselines, live
+cloud price sync, multi-currency, comments, dashboard, SSO, Statement of Work,
+governance workflow + smart checklist, and database-driven reference data). The
+entries below — grouped by theme and sprint — are the work that shipped to reach
+1.0.0.
+
 ### Database-driven enum labels — FE-54 / FR-29
 
 #### Changed
@@ -267,4 +278,5 @@ Existing Prisma/Zod enums remain the stored type for now; migrating columns off 
 - GitHub Actions CI: format → lint → typecheck → test → build + dependency audit. (FE-3)
 - Documentation: `README` quickstart, `docs/ARCHITECTURE.md`, and ADRs 0001–0006.
 
-[Unreleased]: https://github.com/govmed/cost-reaper/commits/main
+[Unreleased]: https://github.com/govmed/cost-reaper/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/govmed/cost-reaper/releases/tag/v1.0.0
