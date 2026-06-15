@@ -638,3 +638,13 @@ Doing it as two CI-verified PRs. Started with the Smart-checklist polish; launch
 - Updated CHANGELOG + living docs. Matched prettier carefully (no local toolchain) → CI gate.
 - FE-54 audit (Explore agent) done: reuse `useRefLabeler` from refLabels.ts; remaining hardcoded enums = RateUnit/CloudProvider/Role/ChecklistSeverity/Scope; seed bug = CLOUD_PRICE_UNIT missing GB. Queued for the next PR.
 ---
+
+---
+### [2026-06-15 17:00 UTC] — AGENT (continuing "Polish then FE-54")
+Smart-checklist polish merged (PR #73). Began FE-54 enum-label migration as two PRs.
+**Actions taken:**
+- PR A: wired RateUnit (RateCardsPage), CloudProvider + CloudPriceUnit (CloudPricesPage), ChecklistSeverity + ChecklistScope (ChecklistRulesPage) to DB reference labels via `useRefLabeler`, with hard-coded fallbacks; codes stay code-coupled.
+- Fixed seed gaps: added SAAS to CLOUD_PROVIDER and GB to CLOUD_PRICE_UNIT.
+- Updated CHANGELOG + living docs. Verified e2e-safe (no display-text assertions on these). Committing → PR → CI → merge.
+- Role labels deferred to PR B (header pill / UsersPage / roles matrix).
+---

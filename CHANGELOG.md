@@ -6,6 +6,14 @@ semantic versioning once it ships a first release.
 
 ## [Unreleased]
 
+### Database-driven enum labels — FE-54 / FR-29 (part 1)
+
+#### Changed
+- **Rate unit, cloud provider, cloud price unit, and checklist severity/scope labels now come from the reference data.** These dropdowns and table cells previously showed hard-coded text (often the bare code, e.g. "HOUR", "AWS", "BLOCKER"); they now resolve their display label from the DB reference tables via `useRefLabeler(typeCode)`, so an admin can rename a label in **Reference data** with no code change. The enum **codes stay code-coupled** (behavioral); only the labels are data-driven. A hard-coded code list remains as a graceful fallback until the reference values load. (Affects Rate cards, Cloud prices, and the Checklist-rule editor.)
+
+#### Fixed
+- **Seeded reference values now cover every catalog value** (FR-29): added the missing `SAAS` value to `CLOUD_PROVIDER` (the catalog already ships SaaS rows) and `GB` to `CLOUD_PRICE_UNIT`, so the provider filter and the price table label them correctly instead of falling back to the bare code.
+
 ### Web delivery — cache headers (NFR-7)
 
 #### Changed

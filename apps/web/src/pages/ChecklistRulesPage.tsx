@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useChecklistRules, useChecklistRuleMutations, useChecklistRuleSets } from '../lib/queries';
+import { useRefLabeler } from '../lib/refLabels';
 import type { ChecklistRuleAdmin } from '../lib/types';
 
+// Fallback option lists (codes) used until the DB reference labels load (FR-29).
 const SEVERITIES = ['BLOCKER', 'WARNING', 'INFO'];
 const SCOPES = ['ESTIMATE', 'LABOR', 'NONLABOR', 'CLOUD', 'RESOURCE'];
 
@@ -87,6 +89,9 @@ export default function ChecklistRulesPage() {
 type Mutations = ReturnType<typeof useChecklistRuleMutations>;
 
 function RuleRow({ r, isAdmin, m }: { r: ChecklistRuleAdmin; isAdmin: boolean; m: Mutations }) {
+  const sev = useRefLabeler('CHECKLIST_SEVERITY');
+  const scope = useRefLabeler('CHECKLIST_SCOPE');
+  const sevOptions = sev.ready ? sev.options : SEVERITIES.map((c) => ({ code: c, label: c }));
   return (
     <tr className="border-t border-slate-100">
       <td className="px-2 py-1">
@@ -104,7 +109,7 @@ function RuleRow({ r, isAdmin, m }: { r: ChecklistRuleAdmin; isAdmin: boolean; m
           r.description
         )}
       </td>
-      <td className="px-2 py-1 text-xs text-slate-500">{r.scope}</td>
+      <td className="px-2 py-1 text-xs text-slate-500">{scope.label(r.scope)}</td>
       <td className="px-2 py-1">
         {isAdmin ? (
           <select
@@ -112,15 +117,15 @@ function RuleRow({ r, isAdmin, m }: { r: ChecklistRuleAdmin; isAdmin: boolean; m
             onChange={(e) => m.update.mutate({ id: r.id, body: { severity: e.target.value } })}
             className={`border border-slate-200 rounded px-2 py-0.5 ${severityClass[r.severity] ?? ''}`}
           >
-            {SEVERITIES.map((s) => (
-              <option key={s} value={s}>
-                {s}
+            {sevOptions.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
               </option>
             ))}
           </select>
         ) : (
           <span className={`rounded px-1.5 py-0.5 text-xs ${severityClass[r.severity] ?? ''}`}>
-            {r.severity}
+            {sev.label(r.severity)}
           </span>
         )}
       </td>
@@ -163,6 +168,14 @@ function RuleRow({ r, isAdmin, m }: { r: ChecklistRuleAdmin; isAdmin: boolean; m
 }
 
 function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
+  const sevLabeler = useRefLabeler('CHECKLIST_SEVERITY');
+  const scopeLabeler = useRefLabeler('CHECKLIST_SCOPE');
+  const sevOptions = sevLabeler.ready
+    ? sevLabeler.options
+    : SEVERITIES.map((c) => ({ code: c, label: c }));
+  const scopeOptions = scopeLabeler.ready
+    ? scopeLabeler.options
+    : SCOPES.map((c) => ({ code: c, label: c }));
   const [key, setKey] = useState('');
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState('WARNING');
@@ -204,9 +217,9 @@ function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
         className="border border-slate-300 rounded px-2 py-1 text-sm"
         title="Scope"
       >
-        {SCOPES.map((s) => (
-          <option key={s} value={s}>
-            {s}
+        {scopeOptions.map((o) => (
+          <option key={o.code} value={o.code}>
+            {o.label}
           </option>
         ))}
       </select>
@@ -216,9 +229,9 @@ function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
         className="border border-slate-300 rounded px-2 py-1 text-sm"
         title="Severity"
       >
-        {SEVERITIES.map((s) => (
-          <option key={s} value={s}>
-            {s}
+        {sevOptions.map((o) => (
+          <option key={o.code} value={o.code}>
+            {o.label}
           </option>
         ))}
       </select>

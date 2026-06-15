@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useCloudPrices, useCloudSync, useLastPulled } from '../lib/queries';
+import { useRefLabeler } from '../lib/refLabels';
 
+// Fallback provider codes used until the DB reference labels load (FR-29).
 const PROVIDERS = ['', 'AWS', 'GCP', 'AZURE', 'SAAS'];
 
 /**
@@ -23,6 +25,11 @@ export default function CloudPricesPage() {
   const { data, isLoading, error } = useCloudPrices();
   const { data: freshness } = useLastPulled();
   const sync = useCloudSync();
+  const prov = useRefLabeler('CLOUD_PROVIDER');
+  const unitLabeler = useRefLabeler('CLOUD_PRICE_UNIT');
+  const providerOptions = prov.ready
+    ? [{ code: '', label: 'All' }, ...prov.options]
+    : PROVIDERS.map((c) => ({ code: c, label: c || 'All' }));
   const [provider, setProvider] = useState('');
   const [category, setCategory] = useState('');
   const [q, setQ] = useState('');
@@ -76,7 +83,7 @@ export default function CloudPricesPage() {
           <tbody>
             {(freshness ?? []).map((f) => (
               <tr key={f.provider} className="border-t border-slate-100">
-                <td className="py-1 font-medium">{f.provider}</td>
+                <td className="py-1 font-medium">{prov.label(f.provider)}</td>
                 <td className="py-1 tabular-nums whitespace-nowrap">{fmtPulled(f.lastPulled)}</td>
                 <td className="py-1 text-right tabular-nums">{f.priceCount}</td>
               </tr>
@@ -93,9 +100,9 @@ export default function CloudPricesPage() {
             onChange={(e) => setProvider(e.target.value)}
             className="mt-1 block border border-slate-300 rounded px-3 py-2"
           >
-            {PROVIDERS.map((p) => (
-              <option key={p} value={p}>
-                {p || 'All'}
+            {providerOptions.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
               </option>
             ))}
           </select>
@@ -145,12 +152,12 @@ export default function CloudPricesPage() {
           <tbody>
             {rows.map((p) => (
               <tr key={p.id} className="border-t border-slate-100">
-                <td className="px-4 py-2 font-medium">{p.provider}</td>
+                <td className="px-4 py-2 font-medium">{prov.label(p.provider)}</td>
                 <td className="px-4 py-2 text-slate-500">{p.category}</td>
                 <td className="px-4 py-2">{p.region}</td>
                 <td className="px-4 py-2">{p.service}</td>
                 <td className="px-4 py-2">{p.skuOrInstance}</td>
-                <td className="px-4 py-2">{p.unit}</td>
+                <td className="px-4 py-2">{unitLabeler.label(p.unit)}</td>
                 <td className="px-4 py-2 text-right tabular-nums">{p.unitPrice}</td>
                 <td className="px-4 py-2">{p.currency}</td>
               </tr>
