@@ -270,4 +270,8 @@ test('a freshly created estimate has no green checklist items (FR-25)', async ({
   await expect(checklist.getByText('Add at least one line item.')).toBeVisible();
   await expect(checklist.getByText('To do:').first()).toBeVisible();
   await expect(checklist.getByText('Add labor lines and assign each a role.')).toBeVisible();
+  // Polish: a completeness progress bar + at-a-glance counts ("N to fix" / "M to do").
+  await expect(checklist.getByRole('progressbar')).toBeVisible();
+  await expect(checklist.getByText(/\d+ to fix/)).toBeVisible();
+  await expect(checklist.getByText(/\d+ to do/)).toBeVisible();
 });

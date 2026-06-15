@@ -39,6 +39,7 @@ semantic versioning once it ships a first release.
 
 #### Changed
 - **"N/A" replaced by an actionable "To do" state.** Users read "N/A" as "doesn't apply / ignore me", but those items *are* applicable — they just haven't been started. Not-started rules now render as an amber **○ "To do"** with the **next step to take** ("To do: add labor lines and assign each a role", "Set a global upcharge %", …) and a **"How?"** guide link, and they're **clickable** to jump to the section where you'd start them. Red **✕** is now reserved for things you entered that are actually wrong/incomplete. A small legend (**Done · Needs fixing · To do**) explains the three states. Completeness/blocking are unchanged — a "To do" still neither blocks nor inflates progress, so a brand-new estimate reads as a to-do list at 0%, not "complete" or "broken".
+- **Smart-checklist panel polish.** Items are now **ordered by what needs action** — needs-fixing first (blockers before warnings), then to-do, then done — so the top of the list is always what to do next. Added a **completeness progress bar** and an at-a-glance **count summary** ("N to fix · M to do · K done"), and a subtle **"blocks"** tag on the failing items that actually gate a workflow transition (a failing BLOCKER), so it's obvious which reds are stopping approval.
 
 ### Rebrand to Kerdos by Veridion LLC, and professional navigation
 
