@@ -77,17 +77,17 @@ describe('evaluateChecklist', () => {
     expect(r.blocking).toBe(true);
   });
 
-  it('marks a per-line rule N/A (not a vacuous pass) when there are no such lines', () => {
+  it('marks a per-line rule "To do" (not a vacuous pass) when there are no such lines', () => {
     const r = evaluateChecklist(RULES, { ...empty, rateCardId: 'rc1' });
     const labor = r.items.find((i) => i.key === 'labor_role_assigned');
-    expect(labor?.applicable).toBe(false); // no labor lines → nothing to check
+    expect(labor?.applicable).toBe(false); // no labor lines → not started, nothing to check
     // Completeness counts only applicable rules: rate_card (pass) + totals_reconcile (fail) = 1/2.
     expect(r.completeness).toBe(0.5);
-    // A N/A blocker does not block.
+    // A not-started ("To do") blocker does not block.
     expect(r.blocking).toBe(false);
   });
 
-  it('shows nothing green on a brand-new estimate — defaults are N/A, not passes', () => {
+  it('shows nothing green on a brand-new estimate — defaults are "To do", not passes', () => {
     const ALL: ChecklistRuleDef[] = [
       ...RULES,
       { key: 'upcharge_set', description: 'Upcharge', severity: 'WARNING', scope: 'ESTIMATE' },
@@ -99,9 +99,9 @@ describe('evaluateChecklist', () => {
       },
     ];
     const r = evaluateChecklist(ALL, empty);
-    // No item is a green pass — each is either failing (todo) or N/A (nothing to check).
+    // No item is a green pass — each is either failing or a not-started "To do".
     expect(r.items.filter((i) => i.applicable && i.passed)).toEqual([]);
-    // Upcharge/contingency default to 0 but show as N/A, not a vacuous green.
+    // Upcharge/contingency default to 0 but show as "To do" (not started), not a vacuous green.
     expect(r.items.find((i) => i.key === 'upcharge_set')?.applicable).toBe(false);
     expect(r.items.find((i) => i.key === 'contingency_set')?.applicable).toBe(false);
   });
