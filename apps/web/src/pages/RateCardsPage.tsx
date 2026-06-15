@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useCreateRateCard, useRateCardMutations, useRateCards } from '../lib/queries';
+import { useRefLabeler } from '../lib/refLabels';
 import type { RateCard, RateCardRole } from '../lib/types';
 
 type RateCardMutations = ReturnType<typeof useRateCardMutations>;
+// Fallback unit codes used until the DB reference labels load (FR-29).
 const UNITS = ['HOUR', 'DAY'];
 
 function RoleRow({
@@ -16,6 +18,8 @@ function RoleRow({
 }) {
   const [roleName, setRoleName] = useState(role.roleName);
   const [rate, setRate] = useState(role.rate);
+  const unit = useRefLabeler('RATE_UNIT');
+  const unitOptions = unit.ready ? unit.options : UNITS.map((c) => ({ code: c, label: c }));
   const save = (body: Record<string, unknown>) =>
     m.updateRole.mutate({ id: cardId, roleId: role.id, body });
   return (
@@ -34,9 +38,9 @@ function RoleRow({
           onChange={(e) => save({ unit: e.target.value })}
           className="border border-slate-200 rounded px-2 py-1 text-sm"
         >
-          {UNITS.map((u) => (
-            <option key={u} value={u}>
-              {u}
+          {unitOptions.map((o) => (
+            <option key={o.code} value={o.code}>
+              {o.label}
             </option>
           ))}
         </select>
@@ -65,6 +69,10 @@ function AddRoleRow({ cardId, m }: { cardId: string; m: RateCardMutations }) {
   const [roleName, setRoleName] = useState('');
   const [unit, setUnit] = useState('HOUR');
   const [rate, setRate] = useState('');
+  const unitLabeler = useRefLabeler('RATE_UNIT');
+  const unitOptions = unitLabeler.ready
+    ? unitLabeler.options
+    : UNITS.map((c) => ({ code: c, label: c }));
   function add() {
     if (!roleName.trim() || !rate) return;
     m.addRole.mutate({ id: cardId, body: { roleName, unit, rate } });
@@ -87,9 +95,9 @@ function AddRoleRow({ cardId, m }: { cardId: string; m: RateCardMutations }) {
           onChange={(e) => setUnit(e.target.value)}
           className="border border-slate-200 rounded px-2 py-1 text-sm"
         >
-          {UNITS.map((u) => (
-            <option key={u} value={u}>
-              {u}
+          {unitOptions.map((o) => (
+            <option key={o.code} value={o.code}>
+              {o.label}
             </option>
           ))}
         </select>

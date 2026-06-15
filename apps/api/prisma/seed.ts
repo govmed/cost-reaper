@@ -966,6 +966,7 @@ const REFERENCE_DATA: RefType[] = [
       { code: 'AWS', name: 'Amazon Web Services' },
       { code: 'GCP', name: 'Google Cloud' },
       { code: 'AZURE', name: 'Microsoft Azure' },
+      { code: 'SAAS', name: 'SaaS' },
     ],
   },
   {
@@ -975,6 +976,7 @@ const REFERENCE_DATA: RefType[] = [
       { code: 'HOUR', name: 'Hour' },
       { code: 'MONTH', name: 'Month' },
       { code: 'GB_MONTH', name: 'GB-month' },
+      { code: 'GB', name: 'Gigabyte' },
       { code: 'REQUEST', name: 'Request' },
     ],
   },
