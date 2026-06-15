@@ -394,11 +394,14 @@ function GovernanceSection({
                   !i.passed || todo
                     ? (useCaseForChecklistKey(i.key) ?? useCaseById('smart-checklist'))
                     : undefined;
-                const marker = i.passed ? '✓' : todo ? '○' : '✕';
-                const markerClass = i.passed
-                  ? 'text-emerald-600'
-                  : todo
-                    ? 'text-amber-500'
+                // Check `todo` BEFORE `passed`: a not-started rule can be
+                // vacuously passed (e.g. "no bad lines" when there are no lines),
+                // so it must render as ○ To do, never a green ✓.
+                const marker = todo ? '○' : i.passed ? '✓' : '✕';
+                const markerClass = todo
+                  ? 'text-amber-500'
+                  : i.passed
+                    ? 'text-emerald-600'
                     : i.severity === 'BLOCKER'
                       ? 'text-rose-600'
                       : 'text-amber-600';
