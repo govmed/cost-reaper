@@ -535,3 +535,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** CLAUDE.md (Current State block), PROJECT_LOG.md (this chapter), AUDIT_LOG.md.
 - **Result:** `main` clean at `75fe0b4`, PR #69 merged, stray refs removed, stale branches pruned, no open PRs. Could not run the toolchain locally (node/pnpm absent in the tool shell) — relied on the merged PR's green CI as the health gate.
 - **Next:** commit the memory refresh on a docs branch → PR → CI-green → merge. Then await direction or pick the next optional-polish item (FE-54 enum-label migration).
+
+### 2026-06-15 14:30 UTC — Merge memory refresh (PR #70) + backfill CHANGELOG (#67–#69)
+- **Action:** Memory-refresh PR #70 went green (build/security/e2e) and merged → `main` at `85b855b` (cleaned another stray `docs/Icon` ref + pruned on the way). Then found the CHANGELOG's `[Unreleased]` stopped at #65 (the #66 rollup covered #54–#65) and was missing the three PRs that landed after: added a **"Web delivery — cache headers (NFR-7)"** section for #69 and a **"Fixed"** entry under the Smart-checklist section for #67 (no green checks on an untouched estimate) + #68 (e2e guard). Also saved a persistent memory `git-icon-ref-breakage.md` (+ MEMORY.md index) for the recurring macOS `Icon\r` ref that breaks `git pull`.
+- **Why:** Section 14/19 — keep the CHANGELOG current per increment; capture the recurring env gotcha so future sessions don't re-diagnose it.
+- **Files touched:** CHANGELOG.md, PROJECT_LOG.md, AUDIT_LOG.md (+ external memory files under `~/.claude/.../memory/`).
+- **Result:** CHANGELOG now documents through #69. Docs-only.
+- **Next:** commit CHANGELOG + living-file updates on a branch → PR → CI-green → merge. Backlog remains 54/54; await direction or pick FE-54 enum-label polish.
