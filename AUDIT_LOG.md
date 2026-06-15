@@ -608,4 +608,7 @@ Resumed the autonomous session. Merged the open, all-green PR #69 (web cache hea
 - Audited `main`: confirmed FR-21a/b (cloud price sync + last-pulled), native `.xlsx`, scenarios/baselines/comments/fx/margin-tax/PERT, SaaS provider, checklist + SSO modules all present.
 - Rewrote the `CLAUDE.md` Current State block; added Chapter 8 to `PROJECT_LOG.md`; appended this audit entry.
 - Could not run pnpm/turbo locally (node/pnpm not on PATH in the tool shell) — relied on PR #69's green CI as the gate.
+- Committed the memory refresh on `docs/refresh-project-memory`, opened PR #70, watched CI green (build/security/e2e), merged → `main` at `85b855b` (cleaned a second stray `docs/Icon` ref on pull).
+- Backfilled `CHANGELOG.md` for the PRs that landed after the #66 rollup: a "Web delivery — cache headers (NFR-7)" section (#69) and a Smart-checklist "Fixed" entry (#67 + e2e #68).
+- Saved persistent memory `git-icon-ref-breakage.md` (recurring macOS `Icon` ref that breaks `git pull`) + MEMORY.md index.
 ---

@@ -6,6 +6,11 @@ semantic versioning once it ships a first release.
 
 ## [Unreleased]
 
+### Web delivery — cache headers (NFR-7)
+
+#### Changed
+- **Correct browser caching for the SPA** (#69): nginx now serves `index.html` with `Cache-Control: no-cache` (always revalidate, so a new deploy is picked up immediately) while the content-hashed `assets/*` are served `immutable` with a one-year max-age. Prevents users from getting a stale shell pointing at old/removed bundles after a release.
+
 ### Estimate-governance repos — workflows & checklist rule sets (FR-24, FR-25)
 
 #### Added
@@ -28,6 +33,9 @@ semantic versioning once it ships a first release.
 
 #### Added
 - **"↻ Re-check" button + "last checked" time** on the Smart-checklist panel (#65). The checklist still auto-re-evaluates on every edit; the button adds confidence and picks up shared-data changes (a rule or rate card edited elsewhere).
+
+#### Fixed
+- **No green checks on an untouched estimate** (#67): a freshly created estimate showed some rules already passing (vacuously) before any work was done. Such rules now report **N/A / pending** until there's something real to verify, so an unworked estimate has **zero green** checklist items. Locked in by an e2e test asserting a brand-new estimate surfaces no green checklist items (#68).
 
 ### Rebrand to Kerdos by Veridion LLC, and professional navigation
 
