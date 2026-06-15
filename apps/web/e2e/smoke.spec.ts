@@ -264,8 +264,10 @@ test('a freshly created estimate has no green checklist items (FR-25)', async ({
   // Untouched estimate → 0% complete and NOTHING green (no ✓ anywhere in the panel).
   await expect(checklist.getByText('0% complete')).toBeVisible();
   await expect(checklist.getByText('✓')).toHaveCount(0);
-  // The real to-dos are flagged; per-line rules read N/A, not a pass.
+  // The real prerequisites are flagged (red ✕); not-started rules read as an
+  // actionable "To do" (amber ○), never a green pass.
   await expect(checklist.getByText('Select a rate card for the estimate.')).toBeVisible();
   await expect(checklist.getByText('Add at least one line item.')).toBeVisible();
-  await expect(checklist.getByText('N/A').first()).toBeVisible();
+  await expect(checklist.getByText('To do:').first()).toBeVisible();
+  await expect(checklist.getByText('Add labor lines and assign each a role.')).toBeVisible();
 });

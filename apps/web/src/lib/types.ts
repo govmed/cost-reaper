@@ -278,7 +278,7 @@ export interface ChecklistItem {
   message: string;
   /** IDs of the specific line items this rule flags, for deep-linking. */
   entityIds: string[];
-  /** false when there's nothing for this rule to check yet — rendered as N/A, not a pass. */
+  /** false when there's nothing for this rule to check yet — rendered as a "To do" (not started), not a pass. */
   applicable: boolean;
 }
 export interface ChecklistResult {

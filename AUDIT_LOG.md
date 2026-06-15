@@ -612,3 +612,16 @@ Resumed the autonomous session. Merged the open, all-green PR #69 (web cache hea
 - Backfilled `CHANGELOG.md` for the PRs that landed after the #66 rollup: a "Web delivery — cache headers (NFR-7)" section (#69) and a Smart-checklist "Fixed" entry (#67 + e2e #68).
 - Saved persistent memory `git-icon-ref-breakage.md` (recurring macOS `Icon` ref that breaks `git pull`) + MEMORY.md index.
 ---
+
+---
+### [2026-06-15 15:10 UTC] — USER
+I have a concern around the Use Case: I am a user and I create an initial Estimate. I have not begun to do anything other than type in my estimate name and click on create. When it goes to the next panel, it shows at the Smart checklist N/A should be change that value to something else. Because my understanding of N/A means not applicable and I think everything on the Smart checklist is applicable. Can we make them Red X and the How? next to them? What are your thoughts?
+
+### [2026-06-15 15:30 UTC] — AGENT
+Agreed "N/A" is misleading. Explained why those items show N/A (the #65/#67/#68 work that killed the old "vacuous green"), and gave my thoughts: yes to "How?" everywhere; but pure Red ✕ would make a fresh estimate look broken and would falsely fail legitimately-empty categories (e.g. a valid cloud-only estimate's labor rule). Recommended a distinct amber **"To do"** state; offered 3 options with visual previews via AskUserQuestion. User chose the **amber "To do"** option. Implemented it.
+**Actions taken:**
+- Engine `checklist-rules.ts`: reworded not-applicable messages to imperative next steps (e.g. "Add labor lines and assign each a role"); updated doc/comment.
+- UI `EstimateEditorPage.tsx`: unified three-state row — ✓ done / ✕ needs fixing / ○ "To do" (amber, "To do:" prefix, clickable jump, "How?" link); added a worded legend (no ✓ glyph, so the #68 e2e still holds).
+- Updated type comments (`governance.ts`, `lib/types.ts`), help use case (three states), CHANGELOG, e2e (assert "To do:" + reworded message instead of "N/A"); unit-test comments aligned (assertions unchanged).
+- Couldn't run toolchain locally (node/pnpm absent) → relying on CI. Committing on a branch → PR → CI-green → merge.
+---

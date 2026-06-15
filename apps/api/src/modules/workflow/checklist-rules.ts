@@ -45,8 +45,10 @@ export interface ChecklistEstimate {
 /**
  * An evaluator may name the specific offending line IDs (for deep-linking) and
  * may declare itself **not applicable** — e.g. a per-line rule on an estimate
- * that has no lines of that type yet. A not-applicable rule shows as "N/A"
- * rather than a (vacuously) green pass, so green means "verified".
+ * that has no lines of that type yet. A not-applicable rule shows as an
+ * actionable **"To do" (not started)** rather than a (vacuously) green pass, so
+ * green still means "verified". Its message reads as the next step to take, so
+ * the not-applicable branch returns an imperative to-do, not "nothing to check".
  */
 type Evaluator = (e: ChecklistEstimate) => {
   passed: boolean;
@@ -69,7 +71,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       applicable: e.labor.length > 0,
       passed: bad.length === 0,
       message: !e.labor.length
-        ? 'No labor lines to check yet.'
+        ? 'Add labor lines and assign each a role.'
         : bad.length
           ? `${bad.length} labor line(s) missing a role/rate, quantity or units.`
           : 'Every labor line has a role and quantity.',
@@ -89,7 +91,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       applicable: e.cloud.length > 0,
       passed: bad.length === 0,
       message: !e.cloud.length
-        ? 'No cloud lines to check yet.'
+        ? 'Add cloud lines (provider, region, instance & usage).'
         : bad.length
           ? `${bad.length} cloud line(s) missing provider/region/instance/usage or price.`
           : 'Every cloud line is complete with a snapshotted price.',
@@ -102,7 +104,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       applicable: e.nonLabor.length > 0,
       passed: bad.length === 0,
       message: !e.nonLabor.length
-        ? 'No non-labor lines to check yet.'
+        ? 'Add non-labor lines with an amount and billing period.'
         : bad.length
           ? `${bad.length} non-labor line(s) missing an amount or billing period.`
           : 'Every non-labor line has an amount and billing period.',
@@ -116,7 +118,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       applicable: all.length > 0,
       passed: bad.length === 0,
       message: !all.length
-        ? 'No lines to check yet.'
+        ? 'Add line items (each needs a billing period).'
         : bad.length
           ? `${bad.length} line(s) missing a billing period.`
           : 'All lines have a billing period.',
@@ -124,9 +126,9 @@ const EVALUATORS: Record<string, Evaluator> = {
     };
   },
   // Upcharge/contingency only matter once there's something to mark up — until
-  // the estimate has lines they're N/A (not a green pass on the default 0), so a
-  // brand-new estimate shows nothing green. Once there are lines, the message
-  // shows the actual value rather than a vague "is set".
+  // the estimate has lines they're not-started "To do" (not a green pass on the
+  // default 0), so a brand-new estimate shows nothing green. Once there are
+  // lines the message shows the actual value rather than a vague "is set".
   upcharge_set: (e) => {
     const hasLines = e.labor.length + e.nonLabor.length + e.cloud.length > 0;
     return {
@@ -134,7 +136,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       passed: e.globalUpchargePercent != null,
       message: hasLines
         ? `Global upcharge is ${e.globalUpchargePercent}%.`
-        : 'No lines to apply an upcharge to yet.',
+        : 'Set a global upcharge % for the estimate (or leave it 0).',
     };
   },
   contingency_set: (e) => {
@@ -144,7 +146,7 @@ const EVALUATORS: Record<string, Evaluator> = {
       passed: e.contingencyPercent != null,
       message: hasLines
         ? `Contingency is ${e.contingencyPercent}%.`
-        : 'No lines to apply contingency to yet.',
+        : 'Set a contingency % for the estimate (or leave it 0).',
     };
   },
   totals_reconcile: (e) => {
@@ -170,7 +172,7 @@ const EVALUATORS: Record<string, Evaluator> = {
         passed: true,
         message: hasResources
           ? 'No resource exceeds 100% on any date.'
-          : 'No assigned resources to check yet.',
+          : 'Assign resources to labor lines (kept ≤100% per day).',
       };
     }
     const offending = new Set(violations.map((v) => v.resourceName));
@@ -209,7 +211,7 @@ export function evaluateChecklist(
     };
   });
   // Only applicable rules count toward blocking/completeness — a rule with nothing
-  // to check (N/A) neither blocks nor inflates progress.
+  // to check (a not-started "To do") neither blocks nor inflates progress.
   const blocking = items.some((i) => i.severity === 'BLOCKER' && i.applicable && !i.passed);
   const applicable = items.filter((i) => i.applicable);
   const passedCount = applicable.filter((i) => i.passed).length;

@@ -481,10 +481,10 @@ export const HELP_USE_CASES: UseCase[] = [
     steps: [
       { text: 'Open the “Smart checklist” panel on the estimate.' },
       {
-        text: 'Each item shows ✓ (pass) or ✕ (fail) with a message; red items are blocking.',
+        text: 'Each item shows one of three states with a message: ✓ done, ✕ needs fixing (red items are blocking), or ○ “To do” — something that applies but you haven’t started yet (e.g. no labor lines added). A brand-new estimate is all ✕/○ and 0% complete — nothing is green until it’s verified.',
       },
       {
-        text: 'Click any item to jump to exactly where it’s fixed — the specific offending line is scrolled into view and highlighted (or the relevant section for estimate-level items).',
+        text: 'Click any item to jump to exactly where it’s fixed or started — the specific offending line is scrolled into view and highlighted (or the relevant section for estimate-level and to-do items). Use the “How?” link for a step-by-step guide.',
       },
       {
         text: 'Resolve every blocking item; the completeness percentage rises and workflow transitions unlock.',

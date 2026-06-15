@@ -26,7 +26,7 @@ semantic versioning once it ships a first release.
 #### Changed
 - **Only approved estimates can start a SOW** (#64): the source picker lists only estimates at an **Approved/Final** workflow stage (reaching which already required the smart checklist to pass), and `POST /sow` enforces it **server-side** (deny-by-default). New `GET /sow/eligible-estimates`; an empty-state hint when nothing qualifies; the seed ships one approved sample estimate.
 
-### Smart checklist — honest "N/A" + manual re-check (FR-25)
+### Smart checklist — honest states, "To do", + manual re-check (FR-25)
 
 #### Changed
 - **Per-line rules show "N/A" instead of a vacuous green** (#65): labor / cloud / non-labor / resource / billing-period rules report **"nothing to check yet"** when there are no applicable lines, so a green ✓ means *verified*. N/A items **don't block** and are **excluded from completeness**, so a brand-new estimate no longer looks ~complete — its real blockers (rate card, line items) stay red.
@@ -36,6 +36,9 @@ semantic versioning once it ships a first release.
 
 #### Fixed
 - **No green checks on an untouched estimate** (#67): a freshly created estimate showed some rules already passing (vacuously) before any work was done. Such rules now report **N/A / pending** until there's something real to verify, so an unworked estimate has **zero green** checklist items. Locked in by an e2e test asserting a brand-new estimate surfaces no green checklist items (#68).
+
+#### Changed
+- **"N/A" replaced by an actionable "To do" state.** Users read "N/A" as "doesn't apply / ignore me", but those items *are* applicable — they just haven't been started. Not-started rules now render as an amber **○ "To do"** with the **next step to take** ("To do: add labor lines and assign each a role", "Set a global upcharge %", …) and a **"How?"** guide link, and they're **clickable** to jump to the section where you'd start them. Red **✕** is now reserved for things you entered that are actually wrong/incomplete. A small legend (**Done · Needs fixing · To do**) explains the three states. Completeness/blocking are unchanged — a "To do" still neither blocks nor inflates progress, so a brand-new estimate reads as a to-do list at 0%, not "complete" or "broken".
 
 ### Rebrand to Kerdos by Veridion LLC, and professional navigation
 

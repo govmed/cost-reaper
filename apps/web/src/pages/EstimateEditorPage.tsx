@@ -382,47 +382,38 @@ function GovernanceSection({
             )}
             <ul className="text-sm space-y-1">
               {checklist.items.map((i) => {
-                // A rule with nothing to check yet (no lines of its type) is N/A —
-                // shown muted, not as a (vacuous) green pass and with nothing to fix.
-                if (!i.applicable) {
-                  return (
-                    <li
-                      key={i.key}
-                      className="flex items-start gap-2 px-1 py-0.5 text-slate-400"
-                      title="Nothing to check yet"
-                    >
-                      <span className="text-slate-300">–</span>
-                      <span>{i.message}</span>
-                      <span className="ml-auto text-[10px] uppercase tracking-wide text-slate-300">
-                        N/A
-                      </span>
-                    </li>
-                  );
-                }
-                // Failing items deep-link to their specific guide; if no guide
+                // Three states: ✓ done (green), ✕ needs fixing (red/amber), and
+                // ○ "To do" (amber) for a rule that isn't applicable yet because
+                // there are no lines of its type to check. A to-do's message is the
+                // next step to take, and it never shows green — so a brand-new
+                // estimate reads as a to-do list, not as complete or broken.
+                const todo = !i.applicable;
+                // Failing and to-do items link to a step-by-step guide; if none
                 // matches the rule key, fall back to the general checklist guide.
-                const guide = !i.passed
-                  ? (useCaseForChecklistKey(i.key) ?? useCaseById('smart-checklist'))
-                  : undefined;
+                const guide =
+                  !i.passed || todo
+                    ? (useCaseForChecklistKey(i.key) ?? useCaseById('smart-checklist'))
+                    : undefined;
+                const marker = i.passed ? '✓' : todo ? '○' : '✕';
+                const markerClass = i.passed
+                  ? 'text-emerald-600'
+                  : todo
+                    ? 'text-amber-500'
+                    : i.severity === 'BLOCKER'
+                      ? 'text-rose-600'
+                      : 'text-amber-600';
                 return (
                   <li key={i.key} className="flex items-start gap-1">
                     <button
                       onClick={() => goToChecklistItem(i)}
-                      title="Go to where to fix this"
+                      title={todo ? 'Go to where to start this' : 'Go to where to fix this'}
                       className="flex-1 flex items-start gap-2 text-left rounded hover:bg-slate-50 px-1 py-0.5 group"
                     >
-                      <span
-                        className={
-                          i.passed
-                            ? 'text-emerald-600'
-                            : i.severity === 'BLOCKER'
-                              ? 'text-rose-600'
-                              : 'text-amber-600'
-                        }
-                      >
-                        {i.passed ? '✓' : '✕'}
+                      <span className={markerClass} aria-hidden="true">
+                        {marker}
                       </span>
                       <span className="text-slate-600 group-hover:text-slate-900 group-hover:underline">
+                        {todo && <span className="font-medium text-amber-700">To do: </span>}
                         {i.message}
                       </span>
                       <span className="ml-auto text-slate-300 group-hover:text-brand">→</span>
@@ -430,7 +421,7 @@ function GovernanceSection({
                     {guide && (
                       <Link
                         to={`/help#uc-${guide.id}`}
-                        title={`How to fix: ${guide.title}`}
+                        title={todo ? `How to start: ${guide.title}` : `How to fix: ${guide.title}`}
                         className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
                       >
                         How?
@@ -442,7 +433,10 @@ function GovernanceSection({
             </ul>
             {checklist.items.length > 0 && (
               <p className="text-xs text-slate-400">
-                Tip: click an item to jump to where it’s fixed, or “How?” for a step-by-step guide.
+                <span className="font-medium text-emerald-600">Done</span> ·{' '}
+                <span className="font-medium text-rose-600">Needs fixing</span> ·{' '}
+                <span className="font-medium text-amber-600">To do</span> — click an item to jump
+                there, or “How?” for a step-by-step guide.
               </p>
             )}
           </>
