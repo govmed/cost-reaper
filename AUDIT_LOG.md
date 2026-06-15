@@ -648,3 +648,13 @@ Smart-checklist polish merged (PR #73). Began FE-54 enum-label migration as two 
 - Updated CHANGELOG + living docs. Verified e2e-safe (no display-text assertions on these). Committing → PR → CI → merge.
 - Role labels deferred to PR B (header pill / UsersPage / roles matrix).
 ---
+
+---
+### [2026-06-15 18:00 UTC] — AGENT (continuing FE-54)
+PR A merged (#74). Built PR B — DB-driven Role labels.
+**Actions taken:**
+- UsersPage: role selects use `useRefLabeler('ROLE')` options (fallback to ROLES).
+- RolesPage: "signed in as", summary cards, and matrix column headers use a `roleLabel()` helper (reference label, ROLE_LABELS fallback).
+- App.tsx: header role badge extracted into a `RolePill` component so the ROLE fetch only runs when authenticated.
+- Updated CHANGELOG + living docs. Verified e2e-safe. Committing → PR → CI → merge. FE-54 enum-label items complete after this.
+---
