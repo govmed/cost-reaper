@@ -580,3 +580,13 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** package.json (×6), apps/api/src/main.ts, CHANGELOG.md, CLAUDE.md, PROJECT_LOG.md, AUDIT_LOG.md.
 - **Result:** Pending — release-prep PR → CI-green → merge, then annotated tag `v1.0.0` + GitHub release from the CHANGELOG notes. node/pnpm unavailable locally → CI gate.
 - **Next:** open release-prep PR; on green, merge → `git tag -a v1.0.0` → push tag → `gh release create v1.0.0`. Then start new feature work.
+
+## Chapter 10 — Post-1.0 polish (started 2026-06-15)
+**Goal:** Small fixes/refinements on top of v1.0.0 before the next feature batch.
+
+### 2026-06-15 19:45 UTC — Real Veridion logo in header + login
+- **Action:** v1.0.0 released (tag + GitHub release on `main` `54cc96f`). User: "I don't like the logo you created … pull the logo from veridion.com … crop the png to only show the logo." The old `veridion-mark.png` was the bare amber "V" mark (Veridion's `mobile-logo.png`). Pulled the official site logo `main-logo-2.png` (amber mark + "Veridion" wordmark + "AI business intelligence" tagline, 297×30 transparent), and cropped off the tagline with PIL (kept x 0–225 = mark + wordmark; tagline starts ~x227, found by per-column content-height analysis). Produced two assets: `veridion-logo.png` (amber mark + black wordmark, for white/login) and `veridion-logo-onteal.png` (amber mark + **white** wordmark — only the black text recolored, mark stays amber — for the teal header). Rewrote `BrandLogo` with an `onLight`/`onDark` variant prop; header uses `onDark` + a divider + "Kerdos" product name (dropped the redundant "Veridion LLC" subtitle, now in the logo); login stacks the colour logo above "Kerdos · Project Cost Estimator". Favicon left as the square mark.
+- **Why:** User dislikes the homemade-looking bare mark; wants the recognizable Veridion brand. FE/UX.
+- **Files touched:** apps/web/public/{veridion-logo.png,veridion-logo-onteal.png}(new), apps/web/src/components/BrandLogo.tsx, apps/web/src/App.tsx, apps/web/src/pages/LoginPage.tsx, CHANGELOG.md.
+- **Result:** Previewed both variants composited on teal/white — clean. e2e-safe: the only brand assertion, `getByRole('link', {name:'Kerdos'})`, still matches (substring of the home link's "Veridion Kerdos" accessible name). No node/pnpm locally → CI gate.
+- **Next:** commit → PR → CI-green → merge. Then begin the next feature batch.

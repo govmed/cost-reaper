@@ -671,3 +671,16 @@ Cutting v1.0.0 (first tagged release; product is feature-complete). Bumped versi
 - Updated CLAUDE.md Current State + PROJECT_LOG Chapter 9.
 - Next: release-prep PR → CI-green → merge → `git tag -a v1.0.0` (push) → `gh release create v1.0.0`. Then begin new features.
 ---
+
+---
+### [2026-06-15 19:30 UTC] — USER
+I don't like the logo you created, can you pull the logo from https://veridion.com and if you need to yu can crop the png file to only show the logo.
+
+### [2026-06-15 19:45 UTC] — AGENT
+v1.0.0 was released (tag + GitHub release). The old logo was the bare amber "V" mark; pulled the official Veridion site logo and cropped it to [mark + "Veridion" wordmark], dropping the tagline.
+**Actions taken:**
+- Fetched veridion.com; identified `main-logo-2.png` (official logo, 297×30) as the real site logo. Cropped off the "AI business intelligence" tagline (PIL, kept x 0–225).
+- Made two assets: `veridion-logo.png` (amber mark + black wordmark, white surfaces) and `veridion-logo-onteal.png` (amber mark + white wordmark, teal header). Previewed both on teal/white.
+- Rewrote `BrandLogo` with onLight/onDark variants; header uses onDark + divider + "Kerdos" (dropped redundant "Veridion LLC" subtitle); login stacks the colour logo above "Kerdos".
+- Updated CHANGELOG + living docs. e2e-safe (Kerdos link assertion still matches). Committing → PR → CI → merge.
+---
