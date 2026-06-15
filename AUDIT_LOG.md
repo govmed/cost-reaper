@@ -625,3 +625,16 @@ Agreed "N/A" is misleading. Explained why those items show N/A (the #65/#67/#68 
 - Updated type comments (`governance.ts`, `lib/types.ts`), help use case (three states), CHANGELOG, e2e (assert "To do:" + reworded message instead of "N/A"); unit-test comments aligned (assertions unchanged).
 - Couldn't run toolchain locally (node/pnpm absent) → relying on CI. Committing on a branch → PR → CI-green → merge.
 ---
+
+---
+### [2026-06-15 16:10 UTC] — USER
+Polish Smart Checklist  then FE-54 enum-label items..
+
+### [2026-06-15 16:30 UTC] — AGENT
+Doing it as two CI-verified PRs. Started with the Smart-checklist polish; launched a background audit of the FE-54 enum-label state for the next PR.
+**Actions taken:**
+- Extracted a `ChecklistPanel` component in EstimateEditorPage.tsx; added state-ordering (needs-fixing→to-do→done, blockers first), a completeness progress bar, an at-a-glance count summary ("N to fix · M to do · K done"), and a "blocks" tag on failing BLOCKERs.
+- Extended the fresh-checklist e2e to assert the progress bar + counts.
+- Updated CHANGELOG + living docs. Matched prettier carefully (no local toolchain) → CI gate.
+- FE-54 audit (Explore agent) done: reuse `useRefLabeler` from refLabels.ts; remaining hardcoded enums = RateUnit/CloudProvider/Role/ChecklistSeverity/Scope; seed bug = CLOUD_PRICE_UNIT missing GB. Queued for the next PR.
+---

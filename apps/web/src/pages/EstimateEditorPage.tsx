@@ -348,104 +348,181 @@ function GovernanceSection({
 
       <Section title="Smart checklist">
         {checklist && (
-          <>
-            <div className="text-sm flex items-center gap-2 flex-wrap">
-              <span className={checklist.blocking ? 'text-rose-700' : 'text-emerald-700'}>
-                {checklist.blocking ? 'Blocking items present' : 'All blocking checks pass'}
-              </span>
-              <span className="text-slate-400">
-                · {Math.round(checklist.completeness * 100)}% complete
-              </span>
-              <span className="ml-auto text-xs text-slate-400">
-                {checkedAt > 0 ? `checked ${new Date(checkedAt).toLocaleTimeString()}` : ''}
-              </span>
-              <button
-                onClick={onRecheck}
-                disabled={rechecking}
-                title="Re-evaluate the checklist now"
-                className="text-xs text-brand hover:underline disabled:opacity-50"
-              >
-                {rechecking ? 'Re-checking…' : '↻ Re-check'}
-              </button>
-            </div>
-            {checklist.items.length === 0 && (
-              <div className="text-sm text-slate-500 flex items-center gap-2">
-                <span>No checklist items match this estimate yet.</span>
-                <Link
-                  to="/help#uc-smart-checklist"
-                  title="How the smart checklist works"
-                  className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
-                >
-                  How?
-                </Link>
-              </div>
-            )}
-            <ul className="text-sm space-y-1">
-              {checklist.items.map((i) => {
-                // Three states: ✓ done (green), ✕ needs fixing (red/amber), and
-                // ○ "To do" (amber) for a rule that isn't applicable yet because
-                // there are no lines of its type to check. A to-do's message is the
-                // next step to take, and it never shows green — so a brand-new
-                // estimate reads as a to-do list, not as complete or broken.
-                const todo = !i.applicable;
-                // Failing and to-do items link to a step-by-step guide; if none
-                // matches the rule key, fall back to the general checklist guide.
-                const guide =
-                  !i.passed || todo
-                    ? (useCaseForChecklistKey(i.key) ?? useCaseById('smart-checklist'))
-                    : undefined;
-                // Check `todo` BEFORE `passed`: a not-started rule can be
-                // vacuously passed (e.g. "no bad lines" when there are no lines),
-                // so it must render as ○ To do, never a green ✓.
-                const marker = todo ? '○' : i.passed ? '✓' : '✕';
-                const markerClass = todo
-                  ? 'text-amber-500'
-                  : i.passed
-                    ? 'text-emerald-600'
-                    : i.severity === 'BLOCKER'
-                      ? 'text-rose-600'
-                      : 'text-amber-600';
-                return (
-                  <li key={i.key} className="flex items-start gap-1">
-                    <button
-                      onClick={() => goToChecklistItem(i)}
-                      title={todo ? 'Go to where to start this' : 'Go to where to fix this'}
-                      className="flex-1 flex items-start gap-2 text-left rounded hover:bg-slate-50 px-1 py-0.5 group"
-                    >
-                      <span className={markerClass} aria-hidden="true">
-                        {marker}
-                      </span>
-                      <span className="text-slate-600 group-hover:text-slate-900 group-hover:underline">
-                        {todo && <span className="font-medium text-amber-700">To do: </span>}
-                        {i.message}
-                      </span>
-                      <span className="ml-auto text-slate-300 group-hover:text-brand">→</span>
-                    </button>
-                    {guide && (
-                      <Link
-                        to={`/help#uc-${guide.id}`}
-                        title={todo ? `How to start: ${guide.title}` : `How to fix: ${guide.title}`}
-                        className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
-                      >
-                        How?
-                      </Link>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-            {checklist.items.length > 0 && (
-              <p className="text-xs text-slate-400">
-                <span className="font-medium text-emerald-600">Done</span> ·{' '}
-                <span className="font-medium text-rose-600">Needs fixing</span> ·{' '}
-                <span className="font-medium text-amber-600">To do</span> — click an item to jump
-                there, or “How?” for a step-by-step guide.
-              </p>
-            )}
-          </>
+          <ChecklistPanel
+            checklist={checklist}
+            onRecheck={onRecheck}
+            checkedAt={checkedAt}
+            rechecking={rechecking}
+          />
         )}
       </Section>
     </div>
+  );
+}
+
+// Sort so actionable items surface first: needs-fixing → to do → done.
+function stateRank(applicable: boolean, passed: boolean): number {
+  if (!applicable) return 1; // to do (not started)
+  if (!passed) return 0; // needs fixing
+  return 2; // done
+}
+function sevRank(s: string): number {
+  if (s === 'BLOCKER') return 0;
+  if (s === 'WARNING') return 1;
+  return 2;
+}
+
+function ChecklistPanel({
+  checklist,
+  onRecheck,
+  checkedAt,
+  rechecking,
+}: {
+  checklist: ChecklistResult;
+  onRecheck: () => void;
+  checkedAt: number;
+  rechecking: boolean;
+}) {
+  // Order: needs-fixing (blockers before warnings) → to do → done. Stable within groups.
+  const items = [...checklist.items].sort((a, b) => {
+    const ra = stateRank(a.applicable, a.passed);
+    const rb = stateRank(b.applicable, b.passed);
+    if (ra !== rb) return ra - rb;
+    if (ra === 0) return sevRank(a.severity) - sevRank(b.severity);
+    return 0;
+  });
+  const toFix = checklist.items.filter((i) => i.applicable && !i.passed).length;
+  const toDo = checklist.items.filter((i) => !i.applicable).length;
+  const done = checklist.items.filter((i) => i.applicable && i.passed).length;
+  const pct = Math.round(checklist.completeness * 100);
+  const barClass = checklist.blocking ? 'bg-rose-400' : 'bg-emerald-500';
+
+  return (
+    <>
+      <div className="text-sm flex items-center gap-2 flex-wrap">
+        <span className={checklist.blocking ? 'text-rose-700' : 'text-emerald-700'}>
+          {checklist.blocking ? 'Blocking items present' : 'All blocking checks pass'}
+        </span>
+        <span className="ml-auto text-xs text-slate-400">
+          {checkedAt > 0 ? `checked ${new Date(checkedAt).toLocaleTimeString()}` : ''}
+        </span>
+        <button
+          onClick={onRecheck}
+          disabled={rechecking}
+          title="Re-evaluate the checklist now"
+          className="text-xs text-brand hover:underline disabled:opacity-50"
+        >
+          {rechecking ? 'Re-checking…' : '↻ Re-check'}
+        </button>
+      </div>
+
+      {checklist.items.length === 0 ? (
+        <div className="text-sm text-slate-500 flex items-center gap-2">
+          <span>No checklist items match this estimate yet.</span>
+          <Link
+            to="/help#uc-smart-checklist"
+            title="How the smart checklist works"
+            className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
+          >
+            How?
+          </Link>
+        </div>
+      ) : (
+        <>
+          {/* Completeness bar + at-a-glance counts */}
+          <div className="flex items-center gap-2 pt-0.5">
+            <div
+              className="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden"
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Checklist completeness"
+            >
+              <div className={`h-full transition-all ${barClass}`} style={{ width: `${pct}%` }} />
+            </div>
+            <span className="text-xs tabular-nums text-slate-500">{pct}% complete</span>
+          </div>
+          <div className="text-xs flex flex-wrap gap-x-3 gap-y-0.5">
+            <span className={toFix ? 'font-medium text-rose-600' : 'text-slate-400'}>
+              {toFix} to fix
+            </span>
+            <span className={toDo ? 'font-medium text-amber-600' : 'text-slate-400'}>
+              {toDo} to do
+            </span>
+            <span className={done ? 'text-emerald-700' : 'text-slate-400'}>{done} done</span>
+          </div>
+
+          <ul className="text-sm space-y-1">
+            {items.map((i) => {
+              // Three states: ✓ done (green), ✕ needs fixing (red/amber), and ○ "To do"
+              // (amber) for a rule that isn't applicable yet (no lines of its type). A
+              // to-do's message is the next step to take and never shows green — so a
+              // brand-new estimate reads as a to-do list, not complete or broken.
+              const todo = !i.applicable;
+              // Failing and to-do items link to a step-by-step guide; if none matches
+              // the rule key, fall back to the general checklist guide.
+              const guide =
+                !i.passed || todo
+                  ? (useCaseForChecklistKey(i.key) ?? useCaseById('smart-checklist'))
+                  : undefined;
+              // Check `todo` BEFORE `passed`: a not-started rule can be vacuously
+              // passed (no lines → "no bad lines"), so it must render ○, never ✓.
+              const marker = todo ? '○' : i.passed ? '✓' : '✕';
+              const markerClass = todo
+                ? 'text-amber-500'
+                : i.passed
+                  ? 'text-emerald-600'
+                  : i.severity === 'BLOCKER'
+                    ? 'text-rose-600'
+                    : 'text-amber-600';
+              // Only a failing BLOCKER actually gates workflow transitions.
+              const blocks = !todo && !i.passed && i.severity === 'BLOCKER';
+              return (
+                <li key={i.key} className="flex items-start gap-1">
+                  <button
+                    onClick={() => goToChecklistItem(i)}
+                    title={todo ? 'Go to where to start this' : 'Go to where to fix this'}
+                    className="flex-1 flex items-start gap-2 text-left rounded hover:bg-slate-50 px-1 py-0.5 group"
+                  >
+                    <span className={markerClass} aria-hidden="true">
+                      {marker}
+                    </span>
+                    <span className="text-slate-600 group-hover:text-slate-900 group-hover:underline">
+                      {todo && <span className="font-medium text-amber-700">To do: </span>}
+                      {i.message}
+                    </span>
+                    <span className="ml-auto flex items-center gap-1.5 shrink-0">
+                      {blocks && (
+                        <span className="text-[10px] uppercase tracking-wide text-rose-600 border border-rose-200 rounded px-1 leading-tight">
+                          blocks
+                        </span>
+                      )}
+                      <span className="text-slate-300 group-hover:text-brand">→</span>
+                    </span>
+                  </button>
+                  {guide && (
+                    <Link
+                      to={`/help#uc-${guide.id}`}
+                      title={todo ? `How to start: ${guide.title}` : `How to fix: ${guide.title}`}
+                      className="shrink-0 text-xs text-brand hover:underline px-1 py-0.5"
+                    >
+                      How?
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="text-xs text-slate-400">
+            <span className="font-medium text-emerald-600">Done</span> ·{' '}
+            <span className="font-medium text-rose-600">Needs fixing</span> ·{' '}
+            <span className="font-medium text-amber-600">To do</span> — click an item to jump there,
+            or “How?” for a step-by-step guide.
+          </p>
+        </>
+      )}
+    </>
   );
 }
 
