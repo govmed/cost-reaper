@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './lib/auth';
+import { useRefLabeler } from './lib/refLabels';
 import BrandLogo from './components/BrandLogo';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -164,6 +165,18 @@ function Protected({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// The signed-in user's role badge. Its own component so the ROLE reference fetch
+// only runs once a user exists (not on the login screen). Label is DB-driven
+// (FR-29) and falls back to the raw role code until it loads.
+function RolePill({ role }: { role: string }) {
+  const roleLabeler = useRefLabeler('ROLE');
+  return (
+    <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs font-medium uppercase tracking-wide">
+      {roleLabeler.label(role)}
+    </span>
+  );
+}
+
 export default function App() {
   const { user, logout } = useAuth();
   return (
@@ -184,9 +197,7 @@ export default function App() {
         {user && (
           <div className="flex items-center gap-3 text-sm whitespace-nowrap">
             <span className="hidden md:inline text-white/80">{user.email}</span>
-            <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs font-medium uppercase tracking-wide">
-              {user.role}
-            </span>
+            <RolePill role={user.role} />
             <button
               onClick={logout}
               className="rounded-md border border-white/25 px-2.5 py-1 text-sm hover:bg-white/10"

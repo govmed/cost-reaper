@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { useUserMutations, useUsers } from '../lib/queries';
+import { useRefLabeler } from '../lib/refLabels';
 
+// Fallback role codes used until the DB reference labels load (FR-29).
 const ROLES = ['ADMIN', 'ESTIMATOR', 'VIEWER'];
 
 export default function UsersPage() {
   const { data, isLoading, error } = useUsers();
   const m = useUserMutations();
+  const roleLabeler = useRefLabeler('ROLE');
+  const roleOptions = roleLabeler.ready
+    ? roleLabeler.options
+    : ROLES.map((c) => ({ code: c, label: c }));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('ESTIMATOR');
@@ -65,9 +71,9 @@ export default function UsersPage() {
             onChange={(e) => setRole(e.target.value)}
             className="mt-1 block border border-slate-300 rounded px-3 py-2"
           >
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
+            {roleOptions.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
               </option>
             ))}
           </select>
@@ -106,9 +112,9 @@ export default function UsersPage() {
                     onChange={(e) => m.update.mutate({ id: u.id, body: { role: e.target.value } })}
                     className="border border-slate-200 rounded px-2 py-1"
                   >
-                    {ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
+                    {roleOptions.map((o) => (
+                      <option key={o.code} value={o.code}>
+                        {o.label}
                       </option>
                     ))}
                   </select>

@@ -1,4 +1,5 @@
 import { useAuth } from '../lib/auth';
+import { useRefLabeler } from '../lib/refLabels';
 import {
   ROLES,
   ROLE_CAPABILITIES,
@@ -12,6 +13,12 @@ import type { Role } from '../lib/types';
 export default function RolesPage() {
   const { user } = useAuth();
   const myRole = user?.role as Role | undefined;
+  // Role display labels come from the DB reference data (FR-29); ROLE_LABELS is
+  // the fallback used until they load. Codes (the matrix keys) stay code-coupled.
+  const roleLabeler = useRefLabeler('ROLE');
+  const roleLabel = (r: Role): string => {
+    return roleLabeler.ready ? roleLabeler.label(r) : ROLE_LABELS[r];
+  };
 
   return (
     <div className="space-y-5">
@@ -24,7 +31,7 @@ export default function RolesPage() {
             <>
               {' '}
               You are signed in as{' '}
-              <span className="font-medium text-brand">{ROLE_LABELS[myRole]}</span>.
+              <span className="font-medium text-brand">{roleLabel(myRole)}</span>.
             </>
           )}
         </p>
@@ -39,7 +46,7 @@ export default function RolesPage() {
               r === myRole ? 'border-brand bg-teal-50' : 'border-slate-200 bg-white'
             }`}
           >
-            <div className="font-semibold text-brand">{ROLE_LABELS[r]}</div>
+            <div className="font-semibold text-brand">{roleLabel(r)}</div>
             <p className="text-xs text-slate-500 mt-1">{ROLE_SUMMARIES[r]}</p>
           </div>
         ))}
@@ -53,7 +60,7 @@ export default function RolesPage() {
               <th className="px-4 py-2 text-left">Capability</th>
               {ROLES.map((r) => (
                 <th key={r} className={`px-4 py-2 text-center ${r === myRole ? 'text-brand' : ''}`}>
-                  {ROLE_LABELS[r]}
+                  {roleLabel(r)}
                 </th>
               ))}
             </tr>
