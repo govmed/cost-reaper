@@ -595,3 +595,17 @@ Redesigned the top navigation: 3 primary links + 4 tidy dropdown menus (Pricing/
 - Local gates green: web typecheck, ESLint, prettier. Committing → PR → merge (gated on green).
 - Confirmed PRs #54/#55/#56 (workflow repo / checklist rule sets / SOW→PDF) all merged earlier this session.
 ---
+
+---
+### [2026-06-15 00:00 UTC] — USER
+Continue
+
+### [2026-06-15 00:05 UTC] — AGENT
+Resumed the autonomous session. Merged the open, all-green PR #69 (web cache headers), cleaned up a stray macOS `Icon` ref file that was breaking `git pull`, pruned 16 merged branches, and brought the living memory back in line with reality (the Current State block had drifted — it called FR-21a/b "not yet built" when they ship on `main`).
+**Actions taken:**
+- `gh pr merge 69 --squash --delete-branch` → `main` at `75fe0b4`; verified MERGED.
+- Removed stray `.git/refs/.../Icon` files (`find .git/refs -name 'Icon*' -delete`), `git remote prune origin`, fast-forwarded `main`.
+- Audited `main`: confirmed FR-21a/b (cloud price sync + last-pulled), native `.xlsx`, scenarios/baselines/comments/fx/margin-tax/PERT, SaaS provider, checklist + SSO modules all present.
+- Rewrote the `CLAUDE.md` Current State block; added Chapter 8 to `PROJECT_LOG.md`; appended this audit entry.
+- Could not run pnpm/turbo locally (node/pnpm not on PATH in the tool shell) — relied on PR #69's green CI as the gate.
+---

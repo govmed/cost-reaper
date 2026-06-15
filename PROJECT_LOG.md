@@ -525,3 +525,13 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/App.tsx, apps/web/e2e/smoke.spec.ts
 - **Result:** Local gates green — web typecheck, ESLint, prettier all clean. (This time ESLint run locally too, per the #56 lesson.)
 - **Next:** commit → PR → CI-green (gated) → merge.
+
+## Chapter 8 — Maintenance, Brand & Memory Hygiene (started 2026-06-15)
+**Goal:** Keep `main` green and the living memory truthful now that the feature backlog is 54/54. Covers Section 19 (living docs), DoD hygiene, and the trailing polish PRs (#60–#69).
+
+### 2026-06-15 00:00 UTC — Merge PR #69, clean repo, refresh project memory
+- **Action:** Resumed an autonomous session. (1) Found PR #69 (`chore/web-cache-headers` — no-cache `index.html` + immutable hashed assets in nginx) open with **all CI green** (build/e2e/security); merged it (squash, branch deleted) → `main` at `75fe0b4`. (2) `git pull` then failed with "fatal: bad object … Icon?" — a stray macOS `Icon\r` file had been committed into `.git/refs/heads/chore/` (and its remote-tracking mirror). Removed both with `find .git/refs -name 'Icon*' -delete`, ran `git remote prune origin` (pruned 16 merged feature branches), and fast-forwarded `main`. (3) Audited the codebase to reconcile reality vs. the stale `CLAUDE.md` Current State block: confirmed **FR-21a/b are fully built** (Azure Retail / AWS SigV4 / GCP Billing `PricingProvider` strategies, `POST /cloud-prices/sync`, `GET /cloud-prices/last-pulled`, web "Refresh prices" + last-pulled table) — the block wrongly listed them as "spec'd, not yet built." Also verified on `main`: SaaS provider + catalog `category`, native `.xlsx` writer (`estimates/xlsx.ts`, no dep), scenarios/baselines/comments/fx/margin-tax/PERT migrations, checklist in `workflow/checklist.service.ts`, SSO in `auth/sso`. (4) Rewrote the **Current State** block to match reality and added a local-env note (node/pnpm not on PATH in this shell → CI is the health gate) + the `Icon`-ref gotcha.
+- **Why:** Section 19 / DoD — the living memory must reflect "now"; it had drifted (referenced long-merged branches as "not yet merged" and called shipped features unbuilt).
+- **Files touched:** CLAUDE.md (Current State block), PROJECT_LOG.md (this chapter), AUDIT_LOG.md.
+- **Result:** `main` clean at `75fe0b4`, PR #69 merged, stray refs removed, stale branches pruned, no open PRs. Could not run the toolchain locally (node/pnpm absent in the tool shell) — relied on the merged PR's green CI as the health gate.
+- **Next:** commit the memory refresh on a docs branch → PR → CI-green → merge. Then await direction or pick the next optional-polish item (FE-54 enum-label migration).
