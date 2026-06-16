@@ -111,6 +111,8 @@ test('Reference data admin page serves DB-driven values (FR-29)', async ({ page 
 
 test('Help guide lists use cases and deep-links by anchor', async ({ page }) => {
   await login(page);
+  // The persistent floating Help button is present on authenticated pages.
+  await expect(page.getByRole('link', { name: 'Help and guides' })).toBeVisible();
   await page.getByRole('button', { name: 'Docs' }).click();
   await page.getByRole('link', { name: 'Help', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Help & use cases' })).toBeVisible();

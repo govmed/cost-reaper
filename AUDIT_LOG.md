@@ -709,3 +709,14 @@ The data rows were a real table (aligned) but the "add a labor line" inputs were
 - Preserved all e2e-referenced selectors (role option, resource/alloc placeholders, date inputs in order, Phase selects, "Add labor" button); shortened only the unreferenced PERT placeholders.
 - Updated CHANGELOG + living docs. Committing → PR → CI → merge.
 ---
+
+---
+### [2026-06-15 21:45 UTC] — USER
+[shared a glossy red "HELP" button image] Could you find use for this?  /  In the values that are monetize use the $ symbol
+
+### [2026-06-15 21:50 UTC] — AGENT
+The image is a 123RF watermarked stock photo (can't ship it — licensing + raster + clashes with the flat UI), but the idea is good. Built a clean floating Help button instead. Queued the "$ on money values" change as a separate PR.
+**Actions taken:**
+- Added a `HelpButton` to App.tsx — a red "? Help" pill fixed bottom-right, links to /help, shown only when signed in, print:hidden. aria-label "Help and guides" so it doesn't collide with the nav "Help" link in e2e; added an e2e assertion.
+- Updated CHANGELOG + living docs. Committing the Help-button PR → CI → merge; then the $ formatting PR.
+---

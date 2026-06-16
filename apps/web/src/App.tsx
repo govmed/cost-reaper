@@ -177,6 +177,27 @@ function RolePill({ role }: { role: string }) {
   );
 }
 
+// Persistent floating Help button → the in-app guide (NFR-12). Honors the
+// "red help button" idea but built in CSS so it scales and matches the UI.
+function HelpButton() {
+  return (
+    <Link
+      to="/help"
+      title="Help & step-by-step guides"
+      aria-label="Help and guides"
+      className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg ring-1 ring-red-700/30 transition hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-2 print:hidden"
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-5 w-5 items-center justify-center rounded-full bg-white/25 text-xs font-bold"
+      >
+        ?
+      </span>
+      Help
+    </Link>
+  );
+}
+
 export default function App() {
   const { user, logout } = useAuth();
   return (
@@ -374,6 +395,7 @@ export default function App() {
         <span className="font-medium text-slate-500">Kerdos</span> — Project Cost Estimator · &copy;{' '}
         {new Date().getFullYear()} Veridion LLC
       </footer>
+      {user && <HelpButton />}
     </div>
   );
 }
