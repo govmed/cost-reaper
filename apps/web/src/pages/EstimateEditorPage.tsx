@@ -15,6 +15,7 @@ import {
 import { SDLC_PHASES } from '../lib/types';
 import { useCaseById, useCaseForChecklistKey } from '../lib/help-content';
 import { useRefLabeler } from '../lib/refLabels';
+import { formatMoney } from '../lib/money';
 import type {
   BillingPeriod,
   CapacityViolation,
@@ -202,17 +203,17 @@ export default function EstimateEditorPage() {
         id="sec-totals"
         className="grid grid-cols-2 md:grid-cols-4 gap-3 rounded-xl scroll-mt-20 transition-shadow"
       >
-        <Card label="One-time" value={`${t.oneTimeTotal} ${cur}`} />
-        <Card label="Monthly" value={`${t.monthlyTotal} ${cur}`} />
-        <Card label="Yearly" value={`${t.yearlyTotal} ${cur}`} />
-        <Card label="Grand total (cost)" value={`${t.grandTotal} ${cur}`} />
+        <Card label="One-time" value={formatMoney(t.oneTimeTotal, cur)} />
+        <Card label="Monthly" value={formatMoney(t.monthlyTotal, cur)} />
+        <Card label="Yearly" value={formatMoney(t.yearlyTotal, cur)} />
+        <Card label="Grand total (cost)" value={formatMoney(t.grandTotal, cur)} />
       </div>
       {(est.marginPercent > 0 || est.taxPercent > 0) && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card label="Margin" value={`${t.marginAmount} ${cur}`} />
-          <Card label="Sell price" value={`${t.sellPrice} ${cur}`} />
-          <Card label="Tax" value={`${t.taxAmount} ${cur}`} />
-          <Card label="Client price" value={`${t.clientPrice} ${cur}`} accent />
+          <Card label="Margin" value={formatMoney(t.marginAmount, cur)} />
+          <Card label="Sell price" value={formatMoney(t.sellPrice, cur)} />
+          <Card label="Tax" value={formatMoney(t.taxAmount, cur)} />
+          <Card label="Client price" value={formatMoney(t.clientPrice, cur)} accent />
         </div>
       )}
 
@@ -272,7 +273,8 @@ export default function EstimateEditorPage() {
             onSave={(v) => m.patch.mutate({ taxPercent: v })}
           />
           <div className="text-sm text-slate-500">
-            Upcharge {t.upchargeAmount} · Contingency {t.contingencyAmount} {cur}
+            Upcharge {formatMoney(t.upchargeAmount, cur)} · Contingency{' '}
+            {formatMoney(t.contingencyAmount, cur)}
           </div>
         </div>
       </Section>
@@ -565,15 +567,9 @@ function PhaseBreakdownSection({
           {phases.map((p) => (
             <tr key={p.phase} className="border-t border-slate-100">
               <td className="px-3 py-2 font-medium">{p.phase}</td>
-              <td className="px-3 py-2 text-right tabular-nums">
-                {p.oneTime} {cur}
-              </td>
-              <td className="px-3 py-2 text-right tabular-nums">
-                {p.monthly} {cur}
-              </td>
-              <td className="px-3 py-2 text-right tabular-nums">
-                {p.yearly} {cur}
-              </td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatMoney(p.oneTime, cur)}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatMoney(p.monthly, cur)}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatMoney(p.yearly, cur)}</td>
             </tr>
           ))}
         </tbody>
@@ -605,15 +601,9 @@ function CategoryBreakdownSection({
           {categories.map((c) => (
             <tr key={c.category} className="border-t border-slate-100">
               <td className="px-3 py-2 font-medium">{c.category}</td>
-              <td className="px-3 py-2 text-right tabular-nums">
-                {c.oneTime} {cur}
-              </td>
-              <td className="px-3 py-2 text-right tabular-nums">
-                {c.monthly} {cur}
-              </td>
-              <td className="px-3 py-2 text-right tabular-nums">
-                {c.yearly} {cur}
-              </td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatMoney(c.oneTime, cur)}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatMoney(c.monthly, cur)}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{formatMoney(c.yearly, cur)}</td>
             </tr>
           ))}
         </tbody>
@@ -774,9 +764,13 @@ function LaborSection({
                 <td className="px-3 py-2">{l.sdlcPhase ?? '—'}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.quantity}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.units}</td>
-                <td className="px-3 py-2 text-right tabular-nums">{l.rateSnapshot}</td>
+                <td className="px-3 py-2 text-right tabular-nums">
+                  {formatMoney(l.rateSnapshot, est.currency)}
+                </td>
                 <td className="px-3 py-2">{billing.label(l.billingPeriod)}</td>
-                <td className="px-3 py-2 text-right tabular-nums">{l.lineTotal}</td>
+                <td className="px-3 py-2 text-right tabular-nums">
+                  {formatMoney(l.lineTotal, est.currency)}
+                </td>
                 <td className="px-3 py-2 text-right">
                   <button
                     onClick={() => m.delLabor.mutate(l.id)}
@@ -966,10 +960,14 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
               className="border-t border-slate-100 scroll-mt-24 transition-colors"
             >
               <td className="px-3 py-2">{n.category}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{n.amount}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {formatMoney(n.amount, est.currency)}
+              </td>
               <td className="px-3 py-2">{billing.label(n.billingPeriod)}</td>
               <td className="px-3 py-2">{n.sdlcPhase ?? '—'}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{n.lineTotal}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {formatMoney(n.lineTotal, est.currency)}
+              </td>
               <td className="px-3 py-2 text-right">
                 <button
                   onClick={() => m.delNonLabor.mutate(n.id)}
@@ -1071,9 +1069,13 @@ function CloudSection({
               </td>
               <td className="px-3 py-2 text-right tabular-nums">{c.quantity}</td>
               <td className="px-3 py-2 text-right tabular-nums">{c.usageHoursPerMonth}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{c.unitPriceSnapshot}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {formatMoney(c.unitPriceSnapshot, est.currency)}
+              </td>
               <td className="px-3 py-2">{c.sdlcPhase ?? '—'}</td>
-              <td className="px-3 py-2 text-right tabular-nums">{c.lineTotal}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {formatMoney(c.lineTotal, est.currency)}
+              </td>
               <td className="px-3 py-2 text-right">
                 <button
                   onClick={() => m.delCloud.mutate(c.id)}
@@ -1104,8 +1106,8 @@ function CloudSection({
               <optgroup key={cat} label={cat}>
                 {items.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.provider} · {p.service} {p.skuOrInstance} ({p.region}) — {p.unitPrice}/
-                    {p.unit}
+                    {p.provider} · {p.service} {p.skuOrInstance} ({p.region}) —{' '}
+                    {formatMoney(p.unitPrice, p.currency)}/{p.unit}
                   </option>
                 ))}
               </optgroup>
@@ -1150,8 +1152,8 @@ function BaselinesSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   }
   const delta = (base: string) => {
     const d = currentGrand - Number(base);
-    const sign = d > 0 ? '+' : '';
-    return `${sign}${d.toFixed(4)}`;
+    const sign = d > 0 ? '+' : d < 0 ? '-' : '';
+    return `${sign}${formatMoney(Math.abs(d), cur)}`;
   };
   return (
     <Section title="Baselines & versions">
@@ -1191,14 +1193,14 @@ function BaselinesSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
                     {b.createdByEmail} · {new Date(b.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-2 py-1 text-right tabular-nums">
-                    {b.grandTotal} {cur}
+                    {formatMoney(b.grandTotal, cur)}
                   </td>
                   <td
                     className={`px-2 py-1 text-right tabular-nums ${
                       d > 0 ? 'text-rose-700' : d < 0 ? 'text-emerald-700' : 'text-slate-400'
                     }`}
                   >
-                    {delta(b.grandTotal)} {cur}
+                    {delta(b.grandTotal)}
                   </td>
                   <td className="px-2 py-1 text-right">
                     <button
@@ -1264,10 +1266,10 @@ function ScenariosSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
               </td>
               <td className="px-2 py-1">{s.status}</td>
               <td className="px-2 py-1 text-right tabular-nums">
-                {s.grandTotal} {s.currency}
+                {formatMoney(s.grandTotal, s.currency)}
               </td>
               <td className="px-2 py-1 text-right tabular-nums">
-                {s.clientPrice} {s.currency}
+                {formatMoney(s.clientPrice, s.currency)}
               </td>
             </tr>
           ))}

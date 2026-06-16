@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useCloudPrices, useCloudSync, useLastPulled } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
+import { formatMoney } from '../lib/money';
 
 // Fallback provider codes used until the DB reference labels load (FR-29).
 const PROVIDERS = ['', 'AWS', 'GCP', 'AZURE', 'SAAS'];
@@ -158,7 +159,9 @@ export default function CloudPricesPage() {
                 <td className="px-4 py-2">{p.service}</td>
                 <td className="px-4 py-2">{p.skuOrInstance}</td>
                 <td className="px-4 py-2">{unitLabeler.label(p.unit)}</td>
-                <td className="px-4 py-2 text-right tabular-nums">{p.unitPrice}</td>
+                <td className="px-4 py-2 text-right tabular-nums">
+                  {formatMoney(p.unitPrice, p.currency)}
+                </td>
                 <td className="px-4 py-2">{p.currency}</td>
               </tr>
             ))}

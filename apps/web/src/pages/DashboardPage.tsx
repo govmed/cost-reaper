@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDashboard, useStageEstimates } from '../lib/queries';
+import { formatMoney } from '../lib/money';
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
@@ -26,7 +27,7 @@ function StageDetail({ stageKey }: { stageKey: string }) {
             {e.name}
           </Link>
           <span className="text-slate-500 tabular-nums whitespace-nowrap">
-            {e.grandTotal} {e.currency} · {new Date(e.updatedAt).toLocaleDateString()}
+            {formatMoney(e.grandTotal, e.currency)} · {new Date(e.updatedAt).toLocaleDateString()}
           </span>
         </li>
       ))}
@@ -57,7 +58,7 @@ export default function DashboardPage() {
           label="Total value"
           value={
             data.totalsByCurrency.length
-              ? data.totalsByCurrency.map((t) => `${t.grandTotal} ${t.currency}`).join(' · ')
+              ? data.totalsByCurrency.map((t) => formatMoney(t.grandTotal, t.currency)).join(' · ')
               : '—'
           }
         />
@@ -112,7 +113,7 @@ export default function DashboardPage() {
                   {r.name}
                 </Link>
                 <span className="text-slate-500 tabular-nums whitespace-nowrap">
-                  {r.grandTotal} {r.currency}
+                  {formatMoney(r.grandTotal, r.currency)}
                 </span>
               </li>
             ))}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateEstimate, useEstimates } from '../lib/queries';
+import { formatMoney } from '../lib/money';
 
 export default function EstimatesPage() {
   const [q, setQ] = useState('');
@@ -75,7 +76,9 @@ export default function EstimatesPage() {
                 <td className="px-4 py-2 font-medium text-brand">{e.name}</td>
                 <td className="px-4 py-2">{e.status}</td>
                 <td className="px-4 py-2">{e.currency}</td>
-                <td className="px-4 py-2 text-right tabular-nums">{e.grandTotal}</td>
+                <td className="px-4 py-2 text-right tabular-nums">
+                  {formatMoney(e.grandTotal, e.currency)}
+                </td>
                 <td className="px-4 py-2 text-slate-500">
                   {new Date(e.updatedAt).toLocaleDateString()}
                 </td>

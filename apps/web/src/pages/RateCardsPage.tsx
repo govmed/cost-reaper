@@ -1,28 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useCreateRateCard, useRateCardMutations, useRateCards } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
+import { currencySymbol } from '../lib/money';
 import type { RateCard, RateCardRole } from '../lib/types';
 
 type RateCardMutations = ReturnType<typeof useRateCardMutations>;
 // Fallback unit codes used until the DB reference labels load (FR-29).
 const UNITS = ['HOUR', 'DAY'];
 
-// The rate card's currency symbol shown beside each rate; USD → "$".
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: '$',
-  CAD: '$',
-  AUD: '$',
-  NZD: '$',
-  EUR: '€',
-  GBP: '£',
-  JPY: '¥',
-  CNY: '¥',
-  INR: '₹',
-};
-function currencySymbol(code: string): string {
-  return CURRENCY_SYMBOLS[(code ?? '').toUpperCase()] ?? code ?? '$';
-}
-/** Format a rate as a 2-decimal money value ("85" → "85.00"); pass through if not numeric. */
+/** Format a rate as a 2-decimal value ("85" → "85.00"); pass through if not numeric. */
 function toMoney(v: string): string {
   const n = Number(v);
   return v.trim() !== '' && Number.isFinite(n) ? n.toFixed(2) : v;
