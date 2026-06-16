@@ -626,5 +626,16 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** User: "Cut v1.0.1 release." Bumped `1.0.0`→`1.0.1` across all 6 package.json + Swagger `setVersion`; promoted CHANGELOG `[Unreleased]` → `## [1.0.1] - 2026-06-16` (+ fresh empty Unreleased, + `[1.0.1]` compare link ref). The v1.0.1 batch = PRs #72/#73 (checklist), #74/#75 (FE-54 labels), #78 (rate-card $/sort), #79 (labor align), #80 (Help button), #81 (Veridion wordmark + K favicon), #82 (app-wide $ money). Internal deps `workspace:*` so drift-free.
 - **Why:** Package the post-1.0 polish into a tagged release (user's request).
 - **Files touched:** package.json (×6), apps/api/src/main.ts, CHANGELOG.md, CLAUDE.md, PROJECT_LOG.md, AUDIT_LOG.md. **Plus two money fixes bundled into the release** (user flagged "Total Value" had no `$`): apps/web/src/pages/DashboardPage.tsx (base-currency total → `formatMoney`) and apps/web/src/pages/EstimateEditorPage.tsx (labor role-picker rate → `formatMoney`).
-- **Result:** Pending — release-prep PR → CI-green → merge → annotated tag `v1.0.1` → GitHub release.
-- **Next:** open release-prep PR; on green, merge → `git tag -a v1.0.1` → push → `gh release create v1.0.1`.
+- **Result:** **Released** — PR #83 merged, tag `v1.0.1` on `main`, GitHub release published. (Cache-bust `?v=2` added in a follow-up commit on the release branch.)
+- **Next:** —
+
+### 2026-06-16 — Post-1.0.1: logo restore, favicon, Labor column widths
+- **Action:** Several quick rounds with the user:
+  1. **"see for yourself" (localhost:5173 still orange):** root cause was the running **Docker `web` container was a stale build** (old `index.html` → `/veridion-mark.png`). Rebuilt it (`docker compose build web && up -d web`) and verified `:5173` serves the new assets. (Lesson: a UI change needs the web container rebuilt to show on :5173; merging ≠ updating the running app.)
+  2. **"I liked the way you had it … edit out the orange V, use the icon from veridion.com":** realized Veridion's *real* icon is the **amber bar** (their favicon/app-icon), and the "orange V" was my homemade bar-**V** mark. **Restored** the bar+wordmark logo (header/login) and set the favicon to Veridion's amber-bar icon (PR #84, merged; `?v=3`).
+  3. **"swap Veridion with your logo":** declined — that's the Anthropic/Claude trademark; shipped the Veridion restore (their stated preference) instead.
+  4. **"Labor card — Role doesn't have enough room; make fields proportional, a 2nd line is fine":** made the Labor table `table-fixed` with a proportional `<colgroup>` (Role ~19%, wraps for long names; numeric cols compact). Gave `PeriodSelect`/`SdlcSelect` an optional `className` so the add-row selects are `w-full`; PERT row `flex-wrap`; Role/Resource cells `break-words`.
+- **Why:** User-driven branding + Labor-card readability.
+- **Files touched:** apps/web/src/components/BrandLogo.tsx, apps/web/index.html, apps/web/public/* (logo PR #84); apps/web/src/pages/EstimateEditorPage.tsx + CHANGELOG.md (Labor widths).
+- **Result:** Logo PR #84 merged. Labor change e2e-safe (selectors unchanged). **Can't visually verify layout locally (no toolchain) — will rebuild the web container so the user sees it and confirm.**
+- **Next:** commit Labor change → PR → CI-green → merge → rebuild web container → verify on :5173.

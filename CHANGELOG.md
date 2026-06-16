@@ -7,6 +7,7 @@ semantic versioning once it ships a first release.
 ## [Unreleased]
 
 ### Changed
+- **Labor table: proportional column widths so the Role fits.** The Labor card's 11 columns were auto-sized, squeezing the **Role** column so long role names were cut off. The table is now `table-fixed` with a proportional `<colgroup>` — Role gets the largest share (and wraps to a second line for long names), while the numeric columns (qty/units/rate/alloc/totals) stay compact. Everything fits the card width instead of being cramped.
 - **Restore the Veridion logo lockup; favicon uses Veridion's real icon.** The header and login show the **Veridion logo again** — the amber **bar mark + "Veridion" wordmark** (cropped from veridion.com), reverting the wordmark-only treatment from 1.0.1. The browser-tab **favicon is now Veridion's actual icon** (the amber bar from their app icon) instead of the placeholder "K" — and the homemade orange bar-**V** mark stays gone. Favicon cache-buster bumped to `?v=3`.
 
 ## [1.0.1] - 2026-06-16
