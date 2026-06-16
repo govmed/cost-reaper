@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Kerdos API')
     .setDescription('Technology Project Cost Estimator REST API (FR-12).')
-    .setVersion('1.0.0')
+    .setVersion('1.0.1')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);

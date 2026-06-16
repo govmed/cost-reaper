@@ -6,12 +6,19 @@ semantic versioning once it ships a first release.
 
 ## [Unreleased]
 
+_Nothing yet — next changes land here._
+
+## [1.0.1] - 2026-06-16
+
+Post-1.0 UI polish: real Veridion wordmark branding, a floating Help button,
+currency-symbol money formatting, and rate-card / labor-card refinements.
+
 ### Added
 - **Persistent floating "Help" button.** A red **? Help** button is now pinned to the bottom-right of every signed-in page and opens the in-app Help guide (NFR-12), so help is always one click away rather than buried in the Docs menu. Built in CSS (scales crisply, matches the flat UI) and hidden when printing.
 
 ### Changed
-- **Monetary values now show the currency symbol app-wide.** Money is rendered through a shared `formatMoney` helper as `<symbol><grouped 2-decimals>` — e.g. `$1,234.50` — using the record's currency (USD → `$`). Applied across the estimate editor (totals, line items, per-phase/per-category breakdowns, baseline deltas, scenarios), the estimates list, the dashboard, the cloud-price catalog, and the printable summary + Statement of Work. Previously these showed a bare number with a trailing currency code (e.g. `1234 USD`). The rate-card page reuses the same shared currency-symbol helper.
-- **Veridion wordmark branding (orange "V" mark removed everywhere).** The header and login now show the **"Veridion" wordmark** (cropped from the veridion.com logo) — the standalone orange "V"/mark was dropped per request. White wordmark on the teal header, black on the login card; "Kerdos" reads as the product name beside it (the redundant "Veridion LLC" subtitle is gone). The browser-tab **favicon is now a clean teal "K"** (Kerdos) tile instead of the orange mark.
+- **Every dollar amount now shows the `$` symbol and exactly 2 decimals, app-wide.** Money is rendered through a shared `formatMoney` helper as `<symbol><grouped 2-decimals>` — e.g. `$1,234.50` — using the record's currency (USD → `$`). Applied across the estimate editor (totals, line items, per-phase/per-category breakdowns, baseline deltas, scenarios, the role picker), the estimates list, the dashboard (per-currency total **and** the base-currency total), the cloud-price catalog, and the printable summary + Statement of Work. Previously these showed a bare number with a trailing currency code (e.g. `1234 USD`) and, in places, 4+ decimals. The rate-card page reuses the same shared currency-symbol helper.
+- **Veridion wordmark branding (orange "V" mark removed everywhere).** The header and login now show the **"Veridion" wordmark** (cropped from the veridion.com logo) — the standalone orange "V"/mark was dropped per request. White wordmark on the teal header, black on the login card; "Kerdos" reads as the product name beside it (the redundant "Veridion LLC" subtitle is gone). The browser-tab **favicon is now a clean teal "K"** (Kerdos) tile instead of the orange mark (with a cache-busting `?v=2` so browsers re-fetch it rather than showing the old cached orange icon).
 - **Rate cards: rates now show a currency symbol and 2 decimals, and the table sorts.** Each rate field shows the rate card's currency symbol (USD → `$`) and formats to two decimals on entry (`85` → `85.00`). The **Role** and **Rate** column headers are now clickable to sort the roles (ascending/descending, with a ▲/▼ indicator) — rate sorts numerically, role alphabetically.
 - **Labor card: the add-line fields now align under the column headers.** The "add a labor line" inputs were a free-flowing wrapped row that didn't line up with the table titles; they're now a footer row of the same table, so each field (role, resource, allocation, date window, phase, qty, units, billing) sits directly under its column. Dates stack inside the Window column and the optional PERT inputs tuck under Units.
 
@@ -285,5 +292,6 @@ Existing Prisma/Zod enums remain the stored type for now; migrating columns off 
 - GitHub Actions CI: format → lint → typecheck → test → build + dependency audit. (FE-3)
 - Documentation: `README` quickstart, `docs/ARCHITECTURE.md`, and ADRs 0001–0006.
 
-[Unreleased]: https://github.com/govmed/cost-reaper/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/govmed/cost-reaper/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/govmed/cost-reaper/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/govmed/cost-reaper/releases/tag/v1.0.0

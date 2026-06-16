@@ -1,6 +1,6 @@
 {
   "name": "cost-reaper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Technology Project Cost Estimator — pnpm + Turborepo monorepo (web + API + shared packages).",
   "repository": {
