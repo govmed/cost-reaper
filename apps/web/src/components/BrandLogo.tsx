@@ -1,12 +1,12 @@
 /**
- * Veridion logo — the brand mark (the amber bar icon from veridion.com) + the
- * "Veridion" wordmark, cropped from the site logo (tagline trimmed).
+ * Veridion wordmark — the "Veridion" wordmark only (the amber bar mark dropped),
+ * cropped from the veridion.com logo.
  *
  * Two variants so it reads on either surface:
- *  - "onLight" (default): amber bar + black wordmark — for white surfaces (login).
- *  - "onDark": amber bar + white wordmark — for the teal app header.
+ *  - "onLight" (default): black wordmark — for white surfaces (login).
+ *  - "onDark": white wordmark — for the teal app header.
  *
- * Source assets: apps/web/public/veridion-logo.png and veridion-logo-onteal.png.
+ * Source assets: apps/web/public/veridion-wordmark.png and veridion-wordmark-onteal.png.
  * Size via `className` (height-based, e.g. "h-7"); width scales to keep aspect.
  */
 export default function BrandLogo({
@@ -16,6 +16,6 @@ export default function BrandLogo({
   className?: string;
   variant?: 'onLight' | 'onDark';
 }) {
-  const src = variant === 'onDark' ? '/veridion-logo-onteal.png' : '/veridion-logo.png';
+  const src = variant === 'onDark' ? '/veridion-wordmark-onteal.png' : '/veridion-wordmark.png';
   return <img src={src} alt="Veridion" className={`${className} w-auto object-contain`} />;
 }
