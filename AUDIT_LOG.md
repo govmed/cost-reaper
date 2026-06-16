@@ -697,3 +697,15 @@ Implemented all three rate-card tweaks on RateCardsPage.
 - Role and Rate column headers are clickable to sort (▲/▼, asc/desc; rate numeric, role alphabetical) over a useMemo-sorted copy.
 - Updated CHANGELOG + living docs. e2e-safe (no rate-cards e2e). Committing → PR → CI → merge.
 ---
+
+---
+### [2026-06-15 21:00 UTC] — USER
+In the Labor card - I don't think the Titles align to the fields very well.
+
+### [2026-06-15 21:15 UTC] — AGENT
+The data rows were a real table (aligned) but the "add a labor line" inputs were a separate flex-wrap row that didn't line up with the column titles. Moved them into the table as a `<tfoot>` row so each field sits under its header.
+**Actions taken:**
+- LaborSection: replaced the flex add-row with an 11-cell `<tfoot>` row matching the headers (Window stacks the two dates; PERT tucks under Units; Rate shows "auto"; line-total blank).
+- Preserved all e2e-referenced selectors (role option, resource/alloc placeholders, date inputs in order, Phase selects, "Add labor" button); shortened only the unreferenced PERT placeholders.
+- Updated CHANGELOG + living docs. Committing → PR → CI → merge.
+---

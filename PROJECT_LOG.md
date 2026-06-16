@@ -597,3 +597,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/src/pages/RateCardsPage.tsx, CHANGELOG.md.
 - **Result:** UI-only, RateCardsPage-scoped. e2e-safe — no test navigates the Rate cards page. Matched prettier by hand (block-body `arrow`/`toggleSort` to dodge arrow-ternary parens; dropped `font-medium` from the sort buttons — inherited from the `<th>` under Tailwind preflight — so both header buttons stay ≤100 cols on one line). node/pnpm unavailable locally → CI gate.
 - **Next:** commit → PR → CI-green → merge.
+
+### 2026-06-15 21:15 UTC — Labor card: align the add-line fields under the column titles
+- **Action:** Rate-card PR merged (#78 → `main` `9a50aa0`). User: "In the Labor card — I don't think the Titles align to the fields very well." The data rows were a proper `<table>` (aligned), but the "add a labor line" inputs were a separate `flex flex-wrap` row that didn't line up under the column headers. Moved that row into the table as a **`<tfoot>` row** (11 cells matching the 11 headers): role / resource / allocation / window (the two date inputs stacked) / phase / qty / units (with the optional PERT opt-likely-pess tucked underneath) / rate ("auto", derived from role) / billing / line-total (blank) / Add-labor button. Inputs are `w-full` so they fill each column; preserved every e2e-referenced selector (role "Select role…" option, "resource (optional)"/"alloc %" placeholders, the two `type=date` inputs in start→end order, both Phase selects, the "Add labor" button) — only the unreferenced PERT placeholders were shortened (opt/likely/pess → o/m/p).
+- **Why:** Alignment/clarity — a table footer guarantees the add-line fields sit under their titles (the user's ask).
+- **Files touched:** apps/web/src/pages/EstimateEditorPage.tsx (LaborSection), CHANGELOG.md.
+- **Result:** UI-only. Couldn't preview locally (no node/pnpm) but the table layout structurally guarantees the alignment; matched prettier by hand. CI is the gate.
+- **Next:** commit → PR → CI-green → merge.

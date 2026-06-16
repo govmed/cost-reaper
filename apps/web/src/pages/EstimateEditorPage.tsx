@@ -788,101 +788,129 @@ function LaborSection({
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            {/* Add-a-line row — each field sits under its column header. */}
+            <tr className="border-t-2 border-slate-200 bg-slate-50/60 align-top">
+              <td className="px-3 py-2">
+                <select
+                  value={roleId}
+                  onChange={(e) => setRoleId(e.target.value)}
+                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
+                >
+                  <option value="">Select role…</option>
+                  {roles.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </td>
+              <td className="px-3 py-2">
+                <input
+                  value={resourceName}
+                  onChange={(e) => setResourceName(e.target.value)}
+                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
+                  placeholder="resource (optional)"
+                />
+              </td>
+              <td className="px-3 py-2">
+                <input
+                  value={allocation}
+                  onChange={(e) => setAllocation(e.target.value)}
+                  type="number"
+                  min="0"
+                  max="100"
+                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm text-right"
+                  title="Allocation %"
+                  placeholder="alloc %"
+                />
+              </td>
+              <td className="px-3 py-2">
+                <div className="flex flex-col gap-1">
+                  <input
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    type="date"
+                    className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
+                    title="Start date"
+                  />
+                  <input
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    type="date"
+                    className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
+                    title="End date"
+                  />
+                </div>
+              </td>
+              <td className="px-3 py-2">
+                <SdlcSelect value={phase} onChange={setPhase} />
+              </td>
+              <td className="px-3 py-2">
+                <input
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  type="number"
+                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm text-right"
+                  placeholder="qty"
+                />
+              </td>
+              <td className="px-3 py-2">
+                <input
+                  value={units}
+                  onChange={(e) => setUnits(e.target.value)}
+                  type="number"
+                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm text-right"
+                  placeholder="units"
+                />
+                <div
+                  className="mt-1 flex items-center justify-end gap-1"
+                  title="Optional three-point (PERT) estimate → units"
+                >
+                  <span className="text-[10px] uppercase tracking-wide text-slate-400">PERT</span>
+                  <input
+                    value={opt}
+                    onChange={(e) => setOpt(e.target.value)}
+                    type="number"
+                    className="w-9 border border-slate-300 rounded px-1 py-0.5 text-sm text-right"
+                    placeholder="o"
+                    title="Optimistic units"
+                  />
+                  <input
+                    value={likely}
+                    onChange={(e) => setLikely(e.target.value)}
+                    type="number"
+                    className="w-9 border border-slate-300 rounded px-1 py-0.5 text-sm text-right"
+                    placeholder="m"
+                    title="Most-likely units"
+                  />
+                  <input
+                    value={pess}
+                    onChange={(e) => setPess(e.target.value)}
+                    type="number"
+                    className="w-9 border border-slate-300 rounded px-1 py-0.5 text-sm text-right"
+                    placeholder="p"
+                    title="Pessimistic units"
+                  />
+                </div>
+              </td>
+              <td className="px-3 py-2 text-right align-middle text-xs text-slate-400">auto</td>
+              <td className="px-3 py-2">
+                <PeriodSelect value={period} onChange={setPeriod} />
+              </td>
+              <td className="px-3 py-2" />
+              <td className="px-3 py-2 text-right align-middle">
+                <button
+                  onClick={add}
+                  disabled={!roleId}
+                  className="bg-slate-800 text-white rounded px-3 py-1 text-sm whitespace-nowrap disabled:opacity-50"
+                >
+                  Add labor
+                </button>
+              </td>
+            </tr>
+          </tfoot>
         </table>
-      </div>
-      <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <select
-          value={roleId}
-          onChange={(e) => setRoleId(e.target.value)}
-          className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
-        >
-          <option value="">Select role…</option>
-          {roles.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-        <input
-          value={resourceName}
-          onChange={(e) => setResourceName(e.target.value)}
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-36"
-          placeholder="resource (optional)"
-        />
-        <input
-          value={allocation}
-          onChange={(e) => setAllocation(e.target.value)}
-          type="number"
-          min="0"
-          max="100"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
-          title="Allocation %"
-          placeholder="alloc %"
-        />
-        <input
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          type="date"
-          className="border border-slate-300 rounded px-2 py-1 text-sm"
-          title="Start date"
-        />
-        <input
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          type="date"
-          className="border border-slate-300 rounded px-2 py-1 text-sm"
-          title="End date"
-        />
-        <SdlcSelect value={phase} onChange={setPhase} />
-        <input
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
-          placeholder="qty"
-        />
-        <input
-          value={units}
-          onChange={(e) => setUnits(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
-          placeholder="units"
-        />
-        <span className="text-slate-400 text-xs" title="Optional three-point (PERT) estimate">
-          PERT:
-        </span>
-        <input
-          value={opt}
-          onChange={(e) => setOpt(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-16"
-          placeholder="opt"
-          title="Optimistic units"
-        />
-        <input
-          value={likely}
-          onChange={(e) => setLikely(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-16"
-          placeholder="likely"
-          title="Most-likely units"
-        />
-        <input
-          value={pess}
-          onChange={(e) => setPess(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-16"
-          placeholder="pess"
-          title="Pessimistic units"
-        />
-        <PeriodSelect value={period} onChange={setPeriod} />
-        <button
-          onClick={add}
-          disabled={!roleId}
-          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
-        >
-          Add labor
-        </button>
       </div>
       {m.addLabor.isError && (
         <p className="text-rose-700 text-sm" role="alert">

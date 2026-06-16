@@ -9,6 +9,7 @@ semantic versioning once it ships a first release.
 ### Changed
 - **Use the real Veridion logo in the header and on login.** Replaced the standalone amber "V" mark with the official Veridion logo (the mark + "Veridion" wordmark) pulled from veridion.com and cropped to drop the "AI business intelligence" tagline. The header renders an amber-mark/white-wordmark variant so it reads on the teal bar; the login card uses the full-colour version. The redundant "Veridion LLC" subtitle was dropped from the header (the logo carries it), and "Kerdos" now reads as the product name beside the company logo. Favicon unchanged (the square mark).
 - **Rate cards: rates now show a currency symbol and 2 decimals, and the table sorts.** Each rate field shows the rate card's currency symbol (USD → `$`) and formats to two decimals on entry (`85` → `85.00`). The **Role** and **Rate** column headers are now clickable to sort the roles (ascending/descending, with a ▲/▼ indicator) — rate sorts numerically, role alphabetically.
+- **Labor card: the add-line fields now align under the column headers.** The "add a labor line" inputs were a free-flowing wrapped row that didn't line up with the table titles; they're now a footer row of the same table, so each field (role, resource, allocation, date window, phase, qty, units, billing) sits directly under its column. Dates stack inside the Window column and the optional PERT inputs tuck under Units.
 
 ## [1.0.0] - 2026-06-15
 
