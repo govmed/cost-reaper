@@ -590,3 +590,10 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/web/public/{veridion-logo.png,veridion-logo-onteal.png}(new), apps/web/src/components/BrandLogo.tsx, apps/web/src/App.tsx, apps/web/src/pages/LoginPage.tsx, CHANGELOG.md.
 - **Result:** Previewed both variants composited on teal/white — clean. e2e-safe: the only brand assertion, `getByRole('link', {name:'Kerdos'})`, still matches (substring of the home link's "Veridion Kerdos" accessible name). No node/pnpm locally → CI gate.
 - **Next:** commit → PR → CI-green → merge. Then begin the next feature batch.
+
+### 2026-06-15 20:30 UTC — Rate card UX: $ + 2 decimals + sortable columns
+- **Action:** Real-logo PR merged (#77 → `main` `efc940c`). Three rate-card tweaks (user, in one turn): (1) "make sure the rate is in $ dollars" → each rate field now shows the card's currency symbol (USD→`$`, via a small `currencySymbol` map threaded from `card.currency`); (2) "85 should look like 85.00" → a `toMoney` helper formats rates to 2 decimals (initial display + on blur; saves the normalized value, compared numerically so unchanged blurs don't write); (3) "allow me to sort the role and Rate" → the **Role** and **Rate** `<th>`s are now sort buttons (▲/▼; rate numeric, role alphabetical, asc/desc toggle) over a `useMemo`-sorted copy of `card.roles`. The rate inputs became bordered `$`-prefixed fields (`inputMode="decimal"`).
+- **Why:** Rate-card authoring clarity + usability (the user's direct asks).
+- **Files touched:** apps/web/src/pages/RateCardsPage.tsx, CHANGELOG.md.
+- **Result:** UI-only, RateCardsPage-scoped. e2e-safe — no test navigates the Rate cards page. Matched prettier by hand (block-body `arrow`/`toggleSort` to dodge arrow-ternary parens; dropped `font-medium` from the sort buttons — inherited from the `<th>` under Tailwind preflight — so both header buttons stay ≤100 cols on one line). node/pnpm unavailable locally → CI gate.
+- **Next:** commit → PR → CI-green → merge.
