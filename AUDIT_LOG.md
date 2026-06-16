@@ -684,3 +684,16 @@ v1.0.0 was released (tag + GitHub release). The old logo was the bare amber "V" 
 - Rewrote `BrandLogo` with onLight/onDark variants; header uses onDark + divider + "Kerdos" (dropped redundant "Veridion LLC" subtitle); login stacks the colour logo above "Kerdos".
 - Updated CHANGELOG + living docs. e2e-safe (Kerdos link assertion still matches). Committing → PR → CI → merge.
 ---
+
+---
+### [2026-06-15 20:15 UTC] — USER
+When I add the rates in the rate card. Make sure the rate is in $ dollars.  /  85 should look like 85.00  /  Allow me to sort the role and Rate
+
+### [2026-06-15 20:30 UTC] — AGENT
+Implemented all three rate-card tweaks on RateCardsPage.
+**Actions taken:**
+- Rate fields show the card's currency symbol (USD → `$`) via a `currencySymbol` map threaded from `card.currency`.
+- Rates format to 2 decimals (`85` → `85.00`) via a `toMoney` helper (initial + on blur; numeric-compare to avoid spurious saves).
+- Role and Rate column headers are clickable to sort (▲/▼, asc/desc; rate numeric, role alphabetical) over a useMemo-sorted copy.
+- Updated CHANGELOG + living docs. e2e-safe (no rate-cards e2e). Committing → PR → CI → merge.
+---

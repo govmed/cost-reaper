@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useCreateRateCard, useRateCardMutations, useRateCards } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
 import type { RateCard, RateCardRole } from '../lib/types';
@@ -7,17 +7,41 @@ type RateCardMutations = ReturnType<typeof useRateCardMutations>;
 // Fallback unit codes used until the DB reference labels load (FR-29).
 const UNITS = ['HOUR', 'DAY'];
 
+// The rate card's currency symbol shown beside each rate; USD → "$".
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  CAD: '$',
+  AUD: '$',
+  NZD: '$',
+  EUR: '€',
+  GBP: '£',
+  JPY: '¥',
+  CNY: '¥',
+  INR: '₹',
+};
+function currencySymbol(code: string): string {
+  return CURRENCY_SYMBOLS[(code ?? '').toUpperCase()] ?? code ?? '$';
+}
+/** Format a rate as a 2-decimal money value ("85" → "85.00"); pass through if not numeric. */
+function toMoney(v: string): string {
+  const n = Number(v);
+  return v.trim() !== '' && Number.isFinite(n) ? n.toFixed(2) : v;
+}
+
 function RoleRow({
   cardId,
   role,
   m,
+  currency,
 }: {
   cardId: string;
   role: RateCardRole;
   m: RateCardMutations;
+  currency: string;
 }) {
   const [roleName, setRoleName] = useState(role.roleName);
-  const [rate, setRate] = useState(role.rate);
+  const [rate, setRate] = useState(toMoney(role.rate));
+  const sym = currencySymbol(currency);
   const unit = useRefLabeler('RATE_UNIT');
   const unitOptions = unit.ready ? unit.options : UNITS.map((c) => ({ code: c, label: c }));
   const save = (body: Record<string, unknown>) =>
@@ -46,12 +70,21 @@ function RoleRow({
         </select>
       </td>
       <td className="px-2 py-1 text-right">
-        <input
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-          onBlur={() => rate !== role.rate && rate && save({ rate })}
-          className="border border-slate-200 rounded px-2 py-1 text-sm w-28 text-right tabular-nums"
-        />
+        <span className="inline-flex w-28 items-center gap-1 rounded border border-slate-200 px-2 py-1 text-sm focus-within:ring-1 focus-within:ring-brand">
+          <span className="text-slate-400">{sym}</span>
+          <input
+            value={rate}
+            inputMode="decimal"
+            onChange={(e) => setRate(e.target.value)}
+            onBlur={() => {
+              const f = toMoney(rate);
+              setRate(f);
+              if (f && Number.isFinite(Number(f)) && Number(f) !== Number(role.rate))
+                save({ rate: f });
+            }}
+            className="w-full border-0 bg-transparent p-0 text-right tabular-nums outline-none"
+          />
+        </span>
       </td>
       <td className="px-2 py-1 text-right">
         <button
@@ -65,10 +98,19 @@ function RoleRow({
   );
 }
 
-function AddRoleRow({ cardId, m }: { cardId: string; m: RateCardMutations }) {
+function AddRoleRow({
+  cardId,
+  m,
+  currency,
+}: {
+  cardId: string;
+  m: RateCardMutations;
+  currency: string;
+}) {
   const [roleName, setRoleName] = useState('');
   const [unit, setUnit] = useState('HOUR');
   const [rate, setRate] = useState('');
+  const sym = currencySymbol(currency);
   const unitLabeler = useRefLabeler('RATE_UNIT');
   const unitOptions = unitLabeler.ready
     ? unitLabeler.options
@@ -103,13 +145,17 @@ function AddRoleRow({ cardId, m }: { cardId: string; m: RateCardMutations }) {
         </select>
       </td>
       <td className="px-2 py-1 text-right">
-        <input
-          value={rate}
-          onChange={(e) => setRate(e.target.value)}
-          type="number"
-          placeholder="rate"
-          className="border border-slate-200 rounded px-2 py-1 text-sm w-28 text-right"
-        />
+        <span className="inline-flex w-28 items-center gap-1 rounded border border-slate-200 px-2 py-1 text-sm focus-within:ring-1 focus-within:ring-brand">
+          <span className="text-slate-400">{sym}</span>
+          <input
+            value={rate}
+            inputMode="decimal"
+            onChange={(e) => setRate(e.target.value)}
+            onBlur={() => setRate(toMoney(rate))}
+            placeholder="0.00"
+            className="w-full border-0 bg-transparent p-0 text-right tabular-nums outline-none placeholder:text-slate-300"
+          />
+        </span>
       </td>
       <td className="px-2 py-1 text-right">
         <button
@@ -124,7 +170,28 @@ function AddRoleRow({ cardId, m }: { cardId: string; m: RateCardMutations }) {
   );
 }
 
+type SortKey = 'roleName' | 'rate';
+
 function RateCardPanel({ card, m }: { card: RateCard; m: RateCardMutations }) {
+  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' } | null>(null);
+  const sortedRoles = useMemo(() => {
+    if (!sort) return card.roles;
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    return [...card.roles].sort((a, b) => {
+      if (sort.key === 'rate') return (Number(a.rate) - Number(b.rate)) * dir;
+      return a.roleName.localeCompare(b.roleName) * dir;
+    });
+  }, [card.roles, sort]);
+  function toggleSort(key: SortKey) {
+    setSort((s) => {
+      if (s?.key !== key) return { key, dir: 'asc' };
+      return { key, dir: s.dir === 'asc' ? 'desc' : 'asc' };
+    });
+  }
+  function arrow(key: SortKey): string {
+    if (sort?.key !== key) return '';
+    return sort.dir === 'asc' ? ' ▲' : ' ▼';
+  }
   return (
     <section className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -158,17 +225,25 @@ function RateCardPanel({ card, m }: { card: RateCard; m: RateCardMutations }) {
       <table className="w-full text-sm">
         <thead className="text-slate-500">
           <tr>
-            <th className="px-2 py-1 text-left font-medium">Role</th>
+            <th className="px-2 py-1 text-left font-medium">
+              <button onClick={() => toggleSort('roleName')} className="hover:text-brand">
+                Role{arrow('roleName')}
+              </button>
+            </th>
             <th className="px-2 py-1 text-left font-medium">Unit</th>
-            <th className="px-2 py-1 text-right font-medium">Rate</th>
+            <th className="px-2 py-1 text-right font-medium">
+              <button onClick={() => toggleSort('rate')} className="hover:text-brand">
+                Rate{arrow('rate')}
+              </button>
+            </th>
             <th />
           </tr>
         </thead>
         <tbody>
-          {card.roles.map((r) => (
-            <RoleRow key={r.id} cardId={card.id} role={r} m={m} />
+          {sortedRoles.map((r) => (
+            <RoleRow key={r.id} cardId={card.id} role={r} m={m} currency={card.currency} />
           ))}
-          <AddRoleRow cardId={card.id} m={m} />
+          <AddRoleRow cardId={card.id} m={m} currency={card.currency} />
         </tbody>
       </table>
     </section>
