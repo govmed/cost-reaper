@@ -720,3 +720,16 @@ The image is a 123RF watermarked stock photo (can't ship it — licensing + rast
 - Added a `HelpButton` to App.tsx — a red "? Help" pill fixed bottom-right, links to /help, shown only when signed in, print:hidden. aria-label "Help and guides" so it doesn't collide with the nav "Help" link in e2e; added an e2e assertion.
 - Updated CHANGELOG + living docs. Committing the Help-button PR → CI → merge; then the $ formatting PR.
 ---
+
+---
+### [2026-06-15 22:05 UTC] — USER
+Remove that orange V logo.
+
+### [2026-06-15 22:10 UTC] — AGENT
+Asked where (AskUserQuestion) → "Everywhere". Removed the orange Veridion mark from the header/login and the favicon.
+**Actions taken:**
+- Re-cropped the veridion.com logo to the "Veridion" wordmark only (no orange mark) → veridion-wordmark.png (black) + veridion-wordmark-onteal.png (white).
+- Generated a clean teal "K" favicon (favicon.png) to replace the orange mark in the tab; updated index.html.
+- Pointed BrandLogo at the wordmark assets; deleted veridion-mark.png + veridion-logo*.png (and a stray macOS Icon file in public/).
+- Updated CHANGELOG + living docs. Help-button PR #80 merged first. Committing this → PR → CI → merge. Then the $ PR.
+---
