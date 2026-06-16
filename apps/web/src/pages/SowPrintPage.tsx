@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useSow } from '../lib/queries';
+import { formatMoney } from '../lib/money';
 
 /** Official, print-ready Statement of Work — "Save as PDF" via the browser (BR-7). */
 export default function SowPrintPage() {
@@ -11,7 +12,7 @@ export default function SowPrintPage() {
   if (!sow) return null;
 
   const cur = sow.currency;
-  const money = (v: string) => `${v} ${cur}`;
+  const money = (v: string) => formatMoney(v, cur);
   const p = sow.pricing;
 
   return (

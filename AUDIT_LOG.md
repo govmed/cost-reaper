@@ -733,3 +733,13 @@ Asked where (AskUserQuestion) → "Everywhere". Removed the orange Veridion mark
 - Pointed BrandLogo at the wordmark assets; deleted veridion-mark.png + veridion-logo*.png (and a stray macOS Icon file in public/).
 - Updated CHANGELOG + living docs. Help-button PR #80 merged first. Committing this → PR → CI → merge. Then the $ PR.
 ---
+
+---
+### [2026-06-15 22:40 UTC] — AGENT (the pending "$ on money" request)
+After the logo PRs, did the app-wide money-symbol change.
+**Actions taken:**
+- Added shared `lib/money.ts` (`currencySymbol`, `formatMoney` → "$1,234.50").
+- Applied across estimate editor (totals, line items, breakdowns, baselines, scenarios, cloud picker), estimates list, dashboard, cloud-price catalog, printable summary, SOW print; refactored RateCardsPage to the shared symbol helper.
+- Left FX rates (multipliers) and the estimate Currency column (code) as-is.
+- Updated CHANGELOG + living docs. e2e-safe (only the "Grand total" label is asserted). Committing → PR → CI → merge.
+---

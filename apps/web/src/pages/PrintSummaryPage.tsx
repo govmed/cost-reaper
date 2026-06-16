@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEstimate } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
+import { formatMoney } from '../lib/money';
 import type { EngineResult } from '../lib/types';
 
 /** Printable, read-only estimate summary (FR-10, FE-23). Reuses the detail payload. */
@@ -16,7 +17,7 @@ export default function PrintSummaryPage() {
 
   const t = est.totals;
   const cur = est.currency;
-  const money = (v: string) => `${v} ${cur}`;
+  const money = (v: string) => formatMoney(v, cur);
 
   return (
     <div className="max-w-3xl mx-auto bg-white text-slate-900 p-2 print:p-0">
@@ -53,10 +54,10 @@ export default function PrintSummaryPage() {
             l.roleName ?? l.description ?? '—',
             l.quantity,
             l.units,
-            l.rateSnapshot,
+            money(l.rateSnapshot),
             billing.label(l.billingPeriod),
             l.sdlcPhase ?? '—',
-            l.lineTotal,
+            money(l.lineTotal),
           ])}
         />
       )}
@@ -66,10 +67,10 @@ export default function PrintSummaryPage() {
           head={['Category', 'Amount', 'Billing', 'Phase', 'Line total']}
           rows={est.nonLaborItems.map((n) => [
             n.category,
-            n.amount,
+            money(n.amount),
             billing.label(n.billingPeriod),
             n.sdlcPhase ?? '—',
-            n.lineTotal,
+            money(n.lineTotal),
           ])}
         />
       )}
@@ -81,9 +82,9 @@ export default function PrintSummaryPage() {
             `${provider.label(c.provider)} · ${c.skuOrInstance} (${c.region})`,
             c.quantity,
             c.usageHoursPerMonth,
-            c.unitPriceSnapshot,
+            money(c.unitPriceSnapshot),
             c.sdlcPhase ?? '—',
-            c.lineTotal,
+            money(c.lineTotal),
           ])}
         />
       )}
