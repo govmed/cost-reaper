@@ -624,9 +624,11 @@ function Th({ children, right }: { children: ReactNode; right?: boolean }) {
 function PeriodSelect({
   value,
   onChange,
+  className = '',
 }: {
   value: BillingPeriod;
   onChange: (v: BillingPeriod) => void;
+  className?: string;
 }) {
   // Labels come from the DB-driven BILLING_PERIOD reference type (FR-29); the
   // stored value stays the code. Falls back to the built-in codes.
@@ -638,7 +640,7 @@ function PeriodSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as BillingPeriod)}
-      className="border border-slate-300 rounded px-2 py-1 text-sm"
+      className={`border border-slate-300 rounded px-2 py-1 text-sm ${className}`}
     >
       {opts.map((o) => (
         <option key={o.code} value={o.code}>
@@ -649,7 +651,15 @@ function PeriodSelect({
   );
 }
 
-function SdlcSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function SdlcSelect({
+  value,
+  onChange,
+  className = '',
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  className?: string;
+}) {
   // Options + labels come from the DB-driven SDLC_PHASE reference data (FR-29);
   // any active value is selectable (the column is a plain code now). Falls back
   // to the built-in codes only until that request resolves.
@@ -662,7 +672,7 @@ function SdlcSelect({ value, onChange }: { value: string; onChange: (v: string) 
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="border border-slate-300 rounded px-2 py-1 text-sm"
+      className={`border border-slate-300 rounded px-2 py-1 text-sm ${className}`}
       title="SDLC phase"
     >
       <option value="">Phase…</option>
@@ -737,7 +747,22 @@ function LaborSection({
   return (
     <Section title="Labor" id="sec-labor">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm table-fixed">
+          {/* Proportional column widths so the Role has room (it wraps to a 2nd
+              line for long names) and the numeric columns stay compact. */}
+          <colgroup>
+            <col className="w-[19%]" /> {/* Role */}
+            <col className="w-[12%]" /> {/* Resource */}
+            <col className="w-[6%]" /> {/* Alloc */}
+            <col className="w-[11%]" /> {/* Window */}
+            <col className="w-[10%]" /> {/* Phase */}
+            <col className="w-[5%]" /> {/* Qty */}
+            <col className="w-[7%]" /> {/* Units */}
+            <col className="w-[8%]" /> {/* Rate */}
+            <col className="w-[9%]" /> {/* Billing */}
+            <col className="w-[8%]" /> {/* Line total */}
+            <col className="w-[5%]" /> {/* actions */}
+          </colgroup>
           <thead className="text-slate-500">
             <tr>
               <Th>Role</Th>
@@ -760,8 +785,8 @@ function LaborSection({
                 id={`line-${l.id}`}
                 className="border-t border-slate-100 scroll-mt-24 transition-colors"
               >
-                <td className="px-3 py-2">{l.roleName ?? l.description ?? '—'}</td>
-                <td className="px-3 py-2">{l.resourceName ?? '—'}</td>
+                <td className="px-3 py-2 break-words">{l.roleName ?? l.description ?? '—'}</td>
+                <td className="px-3 py-2 break-words">{l.resourceName ?? '—'}</td>
                 <td className="px-3 py-2 text-right tabular-nums">{l.allocationPercent}%</td>
                 <td className="px-3 py-2 whitespace-nowrap">{fmtWindow(l.startDate, l.endDate)}</td>
                 <td className="px-3 py-2">{l.sdlcPhase ?? '—'}</td>
@@ -841,7 +866,7 @@ function LaborSection({
                 </div>
               </td>
               <td className="px-3 py-2">
-                <SdlcSelect value={phase} onChange={setPhase} />
+                <SdlcSelect value={phase} onChange={setPhase} className="w-full" />
               </td>
               <td className="px-3 py-2">
                 <input
@@ -861,7 +886,7 @@ function LaborSection({
                   placeholder="units"
                 />
                 <div
-                  className="mt-1 flex items-center justify-end gap-1"
+                  className="mt-1 flex flex-wrap items-center justify-end gap-1"
                   title="Optional three-point (PERT) estimate → units"
                 >
                   <span className="text-[10px] uppercase tracking-wide text-slate-400">PERT</span>
@@ -893,7 +918,7 @@ function LaborSection({
               </td>
               <td className="px-3 py-2 text-right align-middle text-xs text-slate-400">auto</td>
               <td className="px-3 py-2">
-                <PeriodSelect value={period} onChange={setPeriod} />
+                <PeriodSelect value={period} onChange={setPeriod} className="w-full" />
               </td>
               <td className="px-3 py-2" />
               <td className="px-3 py-2 text-right align-middle">
