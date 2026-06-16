@@ -621,6 +621,16 @@ function Th({ children, right }: { children: ReactNode; right?: boolean }) {
   );
 }
 
+/** A labelled field for the "add a line" forms — caption above its input. */
+function AddField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="flex flex-col gap-0.5">
+      <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</span>
+      {children}
+    </label>
+  );
+}
+
 function PeriodSelect({
   value,
   onChange,
@@ -810,129 +820,129 @@ function LaborSection({
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            {/* Add-a-line row — each field sits under its column header. */}
-            <tr className="border-t-2 border-slate-200 bg-slate-50/60 align-top">
-              <td className="px-3 py-2">
-                <select
-                  value={roleId}
-                  onChange={(e) => setRoleId(e.target.value)}
-                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
-                >
-                  <option value="">Select role…</option>
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td className="px-3 py-2">
-                <input
-                  value={resourceName}
-                  onChange={(e) => setResourceName(e.target.value)}
-                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
-                  placeholder="resource (optional)"
-                />
-              </td>
-              <td className="px-3 py-2">
-                <input
-                  value={allocation}
-                  onChange={(e) => setAllocation(e.target.value)}
-                  type="number"
-                  min="0"
-                  max="100"
-                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm text-right"
-                  title="Allocation %"
-                  placeholder="alloc %"
-                />
-              </td>
-              <td className="px-3 py-2">
-                <div className="flex flex-col gap-1">
-                  <input
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    type="date"
-                    className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
-                    title="Start date"
-                  />
-                  <input
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    type="date"
-                    className="w-full border border-slate-300 rounded px-2 py-1 text-sm"
-                    title="End date"
-                  />
-                </div>
-              </td>
-              <td className="px-3 py-2">
-                <SdlcSelect value={phase} onChange={setPhase} className="w-full" />
-              </td>
-              <td className="px-3 py-2">
-                <input
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  type="number"
-                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm text-right"
-                  placeholder="qty"
-                />
-              </td>
-              <td className="px-3 py-2">
-                <input
-                  value={units}
-                  onChange={(e) => setUnits(e.target.value)}
-                  type="number"
-                  className="w-full border border-slate-300 rounded px-2 py-1 text-sm text-right"
-                  placeholder="units"
-                />
-                <div
-                  className="mt-1 flex flex-wrap items-center justify-end gap-1"
-                  title="Optional three-point (PERT) estimate → units"
-                >
-                  <span className="text-[10px] uppercase tracking-wide text-slate-400">PERT</span>
-                  <input
-                    value={opt}
-                    onChange={(e) => setOpt(e.target.value)}
-                    type="number"
-                    className="w-9 border border-slate-300 rounded px-1 py-0.5 text-sm text-right"
-                    placeholder="o"
-                    title="Optimistic units"
-                  />
-                  <input
-                    value={likely}
-                    onChange={(e) => setLikely(e.target.value)}
-                    type="number"
-                    className="w-9 border border-slate-300 rounded px-1 py-0.5 text-sm text-right"
-                    placeholder="m"
-                    title="Most-likely units"
-                  />
-                  <input
-                    value={pess}
-                    onChange={(e) => setPess(e.target.value)}
-                    type="number"
-                    className="w-9 border border-slate-300 rounded px-1 py-0.5 text-sm text-right"
-                    placeholder="p"
-                    title="Pessimistic units"
-                  />
-                </div>
-              </td>
-              <td className="px-3 py-2 text-right align-middle text-xs text-slate-400">auto</td>
-              <td className="px-3 py-2">
-                <PeriodSelect value={period} onChange={setPeriod} className="w-full" />
-              </td>
-              <td className="px-3 py-2" />
-              <td className="px-3 py-2 text-right align-middle">
-                <button
-                  onClick={add}
-                  disabled={!roleId}
-                  className="bg-slate-800 text-white rounded px-3 py-1 text-sm whitespace-nowrap disabled:opacity-50"
-                >
-                  Add labor
-                </button>
-              </td>
-            </tr>
-          </tfoot>
         </table>
+      </div>
+      {/* Add a labor line — a labelled form (roomy fields) below the table. */}
+      <div className="pt-3 border-t border-slate-100 space-y-2">
+        <div className="text-xs font-medium text-slate-500">Add a labor line</div>
+        <div className="flex flex-wrap items-end gap-3">
+          <AddField label="Role">
+            <select
+              value={roleId}
+              onChange={(e) => setRoleId(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
+            >
+              <option value="">Select role…</option>
+              {roles.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </AddField>
+          <AddField label="Resource">
+            <input
+              value={resourceName}
+              onChange={(e) => setResourceName(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 text-sm w-40"
+              placeholder="resource (optional)"
+            />
+          </AddField>
+          <AddField label="Alloc %">
+            <input
+              value={allocation}
+              onChange={(e) => setAllocation(e.target.value)}
+              type="number"
+              min="0"
+              max="100"
+              className="border border-slate-300 rounded px-2 py-1 text-sm w-20 text-right"
+              title="Allocation %"
+              placeholder="alloc %"
+            />
+          </AddField>
+          <AddField label="Start">
+            <input
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              type="date"
+              className="border border-slate-300 rounded px-2 py-1 text-sm"
+              title="Start date"
+            />
+          </AddField>
+          <AddField label="End">
+            <input
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              type="date"
+              className="border border-slate-300 rounded px-2 py-1 text-sm"
+              title="End date"
+            />
+          </AddField>
+          <AddField label="Phase">
+            <SdlcSelect value={phase} onChange={setPhase} />
+          </AddField>
+          <AddField label="Qty (resources)">
+            <input
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              type="number"
+              className="border border-slate-300 rounded px-2 py-1 text-sm w-24 text-right"
+              placeholder="qty"
+              title="Number of resources"
+            />
+          </AddField>
+          <AddField label="Units (hrs/days each)">
+            <input
+              value={units}
+              onChange={(e) => setUnits(e.target.value)}
+              type="number"
+              className="border border-slate-300 rounded px-2 py-1 text-sm w-28 text-right"
+              placeholder="units"
+              title="Hours or days per resource"
+            />
+          </AddField>
+          <AddField label="PERT (opt / likely / pess)">
+            <div className="flex items-center gap-1">
+              <input
+                value={opt}
+                onChange={(e) => setOpt(e.target.value)}
+                type="number"
+                className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
+                placeholder="o"
+                title="Optimistic units"
+              />
+              <input
+                value={likely}
+                onChange={(e) => setLikely(e.target.value)}
+                type="number"
+                className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
+                placeholder="m"
+                title="Most-likely units"
+              />
+              <input
+                value={pess}
+                onChange={(e) => setPess(e.target.value)}
+                type="number"
+                className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
+                placeholder="p"
+                title="Pessimistic units"
+              />
+            </div>
+          </AddField>
+          <AddField label="Billing">
+            <PeriodSelect value={period} onChange={setPeriod} />
+          </AddField>
+          <button
+            onClick={add}
+            disabled={!roleId}
+            className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
+          >
+            Add labor
+          </button>
+        </div>
+        <p className="text-xs text-slate-400">
+          Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000).
+        </p>
       </div>
       {m.addLabor.isError && (
         <p className="text-rose-700 text-sm" role="alert">

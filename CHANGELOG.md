@@ -7,7 +7,7 @@ semantic versioning once it ships a first release.
 ## [Unreleased]
 
 ### Changed
-- **Labor table: proportional column widths so the Role fits.** The Labor card's 11 columns were auto-sized, squeezing the **Role** column so long role names were cut off. The table is now `table-fixed` with a proportional `<colgroup>` — Role gets the largest share (and wraps to a second line for long names), while the numeric columns (qty/units/rate/alloc/totals) stay compact. Everything fits the card width instead of being cramped.
+- **Labor card: readable table + a roomy labelled add-form.** The data table uses proportional `table-fixed` columns so the **Role** gets the most room (and wraps for long names) while numeric columns stay compact. The "add a labor line" controls moved out of the cramped table footer into a **labelled form** below the table, so every field box (Qty, Units, Billing, dates, …) is full-size and clearly captioned — including **"Qty (resources)"** × **"Units (hrs/days each)"** with a `line total = rate × qty × units` hint, so the two are no longer ambiguous. The overall editor content area is ~20% wider to give the dense cards more room.
 - **Branding: "Veridion" wordmark in the header/login; Veridion's bar icon as the favicon.** The header and login show just the **"Veridion" wordmark** (the amber bar mark is dropped per request). The browser-tab **favicon is Veridion's actual amber-bar icon** (from their app icon) — the placeholder "K" and the homemade bar-"V" mark are gone. Favicon cache-buster at `?v=3`.
 
 ## [1.0.1] - 2026-06-16

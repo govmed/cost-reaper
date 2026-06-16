@@ -224,7 +224,7 @@ export default function App() {
           </div>
         )}
       </header>
-      <main className="max-w-6xl mx-auto p-5">
+      <main className="max-w-[86rem] mx-auto p-5">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/sso/callback" element={<SsoCallbackPage />} />
