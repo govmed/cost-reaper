@@ -625,7 +625,9 @@ function Th({ children, right }: { children: ReactNode; right?: boolean }) {
 function AddField({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="flex flex-col gap-0.5">
-      <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</span>
+      <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+        {label}
+      </span>
       {children}
     </label>
   );
