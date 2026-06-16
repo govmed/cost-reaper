@@ -6,7 +6,8 @@ semantic versioning once it ships a first release.
 
 ## [Unreleased]
 
-_Nothing yet — next changes land here._
+### Changed
+- **Restore the Veridion logo lockup; favicon uses Veridion's real icon.** The header and login show the **Veridion logo again** — the amber **bar mark + "Veridion" wordmark** (cropped from veridion.com), reverting the wordmark-only treatment from 1.0.1. The browser-tab **favicon is now Veridion's actual icon** (the amber bar from their app icon) instead of the placeholder "K" — and the homemade orange bar-**V** mark stays gone. Favicon cache-buster bumped to `?v=3`.
 
 ## [1.0.1] - 2026-06-16
 
