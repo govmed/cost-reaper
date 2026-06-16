@@ -27,7 +27,9 @@ test('login → create estimate → add a line → see totals', async ({ page })
   // Scope to the non-labor section — "Licenses" also appears in the category breakdown.
   await expect(page.locator('#sec-nonlabor').getByRole('cell', { name: 'Licenses' })).toBeVisible();
   // Billing period renders its DB-driven label ("One-time"), not the raw code (FR-29).
-  await expect(page.getByRole('cell', { name: 'One-time', exact: true })).toBeVisible();
+  await expect(
+    page.locator('#sec-nonlabor').getByRole('cell', { name: 'One-time', exact: true }),
+  ).toBeVisible();
 
   // The governance checklist panel renders (FR-25)
   await expect(page.getByRole('heading', { name: 'Smart checklist' })).toBeVisible();
@@ -81,7 +83,9 @@ test('SDLC phase breakdown (FR-28), resource capacity guard (FR-27) + stage gate
   await dates.nth(0).fill('2026-07-01');
   await dates.nth(1).fill('2026-07-31');
   await page.getByRole('button', { name: 'Add labor', exact: true }).click();
-  await expect(page.getByRole('cell', { name: 'CapTester' })).toBeVisible();
+  await expect(
+    page.locator('#sec-labor tbody').getByRole('cell', { name: 'CapTester' }),
+  ).toBeVisible();
 
   // …a second overlapping 60% booking would exceed 100% → save is rejected.
   await roleSelect.selectOption({ index: 1 });
