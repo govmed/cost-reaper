@@ -743,3 +743,15 @@ After the logo PRs, did the app-wide money-symbol change.
 - Left FX rates (multipliers) and the estimate Currency column (code) as-is.
 - Updated CHANGELOG + living docs. e2e-safe (only the "Grand total" label is asserted). Committing → PR → CI → merge.
 ---
+
+---
+### [2026-06-16 00:30 UTC] — USER
+Commit and Push?  /  Cut v1.0.1 release  /  All values that are dollar amounts must have the $ symbol. Total Value does not have a $ symbol.  /  And only to the second digit.
+
+### [2026-06-16 00:40 UTC] — AGENT
+Confirmed nothing was uncommitted (main in sync). Cut v1.0.1, and fixed two money displays the user flagged on the way.
+**Actions taken:**
+- Found two missed money values: the Dashboard **base-currency "Total (… equivalent)"** stat (`baseCurrencyTotal`, was raw + 4 decimals + code) and the labor **role-picker** option rate; both now use `formatMoney` (→ `$` + exactly 2 decimals). Re-grep confirms every money field is covered.
+- Release: bumped 1.0.0→1.0.1 (6 package.json + Swagger); CHANGELOG `[Unreleased]` → `## [1.0.1] - 2026-06-16` + fresh Unreleased + compare link refs; sharpened the money bullet.
+- Next: release-prep PR (incl. the two money fixes) → CI-green → merge → tag v1.0.1 (push) → gh release create v1.0.1.
+---

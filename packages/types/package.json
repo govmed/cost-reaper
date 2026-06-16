@@ -1,6 +1,6 @@
 {
   "name": "@cost-reaper/types",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Shared Zod schemas + TypeScript types — the cost-reaper contract across the wire.",
   "main": "./dist/index.js",

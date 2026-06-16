@@ -66,7 +66,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <Stat
           label={`Total (${data.baseCurrency} equivalent)`}
-          value={`${data.baseCurrencyTotal} ${data.baseCurrency}`}
+          value={formatMoney(data.baseCurrencyTotal, data.baseCurrency)}
         />
       </div>
 

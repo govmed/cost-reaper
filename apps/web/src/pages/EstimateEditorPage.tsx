@@ -145,7 +145,10 @@ export default function EstimateEditorPage() {
   const t = est.totals;
   const cur = est.currency;
   const roles = (rateCards ?? []).flatMap((rc) =>
-    rc.roles.map((r) => ({ id: r.id, label: `${r.roleName} (${rc.name}) — ${r.rate}/${r.unit}` })),
+    rc.roles.map((r) => ({
+      id: r.id,
+      label: `${r.roleName} (${rc.name}) — ${formatMoney(r.rate, rc.currency)}/${r.unit}`,
+    })),
   );
 
   return (
