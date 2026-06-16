@@ -39,13 +39,11 @@ export default function LoginPage() {
       onSubmit={onSubmit}
       className="max-w-sm mx-auto mt-16 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4"
     >
-      <div className="flex items-center gap-3 text-brand">
-        <BrandLogo className="h-9" />
+      <div className="space-y-2">
+        <BrandLogo className="h-8" />
         <div>
-          <div className="text-2xl font-bold leading-none tracking-tight">Kerdos</div>
-          <p className="text-xs font-medium text-slate-400">
-            Project Cost Estimator · Veridion LLC
-          </p>
+          <div className="text-2xl font-bold leading-none tracking-tight text-brand">Kerdos</div>
+          <p className="text-xs font-medium text-slate-400">Project Cost Estimator</p>
         </div>
       </div>
       <h1 className="text-base font-medium text-slate-700">Sign in</h1>
