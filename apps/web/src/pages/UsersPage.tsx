@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { useUserMutations, useUsers } from '../lib/queries';
-import { useRefLabeler } from '../lib/refLabels';
+import { useRoles, useUserMutations, useUsers } from '../lib/queries';
 
-// Fallback role codes used until the DB reference labels load (FR-29).
-const ROLES = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
+// Fallback role codes used until the roles API loads (FR-30).
+const FALLBACK_ROLES = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
 
 export default function UsersPage() {
   const { data, isLoading, error } = useUsers();
   const m = useUserMutations();
-  const roleLabeler = useRefLabeler('ROLE');
-  const roleOptions = roleLabeler.ready
-    ? roleLabeler.options
-    : ROLES.map((c) => ({ code: c, label: c }));
+  // Assignable roles are the active, data-driven roles (FR-30) — incl. custom ones.
+  const { data: roles } = useRoles();
+  const roleOptions =
+    roles && roles.length
+      ? roles.filter((r) => r.isActive).map((r) => ({ code: r.code, label: r.displayName }))
+      : FALLBACK_ROLES.map((c) => ({ code: c, label: c }));
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('ESTIMATOR');

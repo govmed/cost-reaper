@@ -6,7 +6,7 @@ import {
   UpdateChecklistRuleRequest,
 } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ChecklistService } from './checklist.service';
 
@@ -18,13 +18,13 @@ export class ChecklistRulesController {
   constructor(private readonly checklist: ChecklistService) {}
 
   @Get()
-  @Roles('ADMIN')
+  @RequirePermission('checklist.configure')
   list(@Query('ruleSetId') ruleSetId?: string) {
     return this.checklist.listRules(ruleSetId);
   }
 
   @Post()
-  @Roles('ADMIN')
+  @RequirePermission('checklist.configure')
   create(
     @Body(new ZodValidationPipe(CreateChecklistRuleRequest)) dto: CreateChecklistRuleRequest,
     @CurrentUser() u: AuthUser,
@@ -33,7 +33,7 @@ export class ChecklistRulesController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN')
+  @RequirePermission('checklist.configure')
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateChecklistRuleRequest)) dto: UpdateChecklistRuleRequest,
@@ -43,7 +43,7 @@ export class ChecklistRulesController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN')
+  @RequirePermission('checklist.configure')
   remove(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.checklist.deleteRule(id, u);
   }

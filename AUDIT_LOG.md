@@ -845,3 +845,17 @@ Built step 2 — expanded the Kerdos sow module to the SOW_TEMPLATE structure.
 - Verified in-container: types rebuild + prisma generate + api tsc = PASS; prettier clean; cross-layer field-name consistency check clean. Web tsc via CI.
 - Opening the PR.
 ---
+
+---
+### [2026-06-17 10:30 UTC] — USER
+Build FE-55
+
+### [2026-06-17 11:40 UTC] — AGENT
+Built FE-55 / FR-30 (admin-defined roles & permission-based RBAC) per ADR-0010, end-to-end.
+**Actions taken:**
+- Dropped the Role enum; added data-driven `roles` table + migration (enum→text, drop type, create roles); seed of 4 built-ins (ADMIN=* / GM=advance / ESTIMATOR=author+sow+advance / VIEWER=none).
+- Permission catalog + `@RequirePermission` + `PermissionsGuard` (cached, ADMIN wildcard); migrated all 10 controllers off `@Roles`; `/roles` CRUD + `/permissions`; user-role validated server-side.
+- Web: widened Role to string + RoleDto/PermissionMeta + role hooks; rewrote RolesPage into an editable permission matrix; Users/Workflow dropdowns from /roles; deleted roleCapabilities.ts.
+- Verified in-container: api tsc PASS; 140 specs pass (incl. new 36-case roles-permissions.spec); prettier clean. Updated Roles-page e2e assertions. Web tsc + e2e via CI.
+- Opening PR.
+---

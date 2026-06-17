@@ -25,7 +25,7 @@ import {
   UpdateEstimateRequest,
 } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { EstimatesService } from './estimates.service';
 
@@ -70,7 +70,7 @@ export class EstimatesController {
   }
 
   @Post()
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   create(
     @Body(new ZodValidationPipe(CreateEstimateRequest)) dto: CreateEstimateRequest,
     @CurrentUser() u: AuthUser,
@@ -79,7 +79,7 @@ export class EstimatesController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateEstimateRequest)) dto: UpdateEstimateRequest,
@@ -89,21 +89,21 @@ export class EstimatesController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   @HttpCode(204)
   remove(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.estimates.remove(id, u.id);
   }
 
   @Post(':id/clone')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   clone(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.estimates.clone(id, u.id);
   }
 
   // Scenarios (FR-14): create a linked variant, and list the comparison group.
   @Post(':id/scenarios')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   createScenario(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.estimates.clone(id, u.id, true);
   }
@@ -115,7 +115,7 @@ export class EstimatesController {
 
   // Versioning / baselines (FR-15).
   @Post(':id/baselines')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   captureBaseline(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CaptureBaselineRequest)) dto: CaptureBaselineRequest,
@@ -130,7 +130,7 @@ export class EstimatesController {
   }
 
   @Delete(':id/baselines/:baselineId')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   delBaseline(
     @Param('id') id: string,
     @Param('baselineId') baselineId: string,
@@ -141,7 +141,7 @@ export class EstimatesController {
 
   // ── Line items ───────────────────────────────────────────────────────────────
   @Post(':id/labor-items')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   addLabor(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(LaborLineInput)) dto: LaborLineInput,
@@ -151,13 +151,13 @@ export class EstimatesController {
   }
 
   @Delete(':id/labor-items/:itemId')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   delLabor(@Param('id') id: string, @Param('itemId') itemId: string, @CurrentUser() u: AuthUser) {
     return this.estimates.deleteLabor(id, itemId, u.id);
   }
 
   @Post(':id/non-labor-items')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   addNonLabor(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(NonLaborLineInput)) dto: NonLaborLineInput,
@@ -167,7 +167,7 @@ export class EstimatesController {
   }
 
   @Delete(':id/non-labor-items/:itemId')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   delNonLabor(
     @Param('id') id: string,
     @Param('itemId') itemId: string,
@@ -177,7 +177,7 @@ export class EstimatesController {
   }
 
   @Post(':id/cloud-items')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   addCloud(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(CloudLineInput)) dto: CloudLineInput,
@@ -187,13 +187,13 @@ export class EstimatesController {
   }
 
   @Delete(':id/cloud-items/:itemId')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   delCloud(@Param('id') id: string, @Param('itemId') itemId: string, @CurrentUser() u: AuthUser) {
     return this.estimates.deleteCloud(id, itemId, u.id);
   }
 
   @Post(':id/assumptions')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   addAssumption(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(AssumptionInput)) dto: AssumptionInput,
@@ -203,7 +203,7 @@ export class EstimatesController {
   }
 
   @Delete(':id/assumptions/:itemId')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('estimate.author')
   delAssumption(
     @Param('id') id: string,
     @Param('itemId') itemId: string,

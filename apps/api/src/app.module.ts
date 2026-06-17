@@ -10,7 +10,9 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ProblemDetailsFilter } from './common/http/http-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { PermissionsGuard } from './common/guards/permissions.guard';
 import { HealthModule } from './modules/health/health.module';
+import { RolesModule } from './modules/roles/roles.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RateCardsModule } from './modules/rate-cards/rate-cards.module';
@@ -38,11 +40,15 @@ import { FxModule } from './modules/fx/fx.module';
     ReferenceModule,
     DashboardModule,
     FxModule,
+    RolesModule,
   ],
   providers: [
     // Auth runs first (authenticate), then RBAC (authorize) — deny-by-default (NFR-16).
+    // RolesGuard enforces any legacy @Roles(); PermissionsGuard enforces FR-30
+    // @RequirePermission() against the data-driven roles table.
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: PermissionsGuard },
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
   ],

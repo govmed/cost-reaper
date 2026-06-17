@@ -134,8 +134,8 @@ describe('Workflow card · transition contract + role gating (FR-2)', () => {
   it('TC-30 a transition gated to VIEWER is structurally valid', () => {
     expect(tOk(transition({ allowedRole: 'VIEWER' }))).toBe(true);
   });
-  it('TC-31 rejects an unknown allowedRole', () => {
-    expect(tOk(transition({ allowedRole: 'MANAGER' }))).toBe(false);
+  it('TC-31 rejects a malformed allowedRole code (membership server-side, FR-30)', () => {
+    expect(tOk(transition({ allowedRole: 'lower' }))).toBe(false);
   });
   it('TC-32 rejects a missing allowedRole', () => {
     const { allowedRole: _omit, ...rest } = transition();
@@ -176,8 +176,8 @@ describe('Workflow card · transition contract + role gating (FR-2)', () => {
   it('TC-43 transition update may be empty', () => {
     expect(UpdateTransitionRequest.safeParse({}).success).toBe(true);
   });
-  it('TC-44 transition update rejects an unknown role', () => {
-    expect(UpdateTransitionRequest.safeParse({ allowedRole: 'BOSS' }).success).toBe(false);
+  it('TC-44 transition update rejects a malformed role code (membership server-side, FR-30)', () => {
+    expect(UpdateTransitionRequest.safeParse({ allowedRole: 'bad role' }).success).toBe(false);
   });
   it('TC-45 transition update can toggle requiresChecklistPass', () => {
     expect(UpdateTransitionRequest.safeParse({ requiresChecklistPass: false }).success).toBe(true);

@@ -8,7 +8,7 @@ import {
   UpdateRateCardRoleRequest,
 } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { RateCardsService } from './rate-cards.service';
 
@@ -30,7 +30,7 @@ export class RateCardsController {
   }
 
   @Post()
-  @Roles('ADMIN')
+  @RequirePermission('ratecard.manage')
   create(
     @Body(new ZodValidationPipe(CreateRateCardRequest)) dto: CreateRateCardRequest,
     @CurrentUser() actor: AuthUser,
@@ -39,7 +39,7 @@ export class RateCardsController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN')
+  @RequirePermission('ratecard.manage')
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateRateCardRequest)) dto: UpdateRateCardRequest,
@@ -49,14 +49,14 @@ export class RateCardsController {
   }
 
   @Delete(':id')
-  @Roles('ADMIN')
+  @RequirePermission('ratecard.manage')
   @HttpCode(204)
   remove(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     return this.rateCards.remove(id, actor.id);
   }
 
   @Post(':id/roles')
-  @Roles('ADMIN')
+  @RequirePermission('ratecard.manage')
   addRole(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(RateCardRoleInput)) dto: RateCardRoleInput,
@@ -66,7 +66,7 @@ export class RateCardsController {
   }
 
   @Patch(':id/roles/:roleId')
-  @Roles('ADMIN')
+  @RequirePermission('ratecard.manage')
   updateRole(
     @Param('id') id: string,
     @Param('roleId') roleId: string,
@@ -77,7 +77,7 @@ export class RateCardsController {
   }
 
   @Delete(':id/roles/:roleId')
-  @Roles('ADMIN')
+  @RequirePermission('ratecard.manage')
   deleteRole(
     @Param('id') id: string,
     @Param('roleId') roleId: string,

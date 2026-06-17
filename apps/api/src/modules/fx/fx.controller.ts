@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { type AuthUser, UpdateFxRateRequest } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { FxService } from './fx.service';
 
@@ -18,13 +18,13 @@ export class FxController {
   }
 
   @Post('refresh')
-  @Roles('ADMIN')
+  @RequirePermission('fx.manage')
   refresh(@CurrentUser() u: AuthUser) {
     return this.fx.refresh(u);
   }
 
   @Patch(':currency')
-  @Roles('ADMIN')
+  @RequirePermission('fx.manage')
   upsert(
     @Param('currency') currency: string,
     @Body(new ZodValidationPipe(UpdateFxRateRequest)) dto: UpdateFxRateRequest,

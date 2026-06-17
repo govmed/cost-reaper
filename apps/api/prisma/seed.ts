@@ -17,11 +17,59 @@ import {
   CloudProvider,
   PrismaClient,
   RateUnit,
-  Role,
 } from '@prisma/client';
 import * as argon2 from 'argon2';
 
 const prisma = new PrismaClient();
+
+// Built-in roles & their permission grants (FR-30). Mirrors the prior @Roles
+// gating exactly: ADMIN holds the wildcard; ESTIMATOR authors estimates/SOWs and
+// advances the workflow; GM only advances (approve / return to draft); VIEWER is
+// read-only. Admins may add custom roles and re-tune these in the Roles editor.
+const BUILTIN_ROLES = [
+  {
+    code: 'ADMIN',
+    displayName: 'Administrator',
+    description: 'Full access to all features and administration.',
+    permissions: ['*'],
+  },
+  {
+    code: 'GM',
+    displayName: 'General Manager',
+    description:
+      'Reviews and approves estimates (or returns them to draft); cannot create or edit.',
+    permissions: ['workflow.advance'],
+  },
+  {
+    code: 'ESTIMATOR',
+    displayName: 'Estimator',
+    description: 'Builds and edits estimates and runs them through the approval workflow.',
+    permissions: ['estimate.author', 'sow.author', 'workflow.advance'],
+  },
+  {
+    code: 'VIEWER',
+    displayName: 'Viewer',
+    description: 'Read-only access to authorized estimates and dashboards.',
+    permissions: [],
+  },
+];
+
+async function seedRoles(): Promise<void> {
+  for (const r of BUILTIN_ROLES) {
+    await prisma.role.upsert({
+      where: { code: r.code },
+      update: {}, // keep admin customizations on re-run (idempotent create)
+      create: {
+        code: r.code,
+        displayName: r.displayName,
+        description: r.description,
+        isActive: true,
+        isBuiltin: true,
+        permissions: r.permissions,
+      },
+    });
+  }
+}
 
 async function seedAdmin() {
   const email = process.env.SEED_ADMIN_EMAIL ?? 'admin@example.com';
@@ -33,7 +81,7 @@ async function seedAdmin() {
     create: {
       email,
       passwordHash,
-      role: Role.ADMIN,
+      role: 'ADMIN',
       displayName: 'Administrator',
       isActive: true,
     },
@@ -726,7 +774,7 @@ async function seedDefaultWorkflow(adminId: string) {
     {
       from: 'DRAFT',
       to: 'IN_REVIEW',
-      allowedRole: Role.ESTIMATOR,
+      allowedRole: 'ESTIMATOR',
       label: 'Submit for review',
       requiresChecklistPass: true,
     },
@@ -734,7 +782,7 @@ async function seedDefaultWorkflow(adminId: string) {
       // The GM (reviewer) sends a submission back for rework (FR-24, FR-2).
       from: 'IN_REVIEW',
       to: 'DRAFT',
-      allowedRole: Role.GM,
+      allowedRole: 'GM',
       label: 'Return to draft',
       requiresChecklistPass: false,
     },
@@ -742,21 +790,21 @@ async function seedDefaultWorkflow(adminId: string) {
       // The GM approves a reviewed estimate (FR-24, FR-2).
       from: 'IN_REVIEW',
       to: 'APPROVED',
-      allowedRole: Role.GM,
+      allowedRole: 'GM',
       label: 'Approve',
       requiresChecklistPass: true,
     },
     {
       from: 'APPROVED',
       to: 'FINAL',
-      allowedRole: Role.ADMIN,
+      allowedRole: 'ADMIN',
       label: 'Finalize',
       requiresChecklistPass: true,
     },
     {
       from: 'FINAL',
       to: 'ARCHIVED',
-      allowedRole: Role.ADMIN,
+      allowedRole: 'ADMIN',
       label: 'Archive',
       requiresChecklistPass: false,
     },
@@ -1233,6 +1281,7 @@ async function seedSampleEstimate(adminId: string) {
 }
 
 async function main(): Promise<void> {
+  await seedRoles();
   const admin = await seedAdmin();
   await seedRateCard(admin.id);
   await seedCloudPrices();

@@ -13,8 +13,10 @@ import type {
   EstimateWorkflow,
   FxRate,
   Paginated,
+  PermissionMeta,
   ProviderLastPulled,
   RateCard,
+  RoleDto,
   ReferenceType,
   ReferenceValue,
   Scenario,
@@ -284,6 +286,40 @@ export function useCloudPrices() {
 
 export function useUsers() {
   return useQuery({ queryKey: ['users'], queryFn: () => api<UserDto[]>('/users') });
+}
+
+// ── Roles & permissions (FR-30) ─────────────────────────────────────────────
+export function useRoles() {
+  return useQuery({ queryKey: ['roles'], queryFn: () => api<RoleDto[]>('/roles') });
+}
+export function usePermissionCatalog() {
+  return useQuery({
+    queryKey: ['permissions'],
+    queryFn: () => api<PermissionMeta[]>('/permissions'),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+export function useRoleMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => {
+    void qc.invalidateQueries({ queryKey: ['roles'] });
+    void qc.invalidateQueries({ queryKey: ['users'] });
+  };
+  return {
+    create: useMutation({
+      mutationFn: (body: unknown) => api('/roles', { method: 'POST', body: JSON.stringify(body) }),
+      onSuccess,
+    }),
+    update: useMutation({
+      mutationFn: (v: { id: string; body: unknown }) =>
+        api(`/roles/${v.id}`, { method: 'PATCH', body: JSON.stringify(v.body) }),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string) => api(`/roles/${id}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
 }
 
 export function useUserMutations() {
