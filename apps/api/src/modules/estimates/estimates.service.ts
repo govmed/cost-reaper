@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -146,7 +147,7 @@ export class EstimatesService {
   }
 
   async update(id: string, dto: UpdateEstimateRequest, actorId: string) {
-    await this.ensure(id);
+    await this.ensureEditable(id);
     // Estimate status is governed by the ESTIMATE_STATUS reference list (FR-29).
     if (dto.status) await this.reference.assertActiveCode('ESTIMATE_STATUS', dto.status);
     await this.prisma.estimate.update({
@@ -391,7 +392,7 @@ export class EstimatesService {
   // ── Line items ───────────────────────────────────────────────────────────────
 
   async addLabor(estimateId: string, dto: LaborLineInput, actorId: string) {
-    await this.ensure(estimateId);
+    await this.ensureEditable(estimateId);
     await this.checkSdlcPhase(dto.sdlcPhase);
     let rate = dto.rateSnapshot;
     if (!rate) {
@@ -456,7 +457,7 @@ export class EstimatesService {
   }
 
   async addNonLabor(estimateId: string, dto: NonLaborLineInput, actorId: string) {
-    await this.ensure(estimateId);
+    await this.ensureEditable(estimateId);
     await this.checkSdlcPhase(dto.sdlcPhase);
     // Cost category is governed by the COST_CATEGORY reference list (FR-29, FE-11).
     await this.reference.assertActiveDisplayName('COST_CATEGORY', dto.category);
@@ -479,7 +480,7 @@ export class EstimatesService {
   }
 
   async addCloud(estimateId: string, dto: CloudLineInput, actorId: string) {
-    await this.ensure(estimateId);
+    await this.ensureEditable(estimateId);
     await this.checkSdlcPhase(dto.sdlcPhase);
     const price = await this.prisma.cloudPrice.findUnique({ where: { id: dto.cloudPriceId } });
     if (!price) throw new NotFoundException('Cloud price not found');
@@ -507,31 +508,35 @@ export class EstimatesService {
   }
 
   async deleteLabor(estimateId: string, itemId: string, actorId: string) {
+    await this.ensureEditable(estimateId);
     await this.prisma.laborLineItem.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
     return this.getDetail(estimateId);
   }
 
   async deleteNonLabor(estimateId: string, itemId: string, actorId: string) {
+    await this.ensureEditable(estimateId);
     await this.prisma.nonLaborLineItem.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
     return this.getDetail(estimateId);
   }
 
   async deleteCloud(estimateId: string, itemId: string, actorId: string) {
+    await this.ensureEditable(estimateId);
     await this.prisma.cloudComputeLineItem.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
     return this.getDetail(estimateId);
   }
 
   async addAssumption(estimateId: string, dto: AssumptionInput, actorId: string) {
-    await this.ensure(estimateId);
+    await this.ensureEditable(estimateId);
     await this.prisma.assumption.create({ data: { estimateId, text: dto.text } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
     return this.getDetail(estimateId);
   }
 
   async deleteAssumption(estimateId: string, itemId: string, actorId: string) {
+    await this.ensureEditable(estimateId);
     await this.prisma.assumption.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
     return this.getDetail(estimateId);
@@ -567,6 +572,25 @@ export class EstimatesService {
     if (!e) throw new NotFoundException('Estimate not found');
   }
 
+  /**
+   * Edit guard (FR-24 governance): an estimate is editable only in its workflow's
+   * initial (Draft) stage. Once it leaves Draft — In Review, Approved, Final,
+   * Archived — its content is locked until it transitions back to Draft. Comments,
+   * cloning, baselines and stage transitions are intentionally NOT gated here.
+   */
+  private async ensureEditable(id: string): Promise<void> {
+    const e = await this.prisma.estimate.findUnique({
+      where: { id },
+      select: { id: true, currentStage: { select: { isInitial: true, label: true } } },
+    });
+    if (!e) throw new NotFoundException('Estimate not found');
+    if (e.currentStage && !e.currentStage.isInitial) {
+      throw new ConflictException(
+        `This estimate is locked while in "${e.currentStage.label}". Return it to Draft to make changes.`,
+      );
+    }
+  }
+
   private computeTotals(e: any): EngineResult {
     return computeEstimate(buildEngineInput(toMappableEstimate(e)));
   }
@@ -583,6 +607,8 @@ export class EstimatesService {
       ownerId: e.ownerId,
       currentStageKey: e.currentStage?.key ?? null,
       currentStageLabel: e.currentStage?.label ?? null,
+      // Content is editable only in the workflow's initial (Draft) stage (FR-24).
+      editable: e.currentStage ? e.currentStage.isInitial : true,
       globalUpchargePercent: Number(e.globalUpchargePercent),
       contingencyPercent: Number(e.contingencyPercent),
       marginPercent: Number(e.marginPercent),

@@ -42,10 +42,12 @@ function NumberSetting({
   label,
   value,
   onSave,
+  disabled,
 }: {
   label: string;
   value: number;
   onSave: (v: number) => void;
+  disabled?: boolean;
 }) {
   const [v, setV] = useState(String(value));
   return (
@@ -57,12 +59,13 @@ function NumberSetting({
         step="0.01"
         min="0"
         max="100"
+        disabled={disabled}
         onChange={(e) => setV(e.target.value)}
         onBlur={() => {
           const n = Number.parseFloat(v);
           if (!Number.isNaN(n)) onSave(n);
         }}
-        className="mt-1 block w-28 border border-slate-300 rounded px-2 py-1"
+        className="mt-1 block w-28 border border-slate-300 rounded px-2 py-1 disabled:bg-slate-100 disabled:text-slate-400"
       />
     </label>
   );
@@ -144,6 +147,9 @@ export default function EstimateEditorPage() {
 
   const t = est.totals;
   const cur = est.currency;
+  // Content is editable only in the workflow's initial (Draft) stage (FR-24).
+  const editable = est.editable;
+  const stageLabel = workflow?.currentStageLabel ?? 'review';
   const roles = (rateCards ?? []).flatMap((rc) =>
     rc.roles.map((r) => ({
       id: r.id,
@@ -164,7 +170,8 @@ export default function EstimateEditorPage() {
           <select
             value={est.status}
             onChange={(e) => m.patch.mutate({ status: e.target.value })}
-            className="border border-slate-300 rounded px-2 py-1 text-sm"
+            disabled={!editable}
+            className="border border-slate-300 rounded px-2 py-1 text-sm disabled:bg-slate-100 disabled:text-slate-400"
           >
             {(statuses && statuses.length
               ? statuses
@@ -200,6 +207,22 @@ export default function EstimateEditorPage() {
           </button>
         </div>
       </div>
+
+      {!editable && (
+        <div
+          role="status"
+          className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          <span aria-hidden className="text-base leading-none">
+            🔒
+          </span>
+          <span>
+            <strong>Locked.</strong> This estimate is in <strong>{stageLabel}</strong> and is
+            read-only. Return it to <strong>Draft</strong> from the Governance panel below to make
+            changes.
+          </span>
+        </div>
+      )}
 
       {/* Totals */}
       <div
@@ -245,7 +268,8 @@ export default function EstimateEditorPage() {
             <select
               value={est.rateCardId ?? ''}
               onChange={(e) => m.patch.mutate({ rateCardId: e.target.value || null })}
-              className="mt-1 block border border-slate-300 rounded px-2 py-1 min-w-56"
+              disabled={!editable}
+              className="mt-1 block border border-slate-300 rounded px-2 py-1 min-w-56 disabled:bg-slate-100 disabled:text-slate-400"
             >
               <option value="">— none —</option>
               {(rateCards ?? []).map((rc) => (
@@ -259,21 +283,25 @@ export default function EstimateEditorPage() {
             label="Global upcharge %"
             value={est.globalUpchargePercent}
             onSave={(v) => m.patch.mutate({ globalUpchargePercent: v })}
+            disabled={!editable}
           />
           <NumberSetting
             label="Contingency %"
             value={est.contingencyPercent}
             onSave={(v) => m.patch.mutate({ contingencyPercent: v })}
+            disabled={!editable}
           />
           <NumberSetting
             label="Margin %"
             value={est.marginPercent}
             onSave={(v) => m.patch.mutate({ marginPercent: v })}
+            disabled={!editable}
           />
           <NumberSetting
             label="Tax %"
             value={est.taxPercent}
             onSave={(v) => m.patch.mutate({ taxPercent: v })}
+            disabled={!editable}
           />
           <div className="text-sm text-slate-500">
             Upcharge {formatMoney(t.upchargeAmount, cur)} · Contingency{' '}
@@ -282,10 +310,10 @@ export default function EstimateEditorPage() {
         </div>
       </Section>
 
-      <LaborSection est={est} roles={roles} m={m} />
-      <NonLaborSection est={est} m={m} />
-      <CloudSection est={est} prices={cloudPrices ?? []} m={m} />
-      <AssumptionsSection est={est} m={m} />
+      <LaborSection est={est} roles={roles} m={m} editable={editable} />
+      <NonLaborSection est={est} m={m} editable={editable} />
+      <CloudSection est={est} prices={cloudPrices ?? []} m={m} editable={editable} />
+      <AssumptionsSection est={est} m={m} editable={editable} />
       <CommentsSection est={est} m={m} />
     </div>
   );
@@ -711,10 +739,12 @@ function LaborSection({
   est,
   roles,
   m,
+  editable,
 }: {
   est: EstimateDetail;
   roles: { id: string; label: string }[];
   m: Mutations;
+  editable: boolean;
 }) {
   const billing = useRefLabeler('BILLING_PERIOD');
   const [roleId, setRoleId] = useState('');
@@ -832,12 +862,14 @@ function LaborSection({
                   {formatMoney(l.lineTotal, est.currency)}
                 </td>
                 <td className="px-3 py-2 text-right">
-                  <button
-                    onClick={() => m.delLabor.mutate(l.id)}
-                    className="text-rose-600 hover:underline"
-                  >
-                    Delete
-                  </button>
+                  {editable && (
+                    <button
+                      onClick={() => m.delLabor.mutate(l.id)}
+                      className="text-rose-600 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -845,133 +877,135 @@ function LaborSection({
         </table>
       </div>
       {/* Add a labor line — a labelled form (roomy fields) below the table. */}
-      <div className="pt-3 border-t border-slate-100 space-y-2">
-        <div className="text-xs font-medium text-slate-500">Add a labor line</div>
-        <div className="flex flex-wrap items-end gap-3">
-          <AddField label="Role">
-            <select
-              value={roleId}
-              onChange={(e) => setRoleId(e.target.value)}
-              className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
+      {editable && (
+        <div className="pt-3 border-t border-slate-100 space-y-2">
+          <div className="text-xs font-medium text-slate-500">Add a labor line</div>
+          <div className="flex flex-wrap items-end gap-3">
+            <AddField label="Role">
+              <select
+                value={roleId}
+                onChange={(e) => setRoleId(e.target.value)}
+                className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
+              >
+                <option value="">Select role…</option>
+                {roles.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            </AddField>
+            <AddField label="Resource">
+              <input
+                value={resourceName}
+                onChange={(e) => setResourceName(e.target.value)}
+                className="border border-slate-300 rounded px-2 py-1 text-sm w-40"
+                placeholder="resource (optional)"
+              />
+            </AddField>
+            <AddField label="Alloc %">
+              <input
+                value={allocation}
+                onChange={(e) => setAllocation(e.target.value)}
+                type="number"
+                min="0"
+                max="100"
+                className="border border-slate-300 rounded px-2 py-1 text-sm w-20 text-right"
+                title="Allocation %"
+                placeholder="alloc %"
+              />
+            </AddField>
+            <AddField label="Start">
+              <input
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                type="date"
+                className="border border-slate-300 rounded px-2 py-1 text-sm"
+                title="Start date"
+              />
+            </AddField>
+            <AddField label="End">
+              <input
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                type="date"
+                className="border border-slate-300 rounded px-2 py-1 text-sm"
+                title="End date"
+              />
+            </AddField>
+            <AddField label="Phase">
+              <SdlcSelect value={phase} onChange={setPhase} />
+            </AddField>
+            <AddField label="Qty (resources)">
+              <input
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                type="number"
+                className="border border-slate-300 rounded px-2 py-1 text-sm w-24 text-right"
+                placeholder="qty"
+                title="Number of resources"
+              />
+            </AddField>
+            <AddField label="Units (hrs/days each)">
+              <input
+                value={pertActive ? '' : units}
+                onChange={(e) => setUnits(e.target.value)}
+                type="number"
+                disabled={pertActive}
+                className="border border-slate-300 rounded px-2 py-1 text-sm w-28 text-right disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                placeholder={pertActive ? 'via PERT' : 'units'}
+                title={
+                  pertActive
+                    ? 'Units are computed from the PERT estimate — clear the PERT boxes to type units directly'
+                    : 'Hours or days per resource'
+                }
+              />
+            </AddField>
+            <AddField label="PERT (opt / likely / pess)">
+              <div className="flex items-center gap-1">
+                <input
+                  value={opt}
+                  onChange={(e) => setOpt(e.target.value)}
+                  type="number"
+                  className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
+                  placeholder="o"
+                  title="Optimistic units"
+                />
+                <input
+                  value={likely}
+                  onChange={(e) => setLikely(e.target.value)}
+                  type="number"
+                  className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
+                  placeholder="m"
+                  title="Most-likely units"
+                />
+                <input
+                  value={pess}
+                  onChange={(e) => setPess(e.target.value)}
+                  type="number"
+                  className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
+                  placeholder="p"
+                  title="Pessimistic units"
+                />
+              </div>
+            </AddField>
+            <AddField label="Billing">
+              <PeriodSelect value={period} onChange={setPeriod} />
+            </AddField>
+            <button
+              onClick={add}
+              disabled={!roleId}
+              className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
             >
-              <option value="">Select role…</option>
-              {roles.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-          </AddField>
-          <AddField label="Resource">
-            <input
-              value={resourceName}
-              onChange={(e) => setResourceName(e.target.value)}
-              className="border border-slate-300 rounded px-2 py-1 text-sm w-40"
-              placeholder="resource (optional)"
-            />
-          </AddField>
-          <AddField label="Alloc %">
-            <input
-              value={allocation}
-              onChange={(e) => setAllocation(e.target.value)}
-              type="number"
-              min="0"
-              max="100"
-              className="border border-slate-300 rounded px-2 py-1 text-sm w-20 text-right"
-              title="Allocation %"
-              placeholder="alloc %"
-            />
-          </AddField>
-          <AddField label="Start">
-            <input
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              type="date"
-              className="border border-slate-300 rounded px-2 py-1 text-sm"
-              title="Start date"
-            />
-          </AddField>
-          <AddField label="End">
-            <input
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              type="date"
-              className="border border-slate-300 rounded px-2 py-1 text-sm"
-              title="End date"
-            />
-          </AddField>
-          <AddField label="Phase">
-            <SdlcSelect value={phase} onChange={setPhase} />
-          </AddField>
-          <AddField label="Qty (resources)">
-            <input
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              type="number"
-              className="border border-slate-300 rounded px-2 py-1 text-sm w-24 text-right"
-              placeholder="qty"
-              title="Number of resources"
-            />
-          </AddField>
-          <AddField label="Units (hrs/days each)">
-            <input
-              value={pertActive ? '' : units}
-              onChange={(e) => setUnits(e.target.value)}
-              type="number"
-              disabled={pertActive}
-              className="border border-slate-300 rounded px-2 py-1 text-sm w-28 text-right disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
-              placeholder={pertActive ? 'via PERT' : 'units'}
-              title={
-                pertActive
-                  ? 'Units are computed from the PERT estimate — clear the PERT boxes to type units directly'
-                  : 'Hours or days per resource'
-              }
-            />
-          </AddField>
-          <AddField label="PERT (opt / likely / pess)">
-            <div className="flex items-center gap-1">
-              <input
-                value={opt}
-                onChange={(e) => setOpt(e.target.value)}
-                type="number"
-                className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
-                placeholder="o"
-                title="Optimistic units"
-              />
-              <input
-                value={likely}
-                onChange={(e) => setLikely(e.target.value)}
-                type="number"
-                className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
-                placeholder="m"
-                title="Most-likely units"
-              />
-              <input
-                value={pess}
-                onChange={(e) => setPess(e.target.value)}
-                type="number"
-                className="border border-slate-300 rounded px-1 py-1 text-sm w-14 text-right"
-                placeholder="p"
-                title="Pessimistic units"
-              />
-            </div>
-          </AddField>
-          <AddField label="Billing">
-            <PeriodSelect value={period} onChange={setPeriod} />
-          </AddField>
-          <button
-            onClick={add}
-            disabled={!roleId}
-            className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
-          >
-            Add labor
-          </button>
+              Add labor
+            </button>
+          </div>
+          <p className="text-xs text-slate-400">
+            Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000). If you
+            fill the PERT boxes, units are taken from that three-point estimate instead.
+          </p>
         </div>
-        <p className="text-xs text-slate-400">
-          Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000). If you fill
-          the PERT boxes, units are taken from that three-point estimate instead.
-        </p>
-      </div>
+      )}
       {m.addLabor.isError && (
         <p className="text-rose-700 text-sm" role="alert">
           {(m.addLabor.error as Error).message}
@@ -981,7 +1015,15 @@ function LaborSection({
   );
 }
 
-function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
+function NonLaborSection({
+  est,
+  m,
+  editable,
+}: {
+  est: EstimateDetail;
+  m: Mutations;
+  editable: boolean;
+}) {
   const billing = useRefLabeler('BILLING_PERIOD');
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
@@ -1035,48 +1077,52 @@ function NonLaborSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
                 {formatMoney(n.lineTotal, est.currency)}
               </td>
               <td className="px-3 py-2 text-right">
-                <button
-                  onClick={() => m.delNonLabor.mutate(n.id)}
-                  className="text-rose-600 hover:underline"
-                >
-                  Delete
-                </button>
+                {editable && (
+                  <button
+                    onClick={() => m.delNonLabor.mutate(n.id)}
+                    className="text-rose-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="border border-slate-300 rounded px-2 py-1 text-sm"
-          title="Cost category"
-        >
-          <option value="">Category…</option>
-          {catOptions.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-32"
-          placeholder="amount"
-        />
-        <PeriodSelect value={period} onChange={setPeriod} />
-        <SdlcSelect value={phase} onChange={setPhase} />
-        <button
-          onClick={add}
-          disabled={!category.trim() || !amount}
-          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
-        >
-          Add non-labor
-        </button>
-      </div>
+      {editable && (
+        <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="border border-slate-300 rounded px-2 py-1 text-sm"
+            title="Cost category"
+          >
+            <option value="">Category…</option>
+            {catOptions.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <input
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            type="number"
+            className="border border-slate-300 rounded px-2 py-1 text-sm w-32"
+            placeholder="amount"
+          />
+          <PeriodSelect value={period} onChange={setPeriod} />
+          <SdlcSelect value={phase} onChange={setPhase} />
+          <button
+            onClick={add}
+            disabled={!category.trim() || !amount}
+            className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+          >
+            Add non-labor
+          </button>
+        </div>
+      )}
     </Section>
   );
 }
@@ -1085,10 +1131,12 @@ function CloudSection({
   est,
   prices,
   m,
+  editable,
 }: {
   est: EstimateDetail;
   prices: CloudPrice[];
   m: Mutations;
+  editable: boolean;
 }) {
   const provider = useRefLabeler('CLOUD_PROVIDER');
   const [priceId, setPriceId] = useState('');
@@ -1143,66 +1191,70 @@ function CloudSection({
                 {formatMoney(c.lineTotal, est.currency)}
               </td>
               <td className="px-3 py-2 text-right">
-                <button
-                  onClick={() => m.delCloud.mutate(c.id)}
-                  className="text-rose-600 hover:underline"
-                >
-                  Delete
-                </button>
+                {editable && (
+                  <button
+                    onClick={() => m.delCloud.mutate(c.id)}
+                    className="text-rose-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-        <select
-          value={priceId}
-          onChange={(e) => setPriceId(e.target.value)}
-          className="border border-slate-300 rounded px-2 py-1 text-sm min-w-72"
-        >
-          <option value="">Select cloud resource…</option>
-          {Object.entries(
-            prices.reduce<Record<string, CloudPrice[]>>((acc, p) => {
-              (acc[p.category] ??= []).push(p);
-              return acc;
-            }, {}),
-          )
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([cat, items]) => (
-              <optgroup key={cat} label={cat}>
-                {items.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.provider} · {p.service} {p.skuOrInstance} ({p.region}) —{' '}
-                    {formatMoney(p.unitPrice, p.currency)}/{p.unit}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-        </select>
-        <input
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
-          placeholder="qty"
-        />
-        <input
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
-          type="number"
-          className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
-          placeholder="usage/mo"
-          title="Usage units per month — hours for compute, or GB / requests / seats / 1 month for other units"
-        />
-        <SdlcSelect value={phase} onChange={setPhase} />
-        <button
-          onClick={add}
-          disabled={!priceId}
-          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
-        >
-          Add cloud
-        </button>
-      </div>
+      {editable && (
+        <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
+          <select
+            value={priceId}
+            onChange={(e) => setPriceId(e.target.value)}
+            className="border border-slate-300 rounded px-2 py-1 text-sm min-w-72"
+          >
+            <option value="">Select cloud resource…</option>
+            {Object.entries(
+              prices.reduce<Record<string, CloudPrice[]>>((acc, p) => {
+                (acc[p.category] ??= []).push(p);
+                return acc;
+              }, {}),
+            )
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([cat, items]) => (
+                <optgroup key={cat} label={cat}>
+                  {items.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.provider} · {p.service} {p.skuOrInstance} ({p.region}) —{' '}
+                      {formatMoney(p.unitPrice, p.currency)}/{p.unit}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+          </select>
+          <input
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            type="number"
+            className="border border-slate-300 rounded px-2 py-1 text-sm w-20"
+            placeholder="qty"
+          />
+          <input
+            value={hours}
+            onChange={(e) => setHours(e.target.value)}
+            type="number"
+            className="border border-slate-300 rounded px-2 py-1 text-sm w-24"
+            placeholder="usage/mo"
+            title="Usage units per month — hours for compute, or GB / requests / seats / 1 month for other units"
+          />
+          <SdlcSelect value={phase} onChange={setPhase} />
+          <button
+            onClick={add}
+            disabled={!priceId}
+            className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+          >
+            Add cloud
+          </button>
+        </div>
+      )}
     </Section>
   );
 }
@@ -1400,7 +1452,15 @@ function CommentsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
   );
 }
 
-function AssumptionsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
+function AssumptionsSection({
+  est,
+  m,
+  editable,
+}: {
+  est: EstimateDetail;
+  m: Mutations;
+  editable: boolean;
+}) {
   const [text, setText] = useState('');
   function add() {
     if (!text.trim()) return;
@@ -1416,31 +1476,35 @@ function AssumptionsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
             className="flex items-center justify-between border-b border-slate-100 py-1"
           >
             <span>{a.text}</span>
-            <button
-              onClick={() => m.delAssumption.mutate(a.id)}
-              className="text-rose-600 hover:underline text-xs"
-            >
-              Delete
-            </button>
+            {editable && (
+              <button
+                onClick={() => m.delAssumption.mutate(a.id)}
+                className="text-rose-600 hover:underline text-xs"
+              >
+                Delete
+              </button>
+            )}
           </li>
         ))}
         {est.assumptions.length === 0 && <li className="text-slate-400">None yet.</li>}
       </ul>
-      <div className="flex gap-2 pt-2">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
-          placeholder="Add an assumption…"
-        />
-        <button
-          onClick={add}
-          disabled={!text.trim()}
-          className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
-        >
-          Add
-        </button>
-      </div>
+      {editable && (
+        <div className="flex gap-2 pt-2">
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="border border-slate-300 rounded px-2 py-1 text-sm flex-1"
+            placeholder="Add an assumption…"
+          />
+          <button
+            onClick={add}
+            disabled={!text.trim()}
+            className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+          >
+            Add
+          </button>
+        </div>
+      )}
     </Section>
   );
 }
