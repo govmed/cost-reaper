@@ -815,6 +815,37 @@ function LaborSection({
   // When all three PERT points are set, units come from PERT (not the Units box).
   const pertActive = !!(opt && likely && pess);
 
+  // NaN-safe parse that PRESERVES a typed 0 — the old `parseFloat(x) || default`
+  // silently turned a typed quantity/allocation 0 into 1/100 (DEF-LABOR-002).
+  const num = (s: string, fallback: number): number => {
+    const n = Number.parseFloat(s);
+    return Number.isFinite(n) ? n : fallback;
+  };
+  const qtyNum = num(quantity, 1);
+  const unitsNum = num(units, 0);
+  const allocNum = num(allocation, 100);
+  const datesOk = (!startDate && !endDate) || (!!startDate && !!endDate && endDate >= startDate);
+  // Mirror the server rules so the form never POSTs a meaningless line (units 0,
+  // qty 0) — instead the Add button stays disabled and tells the user why.
+  const canAdd =
+    !!roleId &&
+    qtyNum > 0 &&
+    (pertActive || unitsNum > 0) &&
+    allocNum >= 0 &&
+    allocNum <= 100 &&
+    datesOk;
+  const addHint = !roleId
+    ? 'Select a role to add a labor line.'
+    : qtyNum <= 0
+      ? 'Quantity must be greater than 0.'
+      : !pertActive && unitsNum <= 0
+        ? 'Enter units greater than 0 (or fill all three PERT boxes).'
+        : allocNum < 0 || allocNum > 100
+          ? 'Allocation must be between 0 and 100%.'
+          : !datesOk
+            ? 'Provide both a start and end date (end on or after start), or neither.'
+            : '';
+
   // Reset the add-row to its defaults after a successful add so stale values —
   // above all the PERT three-point inputs — never carry into (and silently
   // override the Units of) the next line.
@@ -834,26 +865,27 @@ function LaborSection({
   }
 
   function add() {
-    if (!roleId) return;
+    if (!canAdd) return;
     const body: Record<string, unknown> = {
       rateCardRoleId: roleId,
-      units: Number.parseFloat(units) || 0,
-      quantity: Number.parseFloat(quantity) || 1,
+      // Server recomputes effective units from PERT when the three points are sent.
+      units: pertActive ? 0 : unitsNum,
+      quantity: qtyNum,
       billingPeriod: period,
     };
     if (phase) body.sdlcPhase = phase;
     if (resourceName.trim()) {
       body.resourceName = resourceName.trim();
-      body.allocationPercent = Number.parseFloat(allocation) || 100;
+      body.allocationPercent = allocNum;
     }
     if (startDate && endDate) {
       body.startDate = startDate;
       body.endDate = endDate;
     }
-    if (opt && likely && pess) {
-      body.unitsOptimistic = Number.parseFloat(opt) || 0;
-      body.unitsMostLikely = Number.parseFloat(likely) || 0;
-      body.unitsPessimistic = Number.parseFloat(pess) || 0;
+    if (pertActive) {
+      body.unitsOptimistic = num(opt, 0);
+      body.unitsMostLikely = num(likely, 0);
+      body.unitsPessimistic = num(pess, 0);
     }
     m.addLabor.mutate(body, { onSuccess: resetForm });
   }
@@ -1055,12 +1087,18 @@ function LaborSection({
             </AddField>
             <button
               onClick={add}
-              disabled={!roleId}
+              disabled={!canAdd}
+              title={addHint || 'Add this labor line'}
               className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
             >
               Add labor
             </button>
           </div>
+          {addHint && roleId && (
+            <p className="text-xs text-amber-700" role="alert">
+              {addHint}
+            </p>
+          )}
           <p className="text-xs text-slate-400">
             Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000). If you
             fill the PERT boxes, units are taken from that three-point estimate instead.
