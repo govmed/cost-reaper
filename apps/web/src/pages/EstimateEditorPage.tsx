@@ -730,6 +730,26 @@ function LaborSection({
   const [opt, setOpt] = useState('');
   const [likely, setLikely] = useState('');
   const [pess, setPess] = useState('');
+  // When all three PERT points are set, units come from PERT (not the Units box).
+  const pertActive = !!(opt && likely && pess);
+
+  // Reset the add-row to its defaults after a successful add so stale values —
+  // above all the PERT three-point inputs — never carry into (and silently
+  // override the Units of) the next line.
+  function resetForm() {
+    setRoleId('');
+    setUnits('1');
+    setQuantity('1');
+    setPeriod('ONE_TIME');
+    setPhase('');
+    setResourceName('');
+    setAllocation('100');
+    setStartDate('');
+    setEndDate('');
+    setOpt('');
+    setLikely('');
+    setPess('');
+  }
 
   function add() {
     if (!roleId) return;
@@ -753,7 +773,7 @@ function LaborSection({
       body.unitsMostLikely = Number.parseFloat(likely) || 0;
       body.unitsPessimistic = Number.parseFloat(pess) || 0;
     }
-    m.addLabor.mutate(body, { onSuccess: () => setRoleId('') });
+    m.addLabor.mutate(body, { onSuccess: resetForm });
   }
 
   return (
@@ -895,12 +915,17 @@ function LaborSection({
           </AddField>
           <AddField label="Units (hrs/days each)">
             <input
-              value={units}
+              value={pertActive ? '' : units}
               onChange={(e) => setUnits(e.target.value)}
               type="number"
-              className="border border-slate-300 rounded px-2 py-1 text-sm w-28 text-right"
-              placeholder="units"
-              title="Hours or days per resource"
+              disabled={pertActive}
+              className="border border-slate-300 rounded px-2 py-1 text-sm w-28 text-right disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+              placeholder={pertActive ? 'via PERT' : 'units'}
+              title={
+                pertActive
+                  ? 'Units are computed from the PERT estimate — clear the PERT boxes to type units directly'
+                  : 'Hours or days per resource'
+              }
             />
           </AddField>
           <AddField label="PERT (opt / likely / pess)">
@@ -943,7 +968,8 @@ function LaborSection({
           </button>
         </div>
         <p className="text-xs text-slate-400">
-          Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000).
+          Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000). If you fill
+          the PERT boxes, units are taken from that three-point estimate instead.
         </p>
       </div>
       {m.addLabor.isError && (
