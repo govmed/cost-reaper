@@ -645,3 +645,9 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Files touched:** apps/api/prisma/schema.prisma, apps/api/prisma/migrations/20260617060000_add_gm_role/migration.sql, apps/api/prisma/seed.ts, apps/api/src/modules/workflow/workflow.controller.ts, packages/types/src/common.ts, apps/web/src/lib/types.ts, apps/web/src/lib/roleCapabilities.ts, apps/web/src/pages/UsersPage.tsx, apps/web/src/pages/WorkflowPage.tsx; CLAUDE.md/PROJECT_LOG.md/AUDIT_LOG.md.
 - **Result:** Estimate mutation endpoints stay ADMIN/ESTIMATOR-only (GM can't edit); GET routes open to any authed user (GM reviews). No test hardcodes the Approve role, so the re-gate is safe. Removed a stray macOS `Icon` file from the migration dir. Toolchain not on PATH locally → **CI is the gate**. Branch + PR next.
 - **Next:** commit on a feature branch → push → open PR → watch CI → merge when green.
+
+### 2026-06-17 — GM role merged (PR #91) + Icon-ref recovery
+- **Action:** PR #91 opened and all three CI jobs went green (build 52s, e2e 1m51s, security). `gh pr merge --squash --delete-branch` reported `fatal: bad object refs/Icon?` and failed to fast-forward local `main` — the macOS Icon-ref breakage again. Verified the squash had actually landed server-side (`gh pr view 91` → MERGED, mergeCommit `4971b98`), then recovered local: `find .git/refs -name 'Icon*' -delete` (removed ~13 stray Icon refs), `git remote prune origin`, `git pull --ff-only origin main`.
+- **Why:** Land the GM approver role (FR-2/FR-26) and keep the local repo consistent with `origin/main`.
+- **Result:** `main` at `4971b98`; GM verified present (transition endpoint `@Roles('ADMIN','ESTIMATOR','GM')`, Zod/web `Role` include GM); working tree clean; no remaining Icon refs.
+- **Next:** maintenance/polish or whatever the user directs.

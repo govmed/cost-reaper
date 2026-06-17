@@ -785,3 +785,13 @@ Picked up the in-progress GM (General Manager) role work (uncommitted schema enu
 - Estimate mutation endpoints unchanged (ADMIN/ESTIMATOR only) so GM cannot create/edit; GET routes open to authed users so GM can review.
 - Updated CLAUDE.md Current State + PROJECT_LOG.md. Next: feature branch → PR → CI → merge.
 ---
+
+---
+### [2026-06-17 06:40 UTC] — AGENT (cont.)
+GM role PR merged; recovered from the Icon-ref breakage.
+**Actions taken:**
+- Opened PR #91; CI green on build/e2e/security.
+- `gh pr merge --squash` failed locally (`bad object refs/Icon?`) but the squash had landed server-side (PR #91 MERGED, `4971b98`).
+- Fixed: `find .git/refs -name 'Icon*' -delete` + `git remote prune origin` + `git pull --ff-only origin main`. Verified GM on main, tree clean.
+- Updated CLAUDE.md Current State (GM marked merged) + PROJECT_LOG.md.
+---
