@@ -14,6 +14,7 @@ import {
 } from '../lib/queries';
 import { SDLC_PHASES } from '../lib/types';
 import { useCaseById, useCaseForChecklistKey } from '../lib/help-content';
+import HelpDrawer from '../components/HelpDrawer';
 import { useRefLabeler } from '../lib/refLabels';
 import { formatMoney } from '../lib/money';
 import type {
@@ -71,14 +72,48 @@ function NumberSetting({
   );
 }
 
-function Section({ title, children, id }: { title: string; children: ReactNode; id?: string }) {
+function Section({
+  title,
+  children,
+  id,
+  helpIds,
+}: {
+  title: string;
+  children: ReactNode;
+  id?: string;
+  /** When set, a "?" icon on the right opens a contextual help drawer (NFR-12). */
+  helpIds?: string[];
+}) {
+  const [helpOpen, setHelpOpen] = useState(false);
+  const hasHelp = !!helpIds && helpIds.length > 0;
   return (
     <section
       id={id}
       className="bg-white border border-slate-200 rounded-xl p-4 space-y-3 scroll-mt-20 transition-shadow"
     >
-      <h2 className="font-semibold text-brand">{title}</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-semibold text-brand">{title}</h2>
+        {hasHelp && (
+          <button
+            type="button"
+            onClick={() => setHelpOpen(true)}
+            aria-label={`How to use ${title}`}
+            title={`How to: ${title}`}
+            className="shrink-0 inline-flex items-center justify-center w-6 h-6 rounded-full border border-slate-300 text-slate-500 text-sm font-semibold leading-none hover:border-brand hover:text-brand"
+          >
+            ?
+          </button>
+        )}
+      </div>
       {children}
+      {hasHelp && (
+        <HelpDrawer
+          open={helpOpen}
+          onClose={() => setHelpOpen(false)}
+          title={title}
+          useCaseIds={helpIds}
+        />
+      )}
     </section>
   );
 }
@@ -166,27 +201,35 @@ export default function EstimateEditorPage() {
           </Link>
           <h1 className="text-2xl font-semibold">{est.name}</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={est.status}
-            onChange={(e) => m.patch.mutate({ status: e.target.value })}
-            disabled={!editable}
-            className="border border-slate-300 rounded px-2 py-1 text-sm disabled:bg-slate-100 disabled:text-slate-400"
-          >
-            {(statuses && statuses.length
-              ? statuses
-                  .filter((s) => s.isActive)
-                  .map((s) => ({ code: s.code, label: s.displayName }))
-              : [
-                  { code: 'DRAFT', label: 'Draft' },
-                  { code: 'FINAL', label: 'Final' },
-                ]
-            ).map((s) => (
-              <option key={s.code} value={s.code}>
-                {s.label}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-end gap-2">
+          <label className="text-sm">
+            <span className="block text-xs text-slate-500 mb-0.5">Status</span>
+            <select
+              value={est.status}
+              onChange={(e) => m.patch.mutate({ status: e.target.value })}
+              disabled={!editable}
+              title={
+                editable
+                  ? 'Set the estimate status'
+                  : 'Locked — return the estimate to Draft to change its status'
+              }
+              className="border border-slate-300 rounded px-2 py-1 text-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+            >
+              {(statuses && statuses.length
+                ? statuses
+                    .filter((s) => s.isActive)
+                    .map((s) => ({ code: s.code, label: s.displayName }))
+                : [
+                    { code: 'DRAFT', label: 'Draft' },
+                    { code: 'FINAL', label: 'Final' },
+                  ]
+              ).map((s) => (
+                <option key={s.code} value={s.code}>
+                  {s.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <Link
             to={`/estimates/${est.id}/print`}
             className="border border-brand text-brand rounded px-3 py-1.5 text-sm font-medium hover:bg-teal-50"
@@ -261,7 +304,16 @@ export default function EstimateEditorPage() {
 
       <BaselinesSection est={est} m={m} />
 
-      <Section title="Settings" id="sec-settings">
+      <Section
+        title="Settings"
+        id="sec-settings"
+        helpIds={[
+          'choose-rate-card',
+          'apply-upcharge',
+          'apply-contingency',
+          'margin-tax-client-price',
+        ]}
+      >
         <div className="flex flex-wrap gap-6 items-end">
           <label className="text-sm">
             <span className="text-slate-600">Rate card</span>
@@ -763,6 +815,37 @@ function LaborSection({
   // When all three PERT points are set, units come from PERT (not the Units box).
   const pertActive = !!(opt && likely && pess);
 
+  // NaN-safe parse that PRESERVES a typed 0 — the old `parseFloat(x) || default`
+  // silently turned a typed quantity/allocation 0 into 1/100 (DEF-LABOR-002).
+  const num = (s: string, fallback: number): number => {
+    const n = Number.parseFloat(s);
+    return Number.isFinite(n) ? n : fallback;
+  };
+  const qtyNum = num(quantity, 1);
+  const unitsNum = num(units, 0);
+  const allocNum = num(allocation, 100);
+  const datesOk = (!startDate && !endDate) || (!!startDate && !!endDate && endDate >= startDate);
+  // Mirror the server rules so the form never POSTs a meaningless line (units 0,
+  // qty 0) — instead the Add button stays disabled and tells the user why.
+  const canAdd =
+    !!roleId &&
+    qtyNum > 0 &&
+    (pertActive || unitsNum > 0) &&
+    allocNum >= 0 &&
+    allocNum <= 100 &&
+    datesOk;
+  const addHint = !roleId
+    ? 'Select a role to add a labor line.'
+    : qtyNum <= 0
+      ? 'Quantity must be greater than 0.'
+      : !pertActive && unitsNum <= 0
+        ? 'Enter units greater than 0 (or fill all three PERT boxes).'
+        : allocNum < 0 || allocNum > 100
+          ? 'Allocation must be between 0 and 100%.'
+          : !datesOk
+            ? 'Provide both a start and end date (end on or after start), or neither.'
+            : '';
+
   // Reset the add-row to its defaults after a successful add so stale values —
   // above all the PERT three-point inputs — never carry into (and silently
   // override the Units of) the next line.
@@ -782,32 +865,42 @@ function LaborSection({
   }
 
   function add() {
-    if (!roleId) return;
+    if (!canAdd) return;
     const body: Record<string, unknown> = {
       rateCardRoleId: roleId,
-      units: Number.parseFloat(units) || 0,
-      quantity: Number.parseFloat(quantity) || 1,
+      // Server recomputes effective units from PERT when the three points are sent.
+      units: pertActive ? 0 : unitsNum,
+      quantity: qtyNum,
       billingPeriod: period,
     };
     if (phase) body.sdlcPhase = phase;
     if (resourceName.trim()) {
       body.resourceName = resourceName.trim();
-      body.allocationPercent = Number.parseFloat(allocation) || 100;
+      body.allocationPercent = allocNum;
     }
     if (startDate && endDate) {
       body.startDate = startDate;
       body.endDate = endDate;
     }
-    if (opt && likely && pess) {
-      body.unitsOptimistic = Number.parseFloat(opt) || 0;
-      body.unitsMostLikely = Number.parseFloat(likely) || 0;
-      body.unitsPessimistic = Number.parseFloat(pess) || 0;
+    if (pertActive) {
+      body.unitsOptimistic = num(opt, 0);
+      body.unitsMostLikely = num(likely, 0);
+      body.unitsPessimistic = num(pess, 0);
     }
     m.addLabor.mutate(body, { onSuccess: resetForm });
   }
 
   return (
-    <Section title="Labor" id="sec-labor">
+    <Section
+      title="Labor"
+      id="sec-labor"
+      helpIds={[
+        'add-labor-line',
+        'assign-resource-capacity',
+        'pert-estimate',
+        'set-billing-period',
+      ]}
+    >
       <div className="overflow-x-auto">
         <table className="w-full text-sm table-fixed">
           {/* Proportional column widths so the Role has room (it wraps to a 2nd
@@ -994,12 +1087,18 @@ function LaborSection({
             </AddField>
             <button
               onClick={add}
-              disabled={!roleId}
+              disabled={!canAdd}
+              title={addHint || 'Add this labor line'}
               className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
             >
               Add labor
             </button>
           </div>
+          {addHint && roleId && (
+            <p className="text-xs text-amber-700" role="alert">
+              {addHint}
+            </p>
+          )}
           <p className="text-xs text-slate-400">
             Line total = rate × qty × units (e.g. $150/hr × 2 people × 160 hrs = $48,000). If you
             fill the PERT boxes, units are taken from that three-point estimate instead.
@@ -1048,7 +1147,11 @@ function NonLaborSection({
   }
 
   return (
-    <Section title="Non-labor" id="sec-nonlabor">
+    <Section
+      title="Non-labor"
+      id="sec-nonlabor"
+      helpIds={['add-nonlabor-line', 'set-billing-period']}
+    >
       <table className="w-full text-sm">
         <thead className="text-slate-500">
           <tr>
@@ -1157,7 +1260,11 @@ function CloudSection({
   }
 
   return (
-    <Section title="Cloud compute" id="sec-cloud">
+    <Section
+      title="Cloud compute"
+      id="sec-cloud"
+      helpIds={['add-cloud-line', 'set-billing-period']}
+    >
       <table className="w-full text-sm">
         <thead className="text-slate-500">
           <tr>
