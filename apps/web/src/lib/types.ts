@@ -138,6 +138,8 @@ export interface EstimateDetail {
   comments: Comment[];
   totals: EngineResult;
   capacityViolations: CapacityViolation[];
+  /** Content is editable only in the workflow's initial (Draft) stage (FR-24). */
+  editable: boolean;
 }
 
 export interface Baseline {
