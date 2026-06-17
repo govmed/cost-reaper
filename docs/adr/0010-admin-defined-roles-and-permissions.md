@@ -23,7 +23,7 @@ Adopt **permission-based RBAC** with admin-managed roles. Tracked as **FE-55** u
 
 ## Boundary (explicit, by design)
 
-An admin can create a role, grant it any **existing** permission, and gate workflow steps to it — but **cannot invent brand-new coded behavior**. Deep behavioral couplings remain in code: the **ADMIN super-override**, `CloudProvider`→pricing-strategy, `BillingPeriod`→engine math, `ChecklistSeverity`→gating. This is the same "behavioral enums stay coded" stance already recorded in §10 of CLAUDE.md. So "create a *Reviewer* role that can approve but not edit" is fully supported; "create a role that does something the code has no concept of" still needs code.
+An admin can create a role, grant it any **existing** permission, and gate workflow steps to it — but **cannot invent brand-new coded behavior**. Deep behavioral couplings remain in code: the **ADMIN super-override**, `CloudProvider`→pricing-strategy, `BillingPeriod`→engine math, `ChecklistSeverity`→gating. This is the same "behavioral enums stay coded" stance already recorded in §10 of CLAUDE.md. So "create a _Reviewer_ role that can approve but not edit" is fully supported; "create a role that does something the code has no concept of" still needs code.
 
 ## Consequences
 
