@@ -821,3 +821,15 @@ QA'd the Labor card (API robust; bugs were web-side silent coercions), fixed the
 - Verified all in the `api` Docker image: `vitest run` = 510 passed; `tsc --noEmit` clean; prettier clean.
 - Updated living docs. Opening the PR.
 ---
+
+---
+### [2026-06-17 08:40 UTC] — USER
+/Users/titomorales/Downloads/Agents/Markdowns/SOW/statement_of_work_bid_response_template.md  Please read this to create a template for a Statement of Work SOW.
+
+### [2026-06-17 08:55 UTC] — AGENT
+Read the 33-section bid-response reference; asked direction → user chose "Both: doc now, app next."
+**Actions taken:**
+- Created docs/templates/SOW_TEMPLATE.md — refined, contract-ready, {{TOKEN}}-placeholder fill-in template covering all SOW sections + Appendices, with a Kerdos pricing-mapping note (§23 ← estimate totals).
+- Rendered docs/templates/SOW_TEMPLATE.docx via the pandoc/core Docker container (.docx deliverable rule). Prettier-clean.
+- PR next; then (queued) expand the Kerdos sow module to this structure.
+---
