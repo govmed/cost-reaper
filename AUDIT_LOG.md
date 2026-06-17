@@ -808,3 +808,16 @@ Is the website running? http://localhost:5173/ · An idea — Roles & Permission
 - Roles idea: answered — yes, it's **FE-55** (new **FR-30**) under EP-2; user chose "register in spec now". Added FR-30, FE-55, traceability + roadmap Sprint 12 rows, §10 note, and ADR-0010 (Proposed). No code built.
 - Next: address the contextual help-panel feature idea.
 ---
+
+---
+### [2026-06-17 07:55 UTC] — USER
+There is still several bugs in the Labor Card adding new roles is not functioning correctly. That needs to be QA thoroughly and 50 test cases should be written just on that Card alone. · Overall there should be about 500 test cases — every Card needs at least 50 test cases. Then there should be a test of 500 estimates for volume.
+
+### [2026-06-17 08:20 UTC] — AGENT
+QA'd the Labor card (API robust; bugs were web-side silent coercions), fixed them, and built the full per-card test initiative.
+**Actions taken:**
+- Labor card bugs (DEF-LABOR-002): `parseFloat(x) || default` turned typed qty 0→1 and alloc 0→100, blank units→silent 0 line. Fixed with NaN-safe `num()` + a `canAdd` guard; shipped in PR #94 with a 78-case Labor suite.
+- Built 9 more pure spec suites (engine/totals, settings, non-labor, cloud, rate-card, users/RBAC, workflow, assumptions/comments/reference/fx, volume) → **510 total cases**, ≥50 per card + a 500-estimate volume test.
+- Verified all in the `api` Docker image: `vitest run` = 510 passed; `tsc --noEmit` clean; prettier clean.
+- Updated living docs. Opening the PR.
+---
