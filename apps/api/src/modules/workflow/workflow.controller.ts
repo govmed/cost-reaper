@@ -11,7 +11,7 @@ import {
   UpdateWorkflowRequest,
 } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ChecklistService } from './checklist.service';
 import { WorkflowService } from './workflow.service';
@@ -34,7 +34,7 @@ export class WorkflowController {
   }
 
   @Post('workflows')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   create(
     @Body(new ZodValidationPipe(CreateWorkflowRequest)) dto: CreateWorkflowRequest,
     @CurrentUser() u: AuthUser,
@@ -49,7 +49,7 @@ export class WorkflowController {
   }
 
   @Patch('workflows/:wf')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   update(
     @Param('wf') wf: string,
     @Body(new ZodValidationPipe(UpdateWorkflowRequest)) dto: UpdateWorkflowRequest,
@@ -59,7 +59,7 @@ export class WorkflowController {
   }
 
   @Delete('workflows/:wf')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   remove(@Param('wf') wf: string, @CurrentUser() u: AuthUser) {
     return this.workflow.deleteWorkflow(wf, u);
   }
@@ -67,7 +67,7 @@ export class WorkflowController {
   // ── Stage authoring (per workflow, admin) ──────────────────────────────────
 
   @Post('workflows/:wf/stages')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   addStage(
     @Param('wf') wf: string,
     @Body(new ZodValidationPipe(CreateStageRequest)) dto: CreateStageRequest,
@@ -77,7 +77,7 @@ export class WorkflowController {
   }
 
   @Patch('workflows/:wf/stages/:stageId')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   updateStage(
     @Param('stageId') stageId: string,
     @Body(new ZodValidationPipe(UpdateStageRequest)) dto: UpdateStageRequest,
@@ -87,7 +87,7 @@ export class WorkflowController {
   }
 
   @Delete('workflows/:wf/stages/:stageId')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   deleteStage(@Param('stageId') stageId: string, @CurrentUser() u: AuthUser) {
     return this.workflow.deleteStage(stageId, u);
   }
@@ -95,7 +95,7 @@ export class WorkflowController {
   // ── Transition authoring (per workflow, admin) ─────────────────────────────
 
   @Post('workflows/:wf/transitions')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   addTransition(
     @Param('wf') wf: string,
     @Body(new ZodValidationPipe(CreateTransitionRequest)) dto: CreateTransitionRequest,
@@ -105,7 +105,7 @@ export class WorkflowController {
   }
 
   @Patch('workflows/:wf/transitions/:transitionId')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   updateTransition(
     @Param('transitionId') transitionId: string,
     @Body(new ZodValidationPipe(UpdateTransitionRequest)) dto: UpdateTransitionRequest,
@@ -115,7 +115,7 @@ export class WorkflowController {
   }
 
   @Delete('workflows/:wf/transitions/:transitionId')
-  @Roles('ADMIN')
+  @RequirePermission('workflow.configure')
   deleteTransition(@Param('transitionId') transitionId: string, @CurrentUser() u: AuthUser) {
     return this.workflow.deleteTransition(transitionId, u);
   }
@@ -133,7 +133,7 @@ export class WorkflowController {
   }
 
   @Post('estimates/:id/transitions')
-  @Roles('ADMIN', 'ESTIMATOR', 'GM')
+  @RequirePermission('workflow.advance')
   transition(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(TransitionRequest)) dto: TransitionRequest,

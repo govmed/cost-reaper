@@ -1,4 +1,24 @@
-export type Role = 'ADMIN' | 'ESTIMATOR' | 'VIEWER' | 'GM';
+/** FR-30: role codes are data-driven (admins add custom roles); validated server-side. */
+export type Role = string;
+
+export interface RoleDto {
+  id: string;
+  code: string;
+  displayName: string;
+  description: string | null;
+  isActive: boolean;
+  isBuiltin: boolean;
+  permissions: string[];
+  userCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface PermissionMeta {
+  key: string;
+  label: string;
+  description: string;
+  group: string;
+}
 export type BillingPeriod = 'ONE_TIME' | 'MONTHLY' | 'YEARLY';
 /**
  * SDLC phase is data-driven (FR-29) — the dropdown loads active values from the

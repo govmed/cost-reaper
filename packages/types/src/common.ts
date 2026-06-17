@@ -1,11 +1,27 @@
 import { z } from 'zod';
 
 /**
- * RBAC roles (FR-2, FR-26). GM (General Manager) is an approver: it reviews and
- * approves estimates (or sends them back to draft) but cannot create/edit them.
+ * Built-in RBAC roles (FR-2, FR-26). GM (General Manager) is an approver: it
+ * reviews and approves estimates (or sends them back to draft) but cannot
+ * create/edit them. Under FR-30 roles are **data-driven** — admins add custom
+ * roles — so a user's/transition's role is a `RoleCode` string validated
+ * server-side against the active `roles` table; this enum is just the seeded
+ * baseline set.
  */
 export const Role = z.enum(['ADMIN', 'ESTIMATOR', 'VIEWER', 'GM']);
 export type Role = z.infer<typeof Role>;
+
+/**
+ * A role code (FR-30): UPPER_SNAKE, validated server-side against active roles.
+ * Used wherever a role is *referenced* (user assignment, workflow transitions)
+ * so custom roles work without a code change.
+ */
+export const RoleCode = z
+  .string()
+  .min(1)
+  .max(40)
+  .regex(/^[A-Z][A-Z0-9_]*$/, 'Role code must be UPPER_SNAKE (A–Z, 0–9, _)');
+export type RoleCode = z.infer<typeof RoleCode>;
 
 /** Billing period for any line item (FR-23). */
 export const BillingPeriod = z.enum(['ONE_TIME', 'MONTHLY', 'YEARLY']);

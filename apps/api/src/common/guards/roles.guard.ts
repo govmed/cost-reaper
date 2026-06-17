@@ -17,7 +17,9 @@ export class RolesGuard implements CanActivate {
 
     const req = context.switchToHttp().getRequest<{ user?: AuthUser }>();
     const user = req.user;
-    if (!user || !required.includes(user.role)) {
+    // Legacy guard (FR-30 moved enforcement to PermissionsGuard); role is now a
+    // free RoleCode string, so compare against the required codes as strings.
+    if (!user || !(required as readonly string[]).includes(user.role)) {
       throw new ForbiddenException('Insufficient role');
     }
     return true;

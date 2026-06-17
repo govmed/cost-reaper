@@ -12,13 +12,6 @@ datasource db {
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
-enum Role {
-  ADMIN
-  ESTIMATOR
-  VIEWER
-  GM
-}
-
 enum RateUnit {
   HOUR
   DAY
@@ -73,11 +66,29 @@ enum ChecklistScope {
 
 // ─── Identity (FR-1, FR-2, FR-26, NFR-16) ────────────────────────────────────
 
+/// Data-driven roles (FR-30): admins create/modify roles and the permissions each grants.
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  displayName String   @map("display_name")
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  /// Built-in roles (ADMIN/GM/ESTIMATOR/VIEWER) can't be deleted or recoded.
+  isBuiltin   Boolean  @default(false) @map("is_builtin")
+  /// Granted permission keys; the ADMIN role holds ['*'] (allow-all).
+  permissions String[] @default([])
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
 model User {
   id           String    @id @default(uuid()) @db.Uuid
   email        String    @unique
   passwordHash String    @map("password_hash")
-  role         Role      @default(ESTIMATOR)
+  /// Role code (FR-30) validated server-side against the active `roles` table.
+  role         String    @default("ESTIMATOR")
   displayName  String?   @map("display_name")
   isActive     Boolean   @default(true) @map("is_active")
   lastLoginAt  DateTime? @map("last_login_at")
@@ -408,7 +419,7 @@ model WorkflowTransition {
   fromStage             WorkflowStage      @relation("FromStage", fields: [fromStageId], references: [id], onDelete: Cascade)
   toStageId             String             @map("to_stage_id") @db.Uuid
   toStage               WorkflowStage      @relation("ToStage", fields: [toStageId], references: [id], onDelete: Cascade)
-  allowedRole           Role               @map("allowed_role")
+  allowedRole           String             @map("allowed_role")
   label                 String
   requiresChecklistPass Boolean            @default(true) @map("requires_checklist_pass")
 

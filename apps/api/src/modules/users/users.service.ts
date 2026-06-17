@@ -1,15 +1,31 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import * as argon2 from 'argon2';
 import type { CreateUserRequest, UpdateUserRequest, UserDto } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly roles: RolesService,
   ) {}
+
+  /** A role assignment must reference an active role (FR-30, deny-by-default). */
+  private async assertActiveRole(code: string | undefined): Promise<void> {
+    if (code === undefined) return;
+    const active = await this.roles.activeCodes();
+    if (!active.has(code)) {
+      throw new BadRequestException(`Unknown or inactive role: ${code}`);
+    }
+  }
 
   async list(): Promise<UserDto[]> {
     const users = await this.prisma.user.findMany({ orderBy: { createdAt: 'desc' } });
@@ -17,6 +33,7 @@ export class UsersService {
   }
 
   async create(dto: CreateUserRequest, actorId: string): Promise<UserDto> {
+    await this.assertActiveRole(dto.role);
     const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
     if (existing) throw new ConflictException('Email already registered');
     const passwordHash = await argon2.hash(dto.password);
@@ -34,6 +51,7 @@ export class UsersService {
 
   async update(id: string, dto: UpdateUserRequest, actorId: string): Promise<UserDto> {
     await this.getOrThrow(id);
+    await this.assertActiveRole(dto.role);
     const user = await this.prisma.user.update({
       where: { id },
       data: { role: dto.role, isActive: dto.isActive, displayName: dto.displayName },

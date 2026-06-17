@@ -2,13 +2,13 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from '@ne
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { type AuthUser, CreateUserRequest, UpdateUserRequest } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { UsersService } from './users.service';
 
 @ApiTags('users')
 @ApiBearerAuth()
-@Roles('ADMIN')
+@RequirePermission('users.manage')
 @Controller('users')
 export class UsersController {
   constructor(private readonly users: UsersService) {}

@@ -90,8 +90,8 @@ describe('Users · create contract — rejected', () => {
   it('TC-21 rejects a password under 8 chars', () => {
     expect(cOk(user({ password: 'short7!' }))).toBe(false);
   });
-  it('TC-22 rejects an unknown role', () => {
-    expect(cOk(user({ role: 'OWNER' }))).toBe(false);
+  it('TC-22 rejects a malformed role code (membership is validated server-side, FR-30)', () => {
+    expect(cOk(user({ role: 'bad role' }))).toBe(false);
   });
   it('TC-23 rejects an empty display name', () => {
     expect(cOk(user({ displayName: '' }))).toBe(false);
@@ -129,8 +129,8 @@ describe('Users · update contract (admin edits, FR-26)', () => {
   it('TC-33 change role and active together', () => {
     expect(uOk({ role: 'GM', isActive: true })).toBe(true);
   });
-  it('TC-34 rejects an unknown role on update', () => {
-    expect(uOk({ role: 'ROOT' })).toBe(false);
+  it('TC-34 rejects a malformed role code on update (membership server-side, FR-30)', () => {
+    expect(uOk({ role: 'bad-role' })).toBe(false);
   });
   it('TC-35 rejects an empty display name on update', () => {
     expect(uOk({ displayName: '' })).toBe(false);

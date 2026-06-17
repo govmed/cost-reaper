@@ -7,7 +7,7 @@ import {
   UpdateReferenceValueRequest,
 } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { ReferenceService } from './reference.service';
 
@@ -30,7 +30,7 @@ export class ReferenceController {
 
   // Writes are admin-only and audited (FR-29 admin CRUD, NFR-16).
   @Post('types')
-  @Roles('ADMIN')
+  @RequirePermission('reference.manage')
   createType(
     @Body(new ZodValidationPipe(CreateReferenceTypeRequest)) dto: CreateReferenceTypeRequest,
     @CurrentUser() actor: AuthUser,
@@ -39,7 +39,7 @@ export class ReferenceController {
   }
 
   @Post('types/:code/values')
-  @Roles('ADMIN')
+  @RequirePermission('reference.manage')
   createValue(
     @Param('code') code: string,
     @Body(new ZodValidationPipe(CreateReferenceValueRequest)) dto: CreateReferenceValueRequest,
@@ -49,7 +49,7 @@ export class ReferenceController {
   }
 
   @Patch('values/:id')
-  @Roles('ADMIN')
+  @RequirePermission('reference.manage')
   updateValue(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateReferenceValueRequest)) dto: UpdateReferenceValueRequest,
@@ -59,7 +59,7 @@ export class ReferenceController {
   }
 
   @Delete('values/:id')
-  @Roles('ADMIN')
+  @RequirePermission('reference.manage')
   @HttpCode(204)
   deleteValue(@Param('id') id: string, @CurrentUser() actor: AuthUser) {
     return this.reference.deleteValue(id, actor.id);

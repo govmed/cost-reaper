@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { type AuthUser, CloudPriceQuery, CloudSyncRequest } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { CloudPricesService } from './cloud-prices.service';
 
@@ -26,7 +26,7 @@ export class CloudPricesController {
 
   // Admin-triggered catalog refresh (FR-21a).
   @Post('sync')
-  @Roles('ADMIN')
+  @RequirePermission('cloudprice.manage')
   sync(
     @Body(new ZodValidationPipe(CloudSyncRequest)) dto: CloudSyncRequest,
     @CurrentUser() u: AuthUser,

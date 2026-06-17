@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { type AuthUser, CreateSowRequest, UpdateSowRequest } from '@cost-reaper/types';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { SowService } from './sow.service';
 
@@ -32,7 +32,7 @@ export class SowController {
   }
 
   @Post()
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('sow.author')
   create(
     @Body(new ZodValidationPipe(CreateSowRequest)) dto: CreateSowRequest,
     @CurrentUser() u: AuthUser,
@@ -41,7 +41,7 @@ export class SowController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('sow.author')
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(UpdateSowRequest)) dto: UpdateSowRequest,
@@ -51,19 +51,19 @@ export class SowController {
   }
 
   @Post(':id/issue')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('sow.author')
   issue(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.sow.issue(id, u);
   }
 
   @Post(':id/revert')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('sow.author')
   revert(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.sow.revert(id, u);
   }
 
   @Delete(':id')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @RequirePermission('sow.author')
   remove(@Param('id') id: string, @CurrentUser() u: AuthUser) {
     return this.sow.remove(id, u);
   }

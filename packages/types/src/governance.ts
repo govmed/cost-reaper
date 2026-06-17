@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Role } from './common';
+import { RoleCode } from './common';
 
 // ── Customizable workflow (FR-24) ────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ export const WorkflowTransitionDto = z.object({
   description: z.string().nullable(),
   fromStageKey: z.string(),
   toStageKey: z.string(),
-  allowedRole: Role,
+  allowedRole: RoleCode,
   label: z.string(),
   requiresChecklistPass: z.boolean(),
 });
@@ -100,7 +100,7 @@ export type UpdateStageRequest = z.infer<typeof UpdateStageRequest>;
 export const CreateTransitionRequest = z.object({
   fromStageKey: z.string().min(1),
   toStageKey: z.string().min(1),
-  allowedRole: Role,
+  allowedRole: RoleCode,
   label: z.string().min(1).max(80),
   description: z.string().max(500).optional(),
   requiresChecklistPass: z.boolean().optional(),
@@ -108,7 +108,7 @@ export const CreateTransitionRequest = z.object({
 export type CreateTransitionRequest = z.infer<typeof CreateTransitionRequest>;
 
 export const UpdateTransitionRequest = z.object({
-  allowedRole: Role.optional(),
+  allowedRole: RoleCode.optional(),
   label: z.string().min(1).max(80).optional(),
   description: z.string().max(500).optional(),
   requiresChecklistPass: z.boolean().optional(),
@@ -229,7 +229,7 @@ export interface AvailableTransitionDto {
   toStageKey: string;
   toStageLabel: string;
   label: string;
-  allowedRole: Role;
+  allowedRole: RoleCode;
   requiresChecklistPass: boolean;
   /** true if the current user's role may perform it. */
   allowedForUser: boolean;

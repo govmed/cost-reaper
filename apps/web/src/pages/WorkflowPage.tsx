@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { useWorkflowAuthoring, useWorkflowDefinition } from '../lib/queries';
+import { useRoles, useWorkflowAuthoring, useWorkflowDefinition } from '../lib/queries';
 import type { WorkflowDefinition, WorkflowStageDef } from '../lib/types';
 
-const ROLES = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
+// Fallback role codes used until the data-driven roles API loads (FR-30).
+const FALLBACK_ROLES = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
 
 /** Admin authoring of one workflow's stages + transitions (FR-24, FE-43). */
 export default function WorkflowPage() {
@@ -245,6 +246,9 @@ function TransitionsSection({
   a: Authoring;
 }) {
   const labelOf = (k: string) => wf.stages.find((s) => s.key === k)?.label ?? k;
+  // Gate transitions by any active role (FR-30) — including admin-created ones.
+  const { data: rolesData } = useRoles();
+  const ROLES = rolesData?.filter((r) => r.isActive).map((r) => r.code) ?? FALLBACK_ROLES;
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [role, setRole] = useState('ESTIMATOR');

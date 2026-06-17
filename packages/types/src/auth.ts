@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Role } from './common';
+import { RoleCode } from './common';
 
 export const LoginRequest = z.object({
   email: z.string().email(),
@@ -29,7 +29,7 @@ export type TokenPair = z.infer<typeof TokenPair>;
 export const AuthUser = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
-  role: Role,
+  role: RoleCode,
   displayName: z.string().nullable().optional(),
 });
 export type AuthUser = z.infer<typeof AuthUser>;
@@ -39,13 +39,13 @@ export type AuthUser = z.infer<typeof AuthUser>;
 export const CreateUserRequest = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  role: Role.default('ESTIMATOR'),
+  role: RoleCode.default('ESTIMATOR'),
   displayName: z.string().min(1).max(120).optional(),
 });
 export type CreateUserRequest = z.infer<typeof CreateUserRequest>;
 
 export const UpdateUserRequest = z.object({
-  role: Role.optional(),
+  role: RoleCode.optional(),
   isActive: z.boolean().optional(),
   displayName: z.string().min(1).max(120).optional(),
 });
@@ -54,7 +54,7 @@ export type UpdateUserRequest = z.infer<typeof UpdateUserRequest>;
 export const UserDto = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
-  role: Role,
+  role: RoleCode,
   displayName: z.string().nullable(),
   isActive: z.boolean(),
   lastLoginAt: z.string().datetime().nullable(),
