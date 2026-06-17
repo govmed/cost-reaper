@@ -692,3 +692,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Why:** BR-7 — bill by milestone (completed SDLC phase) using the estimate's cost-per-phase; matches the user's invoicing model.
 - **Files touched:** apps/web/src/pages/SowPrintPage.tsx, apps/api/src/modules/sow/sow.service.ts, docs/templates/SOW_TEMPLATE.{md,docx}, living docs.
 - **Result:** Pricing stays §9 (no renumber); milestone table renders only when the estimate has phase costs. Prettier clean; docx re-rendered. Web tsc/e2e via CI. PR next.
+
+### 2026-06-17 — Tests: SOW milestone schedule = cost per SDLC phase (BR-7)
+- **Action:** User asked for tests proving the SOW milestones derive from the estimate's per-phase cost. Added `apps/api/src/modules/sow/sow-milestones.spec.ts` (14 cases) against the real `computeEstimate` phase output (what the SOW renders): tagged phase → one-time milestone fee, qty×base, same-phase aggregation, lifecycle ordering, "Unassigned" rollup last, milestone fees sum to oneTimeSubtotal, recurring-only phase has $0 one-time (billed on cadence), mixed one-time+recurring split, yearly annualization, upcharge included (global + per-line override), contingency excluded, empty → no milestones, full 5-phase build.
+- **Result:** 14/14 pass in-container; prettier clean. PR next.

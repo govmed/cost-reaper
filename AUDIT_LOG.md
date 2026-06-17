@@ -872,3 +872,11 @@ Replaced the generic deliverables with a per-SDLC-phase milestone schedule (invo
 - Rewrote SOW_TEMPLATE.md §9 into a phase/milestone schedule with {{PHASE_*}} tokens + invoice triggers; re-rendered the .docx.
 - Prettier clean; opening PR (web tsc/e2e via CI).
 ---
+
+---
+### [2026-06-17 12:45 UTC] — USER
+Ok, so create several test cases to show me that is the case.
+
+### [2026-06-17 12:52 UTC] — AGENT
+Added sow-milestones.spec.ts (14 cases) proving the SOW milestone schedule = the estimate's per-SDLC-phase cost (computeEstimate.phases): per-phase fee, recurring-vs-one-time split, lifecycle order, Unassigned rollup, sum=oneTimeSubtotal, upcharge in / contingency out. 14/14 pass in-container; prettier clean. Opening PR.
+---
