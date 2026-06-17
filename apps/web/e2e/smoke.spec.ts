@@ -211,8 +211,8 @@ test('Roles & permissions page shows the capability matrix (FR-2/NFR-16)', async
   await page.getByRole('button', { name: 'Governance' }).click();
   await page.getByRole('link', { name: 'Roles', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Roles & permissions' })).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'Author estimates' })).toBeVisible();
-  await expect(page.getByRole('cell', { name: 'Manage users' })).toBeVisible();
+  await expect(page.getByText('Author estimates', { exact: true })).toBeVisible();
+  await expect(page.getByText('Manage users', { exact: true })).toBeVisible();
   // The three role columns render.
   await expect(page.getByRole('columnheader', { name: 'Estimator' })).toBeVisible();
 });
