@@ -253,7 +253,8 @@ test('Statement of Work: create from an approved estimate, edit, open PDF (BR-7)
   await page.getByRole('link', { name: 'Open PDF view' }).click();
   await expect(page.getByRole('heading', { name: 'Statement of Work', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /Print/ })).toBeVisible();
-  await expect(page.getByRole('heading', { name: '5. Pricing' })).toBeVisible();
+  // Pricing is §9 now that the SOW follows the full template structure (BR-7).
+  await expect(page.getByRole('heading', { name: '9. Pricing' })).toBeVisible();
 });
 
 test('a freshly created estimate has no green checklist items (FR-25)', async ({ page }) => {

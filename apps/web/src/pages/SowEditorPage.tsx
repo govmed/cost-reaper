@@ -8,22 +8,47 @@ type Form = {
   clientName: string;
   providerName: string;
   effectiveDate: string;
+  executiveSummary: string;
+  customerUnderstanding: string;
   overview: string;
   scope: string;
+  outOfScope: string;
+  solutionOverview: string;
   deliverables: string;
   timeline: string;
   paymentTerms: string;
+  governanceModel: string;
+  rolesResponsibilities: string;
+  nonFunctionalRequirements: string;
+  testingStrategy: string;
+  maintenanceSupport: string;
   assumptions: string;
+  risksMitigation: string;
+  acceptanceCriteria: string;
+  changeControl: string;
   termsAndConditions: string;
 };
 
+// Narrative sections in the SOW document's order (mirrors SOW_TEMPLATE.md).
 const SECTIONS: { key: keyof Form; label: string; rows: number }[] = [
+  { key: 'executiveSummary', label: 'Executive Summary', rows: 4 },
+  { key: 'customerUnderstanding', label: 'Customer Understanding', rows: 4 },
   { key: 'overview', label: 'Overview', rows: 3 },
   { key: 'scope', label: 'Scope of Services', rows: 4 },
+  { key: 'outOfScope', label: 'Out of Scope', rows: 3 },
+  { key: 'solutionOverview', label: 'Proposed Solution', rows: 4 },
   { key: 'deliverables', label: 'Deliverables', rows: 4 },
   { key: 'timeline', label: 'Timeline', rows: 3 },
   { key: 'paymentTerms', label: 'Payment Terms', rows: 3 },
+  { key: 'governanceModel', label: 'Governance Model', rows: 4 },
+  { key: 'rolesResponsibilities', label: 'Roles & Responsibilities', rows: 4 },
+  { key: 'nonFunctionalRequirements', label: 'Non-Functional Requirements', rows: 5 },
+  { key: 'testingStrategy', label: 'Testing Strategy', rows: 4 },
+  { key: 'maintenanceSupport', label: 'Maintenance & Support', rows: 4 },
   { key: 'assumptions', label: 'Assumptions', rows: 4 },
+  { key: 'risksMitigation', label: 'Risks & Mitigation', rows: 4 },
+  { key: 'acceptanceCriteria', label: 'Acceptance Criteria', rows: 3 },
+  { key: 'changeControl', label: 'Change Control', rows: 3 },
   { key: 'termsAndConditions', label: 'Terms & Conditions', rows: 8 },
 ];
 
@@ -44,12 +69,24 @@ export default function SowEditorPage() {
       clientName: sow.clientName,
       providerName: sow.providerName,
       effectiveDate: sow.effectiveDate ?? '',
+      executiveSummary: sow.executiveSummary,
+      customerUnderstanding: sow.customerUnderstanding,
       overview: sow.overview,
       scope: sow.scope,
+      outOfScope: sow.outOfScope,
+      solutionOverview: sow.solutionOverview,
       deliverables: sow.deliverables,
       timeline: sow.timeline,
       paymentTerms: sow.paymentTerms,
+      governanceModel: sow.governanceModel,
+      rolesResponsibilities: sow.rolesResponsibilities,
+      nonFunctionalRequirements: sow.nonFunctionalRequirements,
+      testingStrategy: sow.testingStrategy,
+      maintenanceSupport: sow.maintenanceSupport,
       assumptions: sow.assumptions,
+      risksMitigation: sow.risksMitigation,
+      acceptanceCriteria: sow.acceptanceCriteria,
+      changeControl: sow.changeControl,
       termsAndConditions: sow.termsAndConditions,
     });
     setDirty(false);

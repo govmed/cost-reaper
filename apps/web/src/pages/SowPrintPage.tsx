@@ -44,14 +44,18 @@ export default function SowPrintPage() {
         <Party label="Provider" name={sow.providerName} />
       </section>
 
-      <Prose title="1. Overview" body={sow.overview} />
-      <Prose title="2. Scope of Services" body={sow.scope} />
-      <Prose title="3. Deliverables" body={sow.deliverables} />
-      <Prose title="4. Timeline" body={sow.timeline} />
+      <Prose title="1. Executive Summary" body={sow.executiveSummary} />
+      <Prose title="2. Customer Understanding" body={sow.customerUnderstanding} />
+      <Prose title="3. Overview" body={sow.overview} />
+      <Prose title="4. Scope of Services" body={sow.scope} />
+      <Prose title="5. Out of Scope" body={sow.outOfScope} />
+      <Prose title="6. Proposed Solution" body={sow.solutionOverview} />
+      <Prose title="7. Deliverables" body={sow.deliverables} />
+      <Prose title="8. Timeline" body={sow.timeline} />
 
       <section className="mt-5">
         <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
-          5. Pricing
+          9. Pricing
         </h2>
         <table className="w-full text-sm">
           <tbody>
@@ -71,13 +75,21 @@ export default function SowPrintPage() {
         </p>
       </section>
 
-      <Prose title="6. Payment Terms" body={sow.paymentTerms} />
-      <Prose title="7. Assumptions" body={sow.assumptions} />
-      <Prose title="8. Terms &amp; Conditions" body={sow.termsAndConditions} />
+      <Prose title="10. Payment Terms" body={sow.paymentTerms} />
+      <Prose title="11. Governance Model" body={sow.governanceModel} />
+      <Prose title="12. Roles &amp; Responsibilities" body={sow.rolesResponsibilities} />
+      <Prose title="13. Non-Functional Requirements" body={sow.nonFunctionalRequirements} />
+      <Prose title="14. Testing Strategy" body={sow.testingStrategy} />
+      <Prose title="15. Maintenance &amp; Support" body={sow.maintenanceSupport} />
+      <Prose title="16. Assumptions" body={sow.assumptions} />
+      <Prose title="17. Risks &amp; Mitigation" body={sow.risksMitigation} />
+      <Prose title="18. Acceptance Criteria" body={sow.acceptanceCriteria} />
+      <Prose title="19. Change Control" body={sow.changeControl} />
+      <Prose title="20. Terms &amp; Conditions" body={sow.termsAndConditions} />
 
       <section className="mt-8 break-inside-avoid">
         <h2 className="font-semibold border-b border-slate-300 mb-3 text-sm uppercase tracking-wide">
-          9. Acceptance
+          21. Acceptance
         </h2>
         <p className="text-xs text-slate-500 mb-6">
           The parties, by their authorized representatives, agree to this Statement of Work.

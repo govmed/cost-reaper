@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, type StatementOfWork } from '@prisma/client';
 import type {
   AuthUser,
   CreateSowRequest,
@@ -48,6 +48,70 @@ const DEFAULT_TERMS =
   '6. Entire Agreement. This SOW, together with the Master Services Agreement, is the entire ' +
   'agreement between the parties regarding its subject matter.';
 
+// Additional template sections (SOW_TEMPLATE.md) — seeded as editable boilerplate.
+const DEFAULT_EXECUTIVE_SUMMARY =
+  'The Provider is pleased to submit this Statement of Work to design, build, implement, operate, ' +
+  'and maintain the solution described herein. Our approach is structured, secure, scalable, and ' +
+  'maintainable, and is aligned to the Client’s business objectives, operational needs, and ' +
+  'compliance requirements.';
+const DEFAULT_CUSTOMER_UNDERSTANDING =
+  'The Provider understands the Client requires a qualified technology partner to deliver and ' +
+  'support the solution, integrate with existing systems where applicable, and provide ' +
+  'documentation, training, and knowledge transfer — improving efficiency, reliability, ' +
+  'transparency, and auditability.';
+const DEFAULT_OUT_OF_SCOPE =
+  'The following are excluded unless added through a formal change order: changes to ' +
+  'customer-owned legacy systems; third-party licensing not identified herein; data cleanup ' +
+  'beyond the agreed scope; hardware procurement unless specified; and any integrations, ' +
+  'reporting, or systems not identified in this SOW.';
+const DEFAULT_SOLUTION_OVERVIEW =
+  'The proposed solution uses a modular, configurable, secure, and scalable architecture that ' +
+  'supports maintainability, observability, auditability, and future enhancement, guided by ' +
+  'security-by-design, privacy-by-design, and accessibility-by-design principles.';
+const DEFAULT_GOVERNANCE =
+  'Delivery is governed through an executive steering committee (strategic decisions and ' +
+  'escalation), weekly project leadership meetings (schedule, budget, scope, risks), technical ' +
+  'and security reviews as needed, a change control board, and an operational readiness review ' +
+  'prior to go-live.';
+const DEFAULT_ROLES =
+  'Provider responsibilities: qualified personnel, delivery management, design and build, agreed ' +
+  'testing, deployment support, status reporting, risk/issue management, knowledge transfer, and ' +
+  'maintenance as agreed.\n' +
+  'Client responsibilities: timely decisions and approvals; access to stakeholders, systems, and ' +
+  'environments; business rules and subject-matter expertise; deliverable review; UAT support; ' +
+  'and test data where required.';
+const DEFAULT_NFRS =
+  'Security: RBAC, MFA where required, encryption in transit and at rest, audit logging, and ' +
+  'least-privilege access.\n' +
+  'Performance: defined response-time and throughput targets with monitoring.\n' +
+  'Availability: defined targets, backup and recovery, and disaster-recovery planning.\n' +
+  'Accessibility: WCAG 2.2 and Section 508 alignment where applicable.\n' +
+  'Maintainability and auditability: modular code, automated testing, and a reportable audit trail.';
+const DEFAULT_TESTING =
+  'Testing includes unit, integration, system, regression, performance, accessibility, and ' +
+  'security testing, plus support for user acceptance testing. Exit criteria: critical/high ' +
+  'defects resolved or accepted, requirements traceability complete, and UAT approval received.';
+const DEFAULT_MAINTENANCE =
+  'After deployment, the Provider may provide incident resolution, problem investigation, minor ' +
+  'enhancements, security patching, monitoring and alert response, and operational reporting ' +
+  'across Tier 1–3 support. Service levels (response and resolution targets by priority) are as ' +
+  'agreed in the governing agreement.';
+const DEFAULT_RISKS =
+  'Key risks and mitigations: unclear requirements (discovery workshops and sign-off); approval ' +
+  'delays (approval SLAs and escalation); third-party dependencies (early identification and ' +
+  'weekly tracking); data quality (assessment and cleansing plan); and scope growth (formal ' +
+  'change control).';
+const DEFAULT_ACCEPTANCE =
+  'A deliverable is accepted when it is submitted in the agreed format, satisfies approved ' +
+  'requirements, review comments are addressed or dispositioned, required approvals are received, ' +
+  'and acceptance is documented in writing. Absent feedback within the agreed review period, the ' +
+  'deliverable may be deemed accepted per the governing agreement.';
+const DEFAULT_CHANGE_CONTROL =
+  'Any change to scope, schedule, cost, deliverables, assumptions, or acceptance criteria is ' +
+  'managed through a formal change-control process: request submission, impact analysis, cost and ' +
+  'schedule estimate, risk assessment, Client review, approval or rejection, baseline update, and ' +
+  'implementation tracking. No out-of-scope work begins until the change is approved by both parties.';
+
 @Injectable()
 export class SowService {
   constructor(
@@ -56,29 +120,7 @@ export class SowService {
     private readonly estimates: EstimatesService,
   ) {}
 
-  private async toDto(sow: {
-    id: string;
-    number: string;
-    estimateId: string;
-    title: string;
-    status: string;
-    clientName: string;
-    providerName: string;
-    overview: string;
-    scope: string;
-    deliverables: string;
-    timeline: string;
-    paymentTerms: string;
-    assumptions: string;
-    termsAndConditions: string;
-    effectiveDate: Date | null;
-    issuedAt: Date | null;
-    totalsSnapshot: Prisma.JsonValue | null;
-    currencySnapshot: string | null;
-    preparedByEmail: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }): Promise<StatementOfWorkDto> {
+  private async toDto(sow: StatementOfWork): Promise<StatementOfWorkDto> {
     // Pricing: a draft reflects the estimate live; an issued SOW uses its snapshot.
     const detail: any = await this.estimates.getDetail(sow.estimateId);
     const useSnapshot = sow.status === 'ISSUED' && sow.totalsSnapshot;
@@ -91,12 +133,24 @@ export class SowService {
       status: sow.status as StatementOfWorkDto['status'],
       clientName: sow.clientName,
       providerName: sow.providerName,
+      executiveSummary: sow.executiveSummary,
+      customerUnderstanding: sow.customerUnderstanding,
       overview: sow.overview,
       scope: sow.scope,
+      outOfScope: sow.outOfScope,
+      solutionOverview: sow.solutionOverview,
       deliverables: sow.deliverables,
       timeline: sow.timeline,
       paymentTerms: sow.paymentTerms,
+      governanceModel: sow.governanceModel,
+      rolesResponsibilities: sow.rolesResponsibilities,
+      nonFunctionalRequirements: sow.nonFunctionalRequirements,
+      testingStrategy: sow.testingStrategy,
+      maintenanceSupport: sow.maintenanceSupport,
       assumptions: sow.assumptions,
+      risksMitigation: sow.risksMitigation,
+      acceptanceCriteria: sow.acceptanceCriteria,
+      changeControl: sow.changeControl,
       termsAndConditions: sow.termsAndConditions,
       effectiveDate: sow.effectiveDate ? sow.effectiveDate.toISOString().slice(0, 10) : null,
       issuedAt: sow.issuedAt ? sow.issuedAt.toISOString() : null,
@@ -173,12 +227,24 @@ export class SowService {
         title: dto.title ?? `Statement of Work — ${detail.name}`,
         clientName: dto.clientName ?? '',
         providerName: dto.providerName ?? '',
+        executiveSummary: DEFAULT_EXECUTIVE_SUMMARY,
+        customerUnderstanding: DEFAULT_CUSTOMER_UNDERSTANDING,
         overview: detail.description ?? '',
         scope: DEFAULT_SCOPE,
+        outOfScope: DEFAULT_OUT_OF_SCOPE,
+        solutionOverview: DEFAULT_SOLUTION_OVERVIEW,
         deliverables: DEFAULT_DELIVERABLES,
         timeline: DEFAULT_TIMELINE,
         paymentTerms: DEFAULT_PAYMENT_TERMS,
+        governanceModel: DEFAULT_GOVERNANCE,
+        rolesResponsibilities: DEFAULT_ROLES,
+        nonFunctionalRequirements: DEFAULT_NFRS,
+        testingStrategy: DEFAULT_TESTING,
+        maintenanceSupport: DEFAULT_MAINTENANCE,
         assumptions: assumptionsText,
+        risksMitigation: DEFAULT_RISKS,
+        acceptanceCriteria: DEFAULT_ACCEPTANCE,
+        changeControl: DEFAULT_CHANGE_CONTROL,
         termsAndConditions: DEFAULT_TERMS,
         preparedByEmail: user.email,
       },
@@ -205,12 +271,24 @@ export class SowService {
         title: dto.title,
         clientName: dto.clientName,
         providerName: dto.providerName,
+        executiveSummary: dto.executiveSummary,
+        customerUnderstanding: dto.customerUnderstanding,
         overview: dto.overview,
         scope: dto.scope,
+        outOfScope: dto.outOfScope,
+        solutionOverview: dto.solutionOverview,
         deliverables: dto.deliverables,
         timeline: dto.timeline,
         paymentTerms: dto.paymentTerms,
+        governanceModel: dto.governanceModel,
+        rolesResponsibilities: dto.rolesResponsibilities,
+        nonFunctionalRequirements: dto.nonFunctionalRequirements,
+        testingStrategy: dto.testingStrategy,
+        maintenanceSupport: dto.maintenanceSupport,
         assumptions: dto.assumptions,
+        risksMitigation: dto.risksMitigation,
+        acceptanceCriteria: dto.acceptanceCriteria,
+        changeControl: dto.changeControl,
         termsAndConditions: dto.termsAndConditions,
         effectiveDate,
       },
