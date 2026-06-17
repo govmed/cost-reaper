@@ -242,26 +242,28 @@ applicable; participate in governance; and support change-control decisions.
 
 ---
 
-## 9. Deliverables
+## 9. Deliverables &amp; Milestone Schedule
 
-| Deliverable                      | Description                                           | Acceptance Criteria                           |
-| -------------------------------- | ----------------------------------------------------- | --------------------------------------------- |
-| Project Management Plan          | Schedule, governance, risks, communication, reporting | Approved by customer                          |
-| Requirements Document            | Functional and non-functional requirements            | Approved by business + technical stakeholders |
-| Requirements Traceability Matrix | Maps requirements to design, build, test, acceptance  | Complete and reviewed                         |
-| Solution Architecture Document   | Target architecture and major design decisions        | Approved by architecture stakeholders         |
-| Technical Design Document        | Application, data, integration, security design       | Approved by technical stakeholders            |
-| Data Model                       | Logical and physical data structures                  | Reviewed and approved                         |
-| Integration Design               | APIs, batch jobs, files, messages, event flows        | Reviewed and approved                         |
-| Security Design                  | Authn, authz, encryption, logging, controls           | Approved by security stakeholders             |
-| Test Strategy                    | Testing approach and responsibilities                 | Approved by project leadership                |
-| Test Cases and Results           | Executed tests and results                            | Meets exit criteria                           |
-| Deployment Plan                  | Production implementation steps                       | Approved before go-live                       |
-| Rollback Plan                    | Recovery approach if deployment fails                 | Approved before go-live                       |
-| User Guide                       | Supports end-user adoption                            | Reviewed and accepted                         |
-| Operations Runbook               | Supports production operations                        | Reviewed and accepted                         |
-| Knowledge Transfer Materials     | Supports customer/support handoff                     | Delivered and reviewed                        |
-| Final Acceptance Package         | Confirms delivery completion                          | Signed by customer                            |
+Deliverables are organized by **SDLC phase**. Each phase is a **billable milestone**: upon the
+Client's written acceptance of that phase's deliverables, the Provider invoices the phase's
+**one-time milestone fee** per the schedule below. The fees are derived from the approved
+estimate's **cost per phase** — when generated from a Kerdos estimate, this table is populated
+from the estimate's per-phase totals. Recurring costs (e.g. cloud, licenses) are billed on their
+stated cadence and are **not** milestones.
+
+| SDLC Phase (Milestone) | Key Deliverables               |   Milestone Fee (one-time) |       Recurring (monthly) |       Recurring (yearly) | Invoice Trigger           |
+| ---------------------- | ------------------------------ | -------------------------: | ------------------------: | -----------------------: | ------------------------- |
+| Planning               | `{{PLANNING_DELIVERABLES}}`    |    `{{PLANNING_ONE_TIME}}` |    `{{PLANNING_MONTHLY}}` |    `{{PLANNING_YEARLY}}` | Acceptance of Planning    |
+| Design                 | `{{DESIGN_DELIVERABLES}}`      |      `{{DESIGN_ONE_TIME}}` |      `{{DESIGN_MONTHLY}}` |      `{{DESIGN_YEARLY}}` | Acceptance of Design      |
+| Development            | `{{DEVELOPMENT_DELIVERABLES}}` | `{{DEVELOPMENT_ONE_TIME}}` | `{{DEVELOPMENT_MONTHLY}}` | `{{DEVELOPMENT_YEARLY}}` | Acceptance of Development |
+| Testing                | `{{TESTING_DELIVERABLES}}`     |     `{{TESTING_ONE_TIME}}` |     `{{TESTING_MONTHLY}}` |     `{{TESTING_YEARLY}}` | Acceptance of Testing     |
+| Deployment             | `{{DEPLOYMENT_DELIVERABLES}}`  |  `{{DEPLOYMENT_ONE_TIME}}` |  `{{DEPLOYMENT_MONTHLY}}` |  `{{DEPLOYMENT_YEARLY}}` | Go-live acceptance        |
+| Maintenance            | `{{MAINTENANCE_DELIVERABLES}}` | `{{MAINTENANCE_ONE_TIME}}` | `{{MAINTENANCE_MONTHLY}}` | `{{MAINTENANCE_YEARLY}}` | Per support agreement     |
+| **Total**              |                                |      `{{MILESTONE_TOTAL}}` |       `{{MONTHLY_TOTAL}}` |       `{{YEARLY_TOTAL}}` |                           |
+
+> Each milestone fee is invoiced upon the Client's acceptance of that phase. Phase fees exclude the
+> project contingency (carried in §23 Pricing). Phases with no cost may be omitted; add custom
+> phases as needed.
 
 ---
 

@@ -24,9 +24,10 @@ const DEFAULT_SCOPE =
   'between the parties. Any work not expressly described herein is out of scope and requires a ' +
   'separate written change order.';
 const DEFAULT_DELIVERABLES =
-  '• Deliverable 1 — description and acceptance criteria\n' +
-  '• Deliverable 2 — description and acceptance criteria\n' +
-  '• Deliverable 3 — description and acceptance criteria';
+  'Deliverables are organized by SDLC phase. Each phase is a billable milestone: upon the ' +
+  'Client’s written acceptance of a phase’s deliverables, the Provider invoices that phase’s ' +
+  'one-time milestone fee per the Milestone Schedule below (derived from the approved estimate’s ' +
+  'cost per phase). Recurring costs are billed on their stated cadence.';
 const DEFAULT_TIMELINE =
   'The Services are expected to commence on the Effective Date and proceed per the milestones ' +
   'agreed by the parties. Dates are estimates and may be adjusted by mutual written agreement.';

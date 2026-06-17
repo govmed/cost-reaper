@@ -859,3 +859,16 @@ Built FE-55 / FR-30 (admin-defined roles & permission-based RBAC) per ADR-0010, 
 - Verified in-container: api tsc PASS; 140 specs pass (incl. new 36-case roles-permissions.spec); prettier clean. Updated Roles-page e2e assertions. Web tsc + e2e via CI.
 - Opening PR.
 ---
+
+---
+### [2026-06-17 12:20 UTC] — USER
+In the SOW template, switch out the Deliverable 1, 2, 3 by the different phases and the cost per phase which become milestones we can invoice to get paid per milestone.
+
+### [2026-06-17 12:30 UTC] — AGENT
+Replaced the generic deliverables with a per-SDLC-phase milestone schedule (invoiceable per phase).
+**Actions taken:**
+- SowPrintPage §7 → "Deliverables & Milestone Schedule": computed table from pricing.phases (phase | one-time milestone fee | monthly | yearly + totals) + invoice-on-acceptance note.
+- Changed the SOW default deliverables boilerplate to milestone/phase language (was "Deliverable 1/2/3").
+- Rewrote SOW_TEMPLATE.md §9 into a phase/milestone schedule with {{PHASE_*}} tokens + invoice triggers; re-rendered the .docx.
+- Prettier clean; opening PR (web tsc/e2e via CI).
+---
