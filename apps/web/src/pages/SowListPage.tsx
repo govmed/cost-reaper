@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useSows, useCreateSow, useSowMutations, useEligibleEstimates } from '../lib/queries';
 import type { SowSummary } from '../lib/types';
+
+type SortKey = 'number' | 'title' | 'estimateName' | 'clientName' | 'status' | 'updatedAt';
 
 /** Statements of Work (BR-7) — list + create from an *approved* estimate. */
 export default function SowListPage() {
@@ -13,6 +15,31 @@ export default function SowListPage() {
   const { data: eligible } = useEligibleEstimates();
   const create = useCreateSow();
   const [estimateId, setEstimateId] = useState('');
+  // Client-side column sorting (the list loads all SOWs). null = API default
+  // (most-recently-updated first).
+  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' } | null>(null);
+
+  const sorted = useMemo(() => {
+    if (!data) return data;
+    if (!sort) return data;
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    return [...data].sort((a, b) => {
+      const av = String(a[sort.key] ?? '');
+      const bv = String(b[sort.key] ?? '');
+      return av.localeCompare(bv, undefined, { numeric: true }) * dir;
+    });
+  }, [data, sort]);
+
+  function toggleSort(key: SortKey) {
+    setSort((s) => {
+      if (s?.key !== key) return { key, dir: 'asc' };
+      return { key, dir: s.dir === 'asc' ? 'desc' : 'asc' };
+    });
+  }
+  function arrow(key: SortKey): string {
+    if (sort?.key !== key) return '';
+    return sort.dir === 'asc' ? ' ▲' : ' ▼';
+  }
 
   function add() {
     if (!estimateId) return;
@@ -77,23 +104,23 @@ export default function SowListPage() {
           <table className="w-full text-sm">
             <thead className="bg-slate-100 text-slate-600 text-left">
               <tr>
-                <th className="px-4 py-2">Number</th>
-                <th className="px-4 py-2">Title</th>
-                <th className="px-4 py-2">Estimate</th>
-                <th className="px-4 py-2">Client</th>
-                <th className="px-4 py-2 text-center">Status</th>
+                <SortTh label="Number" k="number" onSort={toggleSort} arrow={arrow} />
+                <SortTh label="Title" k="title" onSort={toggleSort} arrow={arrow} />
+                <SortTh label="Estimate" k="estimateName" onSort={toggleSort} arrow={arrow} />
+                <SortTh label="Client" k="clientName" onSort={toggleSort} arrow={arrow} />
+                <SortTh label="Status" k="status" onSort={toggleSort} arrow={arrow} center />
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
-              {data.length === 0 && (
+              {sorted!.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
                     No statements of work yet.
                   </td>
                 </tr>
               )}
-              {data.map((s) => (
+              {sorted!.map((s) => (
                 <SowRow key={s.id} s={s} canEdit={canEdit} />
               ))}
             </tbody>
@@ -101,6 +128,33 @@ export default function SowListPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function SortTh({
+  label,
+  k,
+  onSort,
+  arrow,
+  center,
+}: {
+  label: string;
+  k: SortKey;
+  onSort: (k: SortKey) => void;
+  arrow: (k: SortKey) => string;
+  center?: boolean;
+}) {
+  return (
+    <th className={`px-4 py-2 ${center ? 'text-center' : ''}`}>
+      <button
+        onClick={() => onSort(k)}
+        className="font-medium hover:text-brand"
+        aria-label={`Sort by ${label}`}
+      >
+        {label}
+        {arrow(k)}
+      </button>
+    </th>
   );
 }
 
