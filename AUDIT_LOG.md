@@ -833,3 +833,15 @@ Read the 33-section bid-response reference; asked direction → user chose "Both
 - Rendered docs/templates/SOW_TEMPLATE.docx via the pandoc/core Docker container (.docx deliverable rule). Prettier-clean.
 - PR next; then (queued) expand the Kerdos sow module to this structure.
 ---
+
+---
+### [2026-06-17 09:30 UTC] — USER
+Go for it.
+
+### [2026-06-17 09:55 UTC] — AGENT
+Built step 2 — expanded the Kerdos sow module to the SOW_TEMPLATE structure.
+**Actions taken:**
+- Added 12 narrative sections to StatementOfWork (schema + additive migration 20260617120000_sow_template_sections), shared DTO + UpdateSowRequest, web StatementOfWork interface, SowService (toDto/create/update + seeded default boilerplate per section), the SOW editor (SECTIONS/Form/init in template order), and the print view (renumbered 1–21; pricing §9, acceptance §21).
+- Verified in-container: types rebuild + prisma generate + api tsc = PASS; prettier clean; cross-layer field-name consistency check clean. Web tsc via CI.
+- Opening the PR.
+---
