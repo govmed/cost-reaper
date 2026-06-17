@@ -50,7 +50,47 @@ export default function SowPrintPage() {
       <Prose title="4. Scope of Services" body={sow.scope} />
       <Prose title="5. Out of Scope" body={sow.outOfScope} />
       <Prose title="6. Proposed Solution" body={sow.solutionOverview} />
-      <Prose title="7. Deliverables" body={sow.deliverables} />
+      <section className="mt-5 break-inside-avoid">
+        <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
+          7. Deliverables &amp; Milestone Schedule
+        </h2>
+        <p className="text-sm whitespace-pre-wrap leading-relaxed">{sow.deliverables || '—'}</p>
+        {p.phases.length > 0 && (
+          <table className="w-full text-sm mt-3">
+            <thead>
+              <tr className="text-slate-500 text-left border-b border-slate-300">
+                <th className="py-1">Phase / Milestone</th>
+                <th className="py-1 text-right">Milestone fee (one-time)</th>
+                <th className="py-1 text-right">Recurring (monthly)</th>
+                <th className="py-1 text-right">Recurring (yearly)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {p.phases.map((ph) => (
+                <tr key={ph.phase} className="border-t border-slate-100">
+                  <td className="py-1">{ph.phase}</td>
+                  <td className="py-1 text-right tabular-nums">{money(ph.oneTime)}</td>
+                  <td className="py-1 text-right tabular-nums">{money(ph.monthly)}</td>
+                  <td className="py-1 text-right tabular-nums">{money(ph.yearly)}</td>
+                </tr>
+              ))}
+              <tr className="border-t border-slate-300 font-semibold">
+                <td className="py-1">Total</td>
+                <td className="py-1 text-right tabular-nums">{money(p.oneTimeSubtotal)}</td>
+                <td className="py-1 text-right tabular-nums">{money(p.monthlySubtotal)}</td>
+                <td className="py-1 text-right tabular-nums">{money(p.yearlySubtotal)}</td>
+              </tr>
+            </tbody>
+          </table>
+        )}
+        <p className="text-xs text-slate-400 mt-1">
+          Each completed phase is a billable milestone: the one-time milestone fee is invoiced upon
+          the Client&apos;s acceptance of that phase&apos;s deliverables. Recurring amounts are
+          billed on their stated cadence (see §9 Pricing). Phase amounts exclude the project
+          contingency.
+        </p>
+      </section>
+
       <Prose title="8. Timeline" body={sow.timeline} />
 
       <section className="mt-5">
