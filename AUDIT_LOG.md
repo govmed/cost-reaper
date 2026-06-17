@@ -795,3 +795,16 @@ GM role PR merged; recovered from the Icon-ref breakage.
 - Fixed: `find .git/refs -name 'Icon*' -delete` + `git remote prune origin` + `git pull --ff-only origin main`. Verified GM on main, tree clean.
 - Updated CLAUDE.md Current State (GM marked merged) + PROJECT_LOG.md.
 ---
+
+---
+### [2026-06-17 07:10 UTC] — USER
+Is the website running? http://localhost:5173/ · An idea — Roles & Permissions: can admins create/modify roles? Make it a Feature — what number? · Can you also create a user id for General Manager / Estimator / Viewer?
+
+### [2026-06-17 07:30 UTC] — AGENT
+**Actions taken:**
+- Website was NOT running (Docker daemon off). Started Docker Desktop; `docker compose up -d`. Found the running containers were a stale pre-GM build.
+- Rebuilt `api`+`web` images from `main`; `./scripts/migrate.sh` applied `add_gm_role`; idempotent re-seed; re-gated default workflow (IN_REVIEW→APPROVED and →DRAFT to GM) via targeted SQL. Verified GM live (enum + web bundle), 58 estimates preserved. Site up: web 200, api 200.
+- Created demo users via API as admin: gm@/estimator@/viewer@example.com (password Kerdos!2026); admin@ already seeded.
+- Roles idea: answered — yes, it's **FE-55** (new **FR-30**) under EP-2; user chose "register in spec now". Added FR-30, FE-55, traceability + roadmap Sprint 12 rows, §10 note, and ADR-0010 (Proposed). No code built.
+- Next: address the contextual help-panel feature idea.
+---
