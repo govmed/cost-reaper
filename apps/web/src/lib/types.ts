@@ -1,4 +1,4 @@
-export type Role = 'ADMIN' | 'ESTIMATOR' | 'VIEWER';
+export type Role = 'ADMIN' | 'ESTIMATOR' | 'VIEWER' | 'GM';
 export type BillingPeriod = 'ONE_TIME' | 'MONTHLY' | 'YEARLY';
 /**
  * SDLC phase is data-driven (FR-29) — the dropdown loads active values from the

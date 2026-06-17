@@ -3,7 +3,7 @@ import { useUserMutations, useUsers } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
 
 // Fallback role codes used until the DB reference labels load (FR-29).
-const ROLES = ['ADMIN', 'ESTIMATOR', 'VIEWER'];
+const ROLES = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
 
 export default function UsersPage() {
   const { data, isLoading, error } = useUsers();

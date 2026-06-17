@@ -13,10 +13,11 @@ export interface RoleCapability {
   roles: Record<Role, boolean>;
 }
 
-export const ROLES: Role[] = ['ADMIN', 'ESTIMATOR', 'VIEWER'];
+export const ROLES: Role[] = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
 
 export const ROLE_LABELS: Record<Role, string> = {
   ADMIN: 'Admin',
+  GM: 'General Manager',
   ESTIMATOR: 'Estimator',
   VIEWER: 'Viewer',
 };
@@ -24,6 +25,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 export const ROLE_SUMMARIES: Record<Role, string> = {
   ADMIN:
     'Full access, plus governs users, reference data, pricing, and the workflow/checklist engines.',
+  GM: 'Reviews and approves estimates — can approve a submission or return it to draft, but cannot create or edit estimates.',
   ESTIMATOR: 'Builds and edits estimates and runs them through the approval workflow.',
   VIEWER: 'Read-only — can view authorized estimates and dashboards and export them.',
 };
@@ -36,9 +38,11 @@ export const ROLE_CAPABILITY_CATEGORIES = [
   'Insights',
 ];
 
-const T = { ADMIN: true, ESTIMATOR: true, VIEWER: true };
-const A_E = { ADMIN: true, ESTIMATOR: true, VIEWER: false };
-const A = { ADMIN: true, ESTIMATOR: false, VIEWER: false };
+const T = { ADMIN: true, GM: true, ESTIMATOR: true, VIEWER: true };
+const A_E = { ADMIN: true, GM: false, ESTIMATOR: true, VIEWER: false };
+// Advance the workflow: estimators submit, GMs approve / return to draft.
+const A_E_G = { ADMIN: true, GM: true, ESTIMATOR: true, VIEWER: false };
+const A = { ADMIN: true, GM: false, ESTIMATOR: false, VIEWER: false };
 
 export const ROLE_CAPABILITIES: RoleCapability[] = [
   // ── Estimates ──────────────────────────────────────────────────────────────
@@ -63,7 +67,7 @@ export const ROLE_CAPABILITIES: RoleCapability[] = [
     description:
       'Move an estimate between stages (Submit for review, Approve, …), subject to the checklist.',
     category: 'Estimates',
-    roles: A_E,
+    roles: A_E_G,
   },
   {
     key: 'export_estimates',

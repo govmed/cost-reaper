@@ -16,6 +16,7 @@ enum Role {
   ADMIN
   ESTIMATOR
   VIEWER
+  GM
 }
 
 enum RateUnit {

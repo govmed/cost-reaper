@@ -731,16 +731,18 @@ async function seedDefaultWorkflow(adminId: string) {
       requiresChecklistPass: true,
     },
     {
+      // The GM (reviewer) sends a submission back for rework (FR-24, FR-2).
       from: 'IN_REVIEW',
       to: 'DRAFT',
-      allowedRole: Role.ESTIMATOR,
+      allowedRole: Role.GM,
       label: 'Return to draft',
       requiresChecklistPass: false,
     },
     {
+      // The GM approves a reviewed estimate (FR-24, FR-2).
       from: 'IN_REVIEW',
       to: 'APPROVED',
-      allowedRole: Role.ADMIN,
+      allowedRole: Role.GM,
       label: 'Approve',
       requiresChecklistPass: true,
     },
@@ -993,6 +995,7 @@ const REFERENCE_DATA: RefType[] = [
     name: 'User Role',
     values: [
       { code: 'ADMIN', name: 'Administrator' },
+      { code: 'GM', name: 'General Manager' },
       { code: 'ESTIMATOR', name: 'Estimator' },
       { code: 'VIEWER', name: 'Viewer' },
     ],
