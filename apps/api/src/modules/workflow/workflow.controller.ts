@@ -133,7 +133,7 @@ export class WorkflowController {
   }
 
   @Post('estimates/:id/transitions')
-  @Roles('ADMIN', 'ESTIMATOR')
+  @Roles('ADMIN', 'ESTIMATOR', 'GM')
   transition(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(TransitionRequest)) dto: TransitionRequest,

@@ -1,7 +1,10 @@
 import { z } from 'zod';
 
-/** RBAC roles (FR-2, FR-26). */
-export const Role = z.enum(['ADMIN', 'ESTIMATOR', 'VIEWER']);
+/**
+ * RBAC roles (FR-2, FR-26). GM (General Manager) is an approver: it reviews and
+ * approves estimates (or sends them back to draft) but cannot create/edit them.
+ */
+export const Role = z.enum(['ADMIN', 'ESTIMATOR', 'VIEWER', 'GM']);
 export type Role = z.infer<typeof Role>;
 
 /** Billing period for any line item (FR-23). */

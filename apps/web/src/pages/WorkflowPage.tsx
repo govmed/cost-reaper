@@ -4,7 +4,7 @@ import { useAuth } from '../lib/auth';
 import { useWorkflowAuthoring, useWorkflowDefinition } from '../lib/queries';
 import type { WorkflowDefinition, WorkflowStageDef } from '../lib/types';
 
-const ROLES = ['ADMIN', 'ESTIMATOR', 'VIEWER'];
+const ROLES = ['ADMIN', 'GM', 'ESTIMATOR', 'VIEWER'];
 
 /** Admin authoring of one workflow's stages + transitions (FR-24, FE-43). */
 export default function WorkflowPage() {

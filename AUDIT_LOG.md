@@ -769,3 +769,19 @@ You never removed the orange V logo. / localhost:5173/dashboard see for yourself
 - Labor card: `table-fixed` + proportional `<colgroup>` (Role ~19%, wraps); add-row selects `w-full` (new optional className on PeriodSelect/SdlcSelect); PERT `flex-wrap`; Role/Resource `break-words`.
 - Committing Labor change → PR → CI → merge → rebuild web container so the user sees everything.
 ---
+
+---
+### [2026-06-17 06:00 UTC] — USER
+continue
+
+### [2026-06-17 06:10 UTC] — AGENT
+Picked up the in-progress GM (General Manager) role work (uncommitted schema enum + new migration) and completed it end-to-end.
+**Actions taken:**
+- Removed a stray macOS `Icon` file from `apps/api/prisma/migrations/20260617060000_add_gm_role/`.
+- Added `GM` to the shared Zod `Role` (packages/types/src/common.ts) and web `Role` type (apps/web/src/lib/types.ts).
+- roleCapabilities.ts: added GM to ROLES/ROLE_LABELS/ROLE_SUMMARIES and a new `A_E_G` capability map (GM = view/export/use-reference/dashboard + advance-workflow; no authoring/admin) → Roles & permissions page renders a GM column automatically.
+- UsersPage.tsx + WorkflowPage.tsx fallback role lists gained GM; seeded `ROLE` reference values gained `{GM: General Manager}`.
+- Re-gated the default seed workflow: IN_REVIEW→APPROVED ("Approve") and IN_REVIEW→DRAFT ("Return to draft") now require GM (ADMIN overrides); transition endpoint `@Roles` now admits GM.
+- Estimate mutation endpoints unchanged (ADMIN/ESTIMATOR only) so GM cannot create/edit; GET routes open to authed users so GM can review.
+- Updated CLAUDE.md Current State + PROJECT_LOG.md. Next: feature branch → PR → CI → merge.
+---
