@@ -928,3 +928,12 @@ write a proper Checklist Rule Sets suite (~50 cases) covering the rule-set
 ### [2026-06-17 15:12 UTC] — AGENT
 Added checklist-rule-sets.spec.ts — 61 cases covering rule-set CRUD, rule create/update (lower_snake_case key), severity/scope enums, DTOs, and the gating result. 61/61 pass in-container; prettier clean. Opening PR. (SOW updated-date request handled next.)
 ---
+
+---
+### [2026-06-17 15:25 UTC] — USER
+Which folder can I open to see all the test cases? · In the SOW Card, fit a Date/Time of when the Estimate was updated.
+
+### [2026-06-17 15:35 UTC] — AGENT
+- Answered: tests are colocated as *.spec.ts under apps/api/src/modules (+ common/), packages/engine/src/*.test.ts, apps/web/e2e/smoke.spec.ts (727 total cases).
+- SOW list: added a sortable "Estimate updated" column (estimateUpdatedAt on SowSummaryDto + service + web). api tsc + prettier clean. Opening PR.
+---

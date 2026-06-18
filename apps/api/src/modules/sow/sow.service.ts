@@ -166,7 +166,7 @@ export class SowService {
   async list(): Promise<SowSummaryDto[]> {
     const rows = await this.prisma.statementOfWork.findMany({
       orderBy: { updatedAt: 'desc' },
-      include: { estimate: { select: { name: true } } },
+      include: { estimate: { select: { name: true, updatedAt: true } } },
     });
     return rows.map((s) => ({
       id: s.id,
@@ -177,6 +177,7 @@ export class SowService {
       status: s.status as SowSummaryDto['status'],
       clientName: s.clientName,
       updatedAt: s.updatedAt.toISOString(),
+      estimateUpdatedAt: s.estimate.updatedAt.toISOString(),
     }));
   }
 

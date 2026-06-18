@@ -56,6 +56,8 @@ export const SowSummaryDto = z.object({
   status: SowStatus,
   clientName: z.string(),
   updatedAt: z.string(),
+  /** When the source estimate was last updated (so users can spot drift since the SOW). */
+  estimateUpdatedAt: z.string(),
 });
 export type SowSummaryDto = z.infer<typeof SowSummaryDto>;
 

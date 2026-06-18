@@ -508,6 +508,7 @@ export interface SowSummary {
   status: string;
   clientName: string;
   updatedAt: string;
+  estimateUpdatedAt: string;
 }
 export interface StatementOfWork {
   id: string;

@@ -722,3 +722,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-17 — Tests: Checklist Rule Sets contract suite (FR-25)
 - **Action:** User asked for a proper Rule Sets suite (~50 cases). Added `apps/api/src/modules/workflow/checklist-rule-sets.spec.ts` — **61 cases** against the shared contracts: severity/scope enums; `ChecklistRuleSetDto`; `CreateChecklistRuleSetRequest`/`UpdateChecklistRuleSetRequest`; `ChecklistRuleDto`; `CreateChecklistRuleRequest` (incl. the lower_snake_case key rule, bounds, severity/scope, optional ruleSetId); `UpdateChecklistRuleRequest`; and the gating `ChecklistResult` (completeness 0..1, item defaults). Closes the gap (the card previously had only 8 engine-evaluation tests).
 - **Result:** 61/61 pass in-container; prettier clean. PR next.
+
+### 2026-06-17 — SOW list: show when the source estimate was last updated (BR-7)
+- **Action:** User: fit a date/time of when the estimate was updated into the SOW card. Added `estimateUpdatedAt` to `SowSummaryDto` (+ web `SowSummary`); the sow.service list now includes `estimate.updatedAt`. SowListPage gains a sortable **"Estimate updated"** column (localized date/time) so users can spot drift between the SOW and its source estimate (a draft SOW reflects live estimate pricing).
+- **Files touched:** packages/types/src/sow.ts, apps/api/src/modules/sow/sow.service.ts, apps/web/src/lib/types.ts, apps/web/src/pages/SowListPage.tsx, living docs.
+- **Result:** api tsc PASS; prettier clean. PR next.
