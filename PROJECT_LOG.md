@@ -777,3 +777,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-17 — Consistent pagination + sorting across list cards (FR-9)
 - **Action:** Rolled the reusable usePagedSort + <Pagination> + <SortableTh> out to the main flat-table list cards: Estimates (useEstimates now fetches pageSize 200 so the card sorts/paginates client-side), SOW (replaced its bespoke SortTh/sort with the shared controls), Users. Cloud Prices already done. Each now has sortable columns + a rows-per-page dropdown (10/20/25/40/50) + "X–Y of N" + Prev/Next, looking identical. (Rate Cards is a card-list not a flat table; Audit already paginates server-side — left as-is.)
 - **Result:** web tsc + eslint + repo format:check PASS. PR next.
+
+### 2026-06-17 — Catalog: add AWS us-west-2 region (FR-21)
+- **Action:** User noted no us-west for AWS. It was never seeded (catalog is a us-east-1-centric sample). Factored the EC2 instance list into a shared `AWS_EC2` const and seeded **us-west-2** (Oregon) — full EC2 catalog (same on-demand pricing as us-east-1) + S3 + EBS = 75 prices. Idempotent upsert; saved estimate snapshots unaffected (NFR-14).
+- **Result:** prettier clean; rebuilt api + re-seeded → AWS regions now us-east-1 (110), us-west-2 (75), eu-west-1 (3). PR next.
