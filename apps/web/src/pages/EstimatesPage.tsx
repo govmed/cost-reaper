@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateEstimate, useEstimates } from '../lib/queries';
 import { useAuth } from '../lib/auth';
+import { canAuthorEstimates } from '../lib/permissions';
 import { formatMoney } from '../lib/money';
 
 export default function EstimatesPage() {
@@ -14,7 +15,7 @@ export default function EstimatesPage() {
 
   // Only users who can author estimates see the create form (FR-30). A GM is an
   // approver — they review/approve, they don't create their own estimates.
-  const canCreate = !!user?.permissions?.some((p) => p === '*' || p === 'estimate.author');
+  const canCreate = canAuthorEstimates(user);
 
   async function onCreate() {
     if (!name.trim()) return;

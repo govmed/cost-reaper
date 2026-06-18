@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import * as argon2 from 'argon2';
 import type { AuthUser, LoginRequest, RegisterRequest, TokenPair } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { RolesService } from '../roles/roles.service';
 
 interface UserRecord {
   id: string;
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly roles: RolesService,
   ) {}
 
   async register(dto: RegisterRequest): Promise<{ user: AuthUser } & TokenPair> {
@@ -28,7 +30,7 @@ export class AuthService {
     const user = (await this.prisma.user.create({
       data: { email: dto.email, passwordHash, displayName: dto.displayName ?? null },
     })) as unknown as UserRecord;
-    return { user: this.toAuthUser(user), ...(await this.issueTokens(user)) };
+    return { user: await this.toAuthUser(user), ...(await this.issueTokens(user)) };
   }
 
   async login(dto: LoginRequest): Promise<{ user: AuthUser } & TokenPair> {
@@ -39,7 +41,7 @@ export class AuthService {
     const valid = await argon2.verify(user.passwordHash, dto.password);
     if (!valid) throw new UnauthorizedException('Invalid credentials');
     await this.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
-    return { user: this.toAuthUser(user), ...(await this.issueTokens(user)) };
+    return { user: await this.toAuthUser(user), ...(await this.issueTokens(user)) };
   }
 
   /**
@@ -63,7 +65,7 @@ export class AuthService {
     }
     if (!user.isActive) throw new UnauthorizedException('Account is deactivated');
     await this.prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
-    return { user: this.toAuthUser(user), ...(await this.issueTokens(user)) };
+    return { user: await this.toAuthUser(user), ...(await this.issueTokens(user)) };
   }
 
   async refresh(refreshToken: string): Promise<TokenPair> {
@@ -97,7 +99,14 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private toAuthUser(user: UserRecord): AuthUser {
-    return { id: user.id, email: user.email, role: user.role, displayName: user.displayName };
+  private async toAuthUser(user: UserRecord): Promise<AuthUser> {
+    const permissions = await this.roles.permissionsFor(user.role);
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      displayName: user.displayName,
+      permissions: [...permissions],
+    };
   }
 }

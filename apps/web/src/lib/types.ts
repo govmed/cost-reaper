@@ -39,6 +39,8 @@ export interface AuthUser {
   email: string;
   role: Role;
   displayName: string | null;
+  /** Permission keys the user's role grants (FR-30); `*` = wildcard (Admin). */
+  permissions?: string[];
 }
 
 export interface UserDto {
