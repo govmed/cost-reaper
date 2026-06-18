@@ -32,9 +32,7 @@ export function SortableTh({
     >
       <span className="inline-flex items-center gap-1">
         {label}
-        <span className="text-xs text-slate-400">
-          {active ? (dir === 'asc' ? '▲' : '▼') : '↕'}
-        </span>
+        <span className="text-xs text-slate-400">{active ? (dir === 'asc' ? '▲' : '▼') : '↕'}</span>
       </span>
     </th>
   );
