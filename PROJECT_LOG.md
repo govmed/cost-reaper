@@ -741,3 +741,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** Log-tailing during testing surfaced that the LoggingInterceptor used a success-only `tap(() => …)`, so guard denials (401/403) and handler errors (4xx/5xx) never produced a request-log line (they run before/around the success path). Changed it to `tap({ next, error })` — logs both paths, derives the status from `HttpException.getStatus()` (else 500), tags level warn/error for ≥400/≥500, and includes the error message. The request log is now a complete audit/observability trail (incl. permission denials).
 - **Files touched:** apps/api/src/common/interceptors/logging.interceptor.ts; living docs.
 - **Result:** api tsc PASS; prettier clean. PR next; will re-demonstrate the captured log now includes the 403.
+
+### 2026-06-17 — Observability (follow-up): log guard denials too, in the filter (NFR-9)
+- **Action:** Re-tailing logs showed the interceptor error-path still missed guard denials — NestJS runs guards BEFORE interceptors, so a denied (401/403) request never reaches the interceptor. Moved failure logging to the global `ProblemDetailsFilter` (which `@Catch()`-es everything: guard denials, validation 4xx, 404s, 5xx) and reverted the interceptor to success-only (no double-logging). Net: interceptor logs 2xx/3xx, filter logs every failure → complete request/audit log incl. permission denials.
+- **Files touched:** apps/api/src/common/interceptors/logging.interceptor.ts, apps/api/src/common/http/http-exception.filter.ts; living docs.
+- **Result:** api tsc PASS; problem-details spec green; prettier clean. PR next; will re-capture showing 403/404/401 logged.

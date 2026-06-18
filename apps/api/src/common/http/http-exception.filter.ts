@@ -42,6 +42,22 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       detail = process.env.NODE_ENV === 'production' ? undefined : exception.message;
     }
 
+    // Structured request log for every FAILURE (NFR-9). Guards run before the
+    // LoggingInterceptor, so denied requests (401/403) never reach it — this
+    // filter @Catch()-es everything (guard denials, validation, 404s, 5xx), so
+    // together they make a complete request/audit log.
+    const requestId = (req as Request & { id?: string }).id;
+    process.stdout.write(
+      `${JSON.stringify({
+        level: status >= 500 ? 'error' : 'warn',
+        time: new Date().toISOString(),
+        requestId,
+        method: req.method,
+        url: req.url,
+        status,
+        error: detail ?? title,
+      })}\n`,
+    );
     if (status >= 500) {
       this.logger.error(
         `${req.method} ${req.url} -> ${status}`,
