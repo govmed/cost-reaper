@@ -202,6 +202,17 @@ export interface Paginated<T> {
   pageSize: number;
 }
 
+/** An immutable audit-trail event (FR-11). */
+export interface AuditEvent {
+  id: string;
+  entityType: string;
+  entityId: string;
+  action: string;
+  actorId: string | null;
+  actorEmail: string | null;
+  occurredAt: string;
+}
+
 export interface RateCardRole {
   id: string;
   roleName: string;

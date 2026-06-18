@@ -20,6 +20,7 @@ export const PERMISSION_KEYS = [
   'checklist.configure',
   'roles.manage',
   'users.manage',
+  'audit.view',
 ] as const;
 
 export const PermissionKey = z.enum(PERMISSION_KEYS);
@@ -101,6 +102,12 @@ export const PERMISSIONS: PermissionMeta[] = [
     key: 'users.manage',
     label: 'Manage users',
     description: 'Create users, assign roles, and activate or deactivate accounts.',
+    group: 'Administration',
+  },
+  {
+    key: 'audit.view',
+    label: 'View the audit log',
+    description: 'Read the immutable audit trail of who changed what, and when.',
     group: 'Administration',
   },
 ];
