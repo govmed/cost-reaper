@@ -43,6 +43,8 @@ NAMES = {
     "fx-rates.mapper": "FX rate mapper",
     "sso-config": "SSO config",
     "auth.service": "Auth service",
+    "gm-scope": "GM visibility scope (FR-2)",
+    "pagination": "Pagination (FR-9)",
     "reference-tree": "Reference tree",
     "problem-details": "RFC7807 problem+json",
     "zod-validation.pipe": "Zod validation pipe",

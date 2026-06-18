@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateEstimate, useEstimates } from '../lib/queries';
+import { useAuth } from '../lib/auth';
+import { canAuthorEstimates } from '../lib/permissions';
 import { formatMoney } from '../lib/money';
 
 export default function EstimatesPage() {
   const [q, setQ] = useState('');
   const [name, setName] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data, isLoading, error } = useEstimates({ q });
   const create = useCreateEstimate();
+
+  // Only users who can author estimates see the create form (FR-30). A GM is an
+  // approver — they review/approve, they don't create their own estimates.
+  const canCreate = canAuthorEstimates(user);
 
   async function onCreate() {
     if (!name.trim()) return;
@@ -34,24 +41,26 @@ export default function EstimatesPage() {
         />
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-4 flex gap-2 items-end">
-        <label className="text-sm flex-1">
-          <span className="text-slate-600">New estimate name</span>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full border border-slate-300 rounded px-3 py-2"
-            placeholder="Q3 Platform build"
-          />
-        </label>
-        <button
-          onClick={onCreate}
-          disabled={create.isPending || !name.trim()}
-          className="bg-brand text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
-        >
-          Create
-        </button>
-      </div>
+      {canCreate && (
+        <div className="bg-white border border-slate-200 rounded-xl p-4 flex gap-2 items-end">
+          <label className="text-sm flex-1">
+            <span className="text-slate-600">New estimate name</span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 w-full border border-slate-300 rounded px-3 py-2"
+              placeholder="Q3 Platform build"
+            />
+          </label>
+          <button
+            onClick={onCreate}
+            disabled={create.isPending || !name.trim()}
+            className="bg-brand text-white rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
+          >
+            Create
+          </button>
+        </div>
+      )}
 
       {isLoading && <p className="text-slate-500">Loading…</p>}
       {error && <p className="text-rose-700">{(error as Error).message}</p>}

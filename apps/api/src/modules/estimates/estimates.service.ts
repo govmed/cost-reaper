@@ -35,6 +35,7 @@ import { ReferenceService } from '../reference/reference.service';
 import { buildEngineInput, toMappableEstimate } from './engine-mapping';
 import { CsvLine, exportRows, toCsv } from './estimate-csv';
 import { buildXlsx } from './xlsx';
+import { gmStageWhere } from '../../common/gm-scope';
 
 const DETAIL_INCLUDE = {
   laborItems: { include: { rateCardRole: true } },
@@ -107,11 +108,14 @@ export class EstimatesService {
     return this.getDetail(est.id);
   }
 
-  async list(query: EstimateListQuery) {
+  async list(query: EstimateListQuery, user?: AuthUser) {
     const where: any = {};
     if (query.q) where.name = { contains: query.q, mode: 'insensitive' };
     if (query.status) where.status = query.status;
     if (query.ownerId) where.ownerId = query.ownerId;
+    // A GM (approver) only sees the estimates in their queue — those awaiting
+    // review and the ones they've approved.
+    Object.assign(where, gmStageWhere(user));
 
     const [total, rows] = await this.prisma.$transaction([
       this.prisma.estimate.count({ where }),

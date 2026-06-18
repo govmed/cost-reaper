@@ -24,6 +24,17 @@ rights to simply won't appear or will be rejected.
 > permissions each one grants (e.g. a "Reviewer" that can approve but not edit).
 > The four above are the built-in baseline.
 
+> **GM scope.** A GM is an approver, so their views are limited to their review
+> queue:
+>
+> - The **Estimates** list shows only estimates that are **In Review** or **Approved**.
+> - On the **Dashboard**, the counts, the **By workflow stage** breakdown, and the
+>   totals cover only those two stages, and **Recent activity** shows estimates **the
+>   GM personally acted on** (not everyone's).
+> - There is **no "Create" form** on the Estimates page for a GM, and the
+>   **Governance** menu (workflow / checklist / roles configuration) is **Admin-only**,
+>   so it doesn't appear for a GM.
+
 ## 2. Sign in
 
 1. Go to the web app and enter your **email** and **password**.

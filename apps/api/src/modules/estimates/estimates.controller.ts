@@ -36,8 +36,11 @@ export class EstimatesController {
   constructor(private readonly estimates: EstimatesService) {}
 
   @Get()
-  list(@Query(new ZodValidationPipe(EstimateListQuery)) query: EstimateListQuery) {
-    return this.estimates.list(query);
+  list(
+    @Query(new ZodValidationPipe(EstimateListQuery)) query: EstimateListQuery,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.estimates.list(query, user);
   }
 
   @Get(':id')

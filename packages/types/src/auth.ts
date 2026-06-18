@@ -31,6 +31,12 @@ export const AuthUser = z.object({
   email: z.string().email(),
   role: RoleCode,
   displayName: z.string().nullable().optional(),
+  /**
+   * Permission keys the user's role grants (FR-30); `*` = wildcard (Admin).
+   * Populated on the login/register/SSO response; omitted on the token-derived
+   * request user (the server resolves permissions fresh per request).
+   */
+  permissions: z.array(z.string()).optional(),
 });
 export type AuthUser = z.infer<typeof AuthUser>;
 

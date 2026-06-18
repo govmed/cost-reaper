@@ -985,3 +985,11 @@ Yes, write the pagination suite.
 ### [2026-06-17 17:55 UTC] — AGENT
 Extracted pure pagination helpers (pageSkipTake/lastPage/paginate), wired pageSkipTake into the real estimates + audit list() services, and added pagination.spec.ts (42 cases: contracts + skip/take + slice semantics). 58 pass in-container (verbose ✓ per case); api tsc + prettier clean. Regenerated TEST_CASES catalog. Opening PR.
 ---
+
+---
+### [2026-06-17 18:30 UTC] — USER
+(several) GM should see only In Review/Approved estimates · GM shouldn't see the Governance menu · GM dashboard byStage only Approved/In Review · GM dashboard recent activity = my own · GM can't create estimates · update the user guide.
+
+### [2026-06-17 18:45 UTC] — AGENT
+Added shared gm-scope helper (+13 tests) and applied GM scoping: estimates list, dashboard summary/byStage/totals, dashboard recent=own-activity, stage drill guard, hidden create form (web), Governance nav Admin-only. User Guide "GM scope" note added. api tsc + prettier clean; live-verified (3 visible estimates, byStage limited, create 403, draft drill empty). Opening PR. (Also noted two new requests: record IP/location on changes; embed the estimate as a professional table inside the SOW — to follow.)
+---

@@ -18,6 +18,8 @@ import { SDLC_PHASES } from '../lib/types';
 import { useCaseById, useCaseForChecklistKey } from '../lib/help-content';
 import HelpDrawer from '../components/HelpDrawer';
 import { useRefLabeler } from '../lib/refLabels';
+import { useAuth } from '../lib/auth';
+import { canAuthorEstimates } from '../lib/permissions';
 import { formatMoney } from '../lib/money';
 import type {
   BillingPeriod,
@@ -1570,6 +1572,8 @@ function formatBytes(n: number): string {
 
 /** Upload + catalog supporting documents for an estimate (FR-29). */
 function DocumentsSection({ est }: { est: EstimateDetail }) {
+  const { user } = useAuth();
+  const canAuthor = canAuthorEstimates(user);
   const { data: docs } = useEstimateDocuments(est.id);
   const m = useDocumentMutations(est.id);
   const types = useRefLabeler('DOCUMENT_TYPE');
@@ -1642,14 +1646,16 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
                   >
                     Download
                   </button>
-                  <button
-                    onClick={() => {
-                      if (window.confirm(`Delete "${d.fileName}"?`)) m.remove.mutate(d.id);
-                    }}
-                    className="ml-3 text-rose-600 hover:underline text-xs"
-                  >
-                    Delete
-                  </button>
+                  {canAuthor && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Delete "${d.fileName}"?`)) m.remove.mutate(d.id);
+                      }}
+                      className="ml-3 text-rose-600 hover:underline text-xs"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -1657,53 +1663,55 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
         </table>
       </div>
 
-      <div className="pt-3 border-t border-slate-100 space-y-2">
-        <div className="text-xs font-medium text-slate-500">Upload a document</div>
-        <div className="flex flex-wrap items-end gap-3">
-          <AddField label="File">
-            <input
-              ref={fileRef}
-              type="file"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block text-sm w-64"
-            />
-          </AddField>
-          <AddField label="Document type">
-            <select
-              value={docType}
-              onChange={(e) => setDocType(e.target.value)}
-              className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
+      {canAuthor && (
+        <div className="pt-3 border-t border-slate-100 space-y-2">
+          <div className="text-xs font-medium text-slate-500">Upload a document</div>
+          <div className="flex flex-wrap items-end gap-3">
+            <AddField label="File">
+              <input
+                ref={fileRef}
+                type="file"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                className="block text-sm w-64"
+              />
+            </AddField>
+            <AddField label="Document type">
+              <select
+                value={docType}
+                onChange={(e) => setDocType(e.target.value)}
+                className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
+              >
+                <option value="">Select a type…</option>
+                {types.options.map((o) => (
+                  <option key={o.code} value={o.code}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </AddField>
+            <AddField label="Description (optional)">
+              <input
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="border border-slate-300 rounded px-2 py-1 text-sm w-56"
+                placeholder="notes about this file"
+              />
+            </AddField>
+            <button
+              onClick={upload}
+              disabled={!canUpload}
+              className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
             >
-              <option value="">Select a type…</option>
-              {types.options.map((o) => (
-                <option key={o.code} value={o.code}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </AddField>
-          <AddField label="Description (optional)">
-            <input
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="border border-slate-300 rounded px-2 py-1 text-sm w-56"
-              placeholder="notes about this file"
-            />
-          </AddField>
-          <button
-            onClick={upload}
-            disabled={!canUpload}
-            className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
-          >
-            {m.upload.isPending ? 'Uploading…' : 'Upload'}
-          </button>
+              {m.upload.isPending ? 'Uploading…' : 'Upload'}
+            </button>
+          </div>
+          {m.upload.isError && (
+            <p className="text-rose-700 text-sm" role="alert">
+              {(m.upload.error as Error).message}
+            </p>
+          )}
         </div>
-        {m.upload.isError && (
-          <p className="text-rose-700 text-sm" role="alert">
-            {(m.upload.error as Error).message}
-          </p>
-        )}
-      </div>
+      )}
     </Section>
   );
 }
