@@ -937,3 +937,11 @@ Which folder can I open to see all the test cases? · In the SOW Card, fit a Dat
 - Answered: tests are colocated as *.spec.ts under apps/api/src/modules (+ common/), packages/engine/src/*.test.ts, apps/web/e2e/smoke.spec.ts (727 total cases).
 - SOW list: added a sortable "Estimate updated" column (estimateUpdatedAt on SowSummaryDto + service + web). api tsc + prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 15:50 UTC] — USER
+I changed a draft estimate and the Estimate update timestamp is the same. Take a look at SOW-8CED04.
+
+### [2026-06-17 15:58 UTC] — AGENT
+Diagnosed: estimate.updated_at only bumps on Estimate-row updates; line-item/assumption edits write child tables, so @updatedAt stayed stale (confirmed on SOW-8CED04 — estimate 06-14 vs SOW 06-18). Fix: touch(id) bumps estimate.updatedAt in all 8 content mutators (labor/non-labor/cloud add+delete, assumption add+delete). api tsc + prettier clean. Opening PR.
+---

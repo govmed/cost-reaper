@@ -727,3 +727,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** User: fit a date/time of when the estimate was updated into the SOW card. Added `estimateUpdatedAt` to `SowSummaryDto` (+ web `SowSummary`); the sow.service list now includes `estimate.updatedAt`. SowListPage gains a sortable **"Estimate updated"** column (localized date/time) so users can spot drift between the SOW and its source estimate (a draft SOW reflects live estimate pricing).
 - **Files touched:** packages/types/src/sow.ts, apps/api/src/modules/sow/sow.service.ts, apps/web/src/lib/types.ts, apps/web/src/pages/SowListPage.tsx, living docs.
 - **Result:** api tsc PASS; prettier clean. PR next.
+
+### 2026-06-17 — Fix: estimate updatedAt now bumps on content edits (BR-7/NFR-5)
+- **Action:** User reported the SOW "Estimate updated" stayed stale after editing a draft estimate (verified on SOW-8CED04: estimate.updated_at was 2026-06-14 while the SOW was 2026-06-18). Root cause: Prisma `@updatedAt` on `Estimate` only bumps when the Estimate row is updated; line-item/assumption edits write child tables and never touch the parent. Fix: added a private `touch(id)` that bumps `estimate.updatedAt`, called in all 8 content mutators (labor/non-labor/cloud add+delete, assumption add+delete). Settings/status patches already bump it via the real `estimate.update`; comments intentionally don't (not pricing content).
+- **Files touched:** apps/api/src/modules/estimates/estimates.service.ts; living docs.
+- **Result:** api tsc PASS (Prisma allows the `updatedAt` override); prettier clean. PR next. (Pre-existing rows keep their old timestamp; future edits update correctly.)
