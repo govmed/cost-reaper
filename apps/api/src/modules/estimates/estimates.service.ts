@@ -453,6 +453,7 @@ export class EstimatesService {
       },
     });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -476,6 +477,7 @@ export class EstimatesService {
       },
     });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -504,6 +506,7 @@ export class EstimatesService {
       },
     });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -511,6 +514,7 @@ export class EstimatesService {
     await this.ensureEditable(estimateId);
     await this.prisma.laborLineItem.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -518,6 +522,7 @@ export class EstimatesService {
     await this.ensureEditable(estimateId);
     await this.prisma.nonLaborLineItem.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -525,6 +530,7 @@ export class EstimatesService {
     await this.ensureEditable(estimateId);
     await this.prisma.cloudComputeLineItem.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -532,6 +538,7 @@ export class EstimatesService {
     await this.ensureEditable(estimateId);
     await this.prisma.assumption.create({ data: { estimateId, text: dto.text } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -539,6 +546,7 @@ export class EstimatesService {
     await this.ensureEditable(estimateId);
     await this.prisma.assumption.deleteMany({ where: { id: itemId, estimateId } });
     await this.audit.record('Estimate', estimateId, 'UPDATE', actorId);
+    await this.touch(estimateId);
     return this.getDetail(estimateId);
   }
 
@@ -566,6 +574,17 @@ export class EstimatesService {
   }
 
   // ── Internals ────────────────────────────────────────────────────────────────
+
+  /**
+   * Bump the estimate's `updatedAt` after a content change. Line items and
+   * assumptions live in child tables, so writing them does NOT touch the parent
+   * estimate row's @updatedAt on its own — we bump it explicitly so consumers
+   * (e.g. the SOW "Estimate updated" column) reflect content edits, not just
+   * settings/status changes.
+   */
+  private async touch(id: string): Promise<void> {
+    await this.prisma.estimate.update({ where: { id }, data: { updatedAt: new Date() } });
+  }
 
   private async ensure(id: string): Promise<void> {
     const e = await this.prisma.estimate.findUnique({ where: { id }, select: { id: true } });
