@@ -29,7 +29,12 @@ function makeService(users: any[]) {
       },
     },
   };
-  return new AuthService(prisma, new JwtService());
+  // Minimal RolesService stub — resolves a role's permissions for the auth user.
+  const roles: any = {
+    permissionsFor: async (role: string) =>
+      new Set<string>(role === 'ADMIN' ? ['*'] : ['estimate.author']),
+  };
+  return new AuthService(prisma, new JwtService(), roles);
 }
 
 describe('AuthService', () => {
@@ -37,6 +42,7 @@ describe('AuthService', () => {
     const svc = makeService([]);
     const res = await svc.register({ email: 'new@x.com', password: 'password123' });
     expect(res.user.email).toBe('new@x.com');
+    expect(res.user.permissions).toContain('estimate.author');
     expect(typeof res.accessToken).toBe('string');
     expect(typeof res.refreshToken).toBe('string');
   });
@@ -69,6 +75,7 @@ describe('AuthService', () => {
     ]);
     const ok = await svc.login({ email: 'a@x.com', password: 'password123' });
     expect(ok.user.role).toBe('ADMIN');
+    expect(ok.user.permissions).toContain('*');
     expect(typeof ok.accessToken).toBe('string');
     await expect(svc.login({ email: 'a@x.com', password: 'wrong' })).rejects.toThrow();
   });
