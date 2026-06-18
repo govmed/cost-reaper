@@ -953,3 +953,11 @@ Write a full Dashboard suite (~50 cases); for each test case I expect a log snip
 ### [2026-06-17 16:25 UTC] — AGENT
 Added dashboard-card.spec.ts (51 cases) and ran it with vitest --reporter=verbose so each case prints a ✓ pass line (evidence). 51/51 pass in-container; prettier clean. Opening PR. (Answered the tester-credentials question in chat.)
 ---
+
+---
+### [2026-06-17 16:40 UTC] — USER
+If you can't do manual UX testing, can you tail the log and capture the output as you are testing?
+
+### [2026-06-17 16:50 UTC] — AGENT
+Yes — demonstrated by marking a log window, exercising the app (login/dashboard/estimate edit/forbidden), then `docker compose logs api --since` to capture only that window's structured JSON request logs (method/url/status/ms/requestId). The capture surfaced a real gap: guard denials (401/403) + handler errors weren't logged (success-only tap). Fixed the LoggingInterceptor to log the error path too (NFR-9). api tsc + prettier clean. Opening PR.
+---
