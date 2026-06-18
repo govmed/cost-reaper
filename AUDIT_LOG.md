@@ -880,3 +880,11 @@ Ok, so create several test cases to show me that is the case.
 ### [2026-06-17 12:52 UTC] — AGENT
 Added sow-milestones.spec.ts (14 cases) proving the SOW milestone schedule = the estimate's per-SDLC-phase cost (computeEstimate.phases): per-phase fee, recurring-vs-one-time split, lifecycle order, Unassigned rollup, sum=oneTimeSubtotal, upcharge in / contingency out. 14/14 pass in-container; prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 13:05 UTC] — USER
+In the Statement of Work Card - columns should be sortable
+
+### [2026-06-17 13:10 UTC] — AGENT
+Added client-side sortable columns to the SOW list (Number/Title/Estimate/Client/Status) — clickable headers with ▲/▼, default = API order (most recent first). Mirrors the Rate Cards sort idiom. Prettier clean; opening PR (web tsc/e2e via CI).
+---

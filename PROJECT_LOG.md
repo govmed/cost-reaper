@@ -696,3 +696,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-17 — Tests: SOW milestone schedule = cost per SDLC phase (BR-7)
 - **Action:** User asked for tests proving the SOW milestones derive from the estimate's per-phase cost. Added `apps/api/src/modules/sow/sow-milestones.spec.ts` (14 cases) against the real `computeEstimate` phase output (what the SOW renders): tagged phase → one-time milestone fee, qty×base, same-phase aggregation, lifecycle ordering, "Unassigned" rollup last, milestone fees sum to oneTimeSubtotal, recurring-only phase has $0 one-time (billed on cadence), mixed one-time+recurring split, yearly annualization, upcharge included (global + per-line override), contingency excluded, empty → no milestones, full 5-phase build.
 - **Result:** 14/14 pass in-container; prettier clean. PR next.
+
+### 2026-06-17 — SOW list: sortable columns (BR-7)
+- **Action:** User: SOW card columns should be sortable. Added client-side column sorting to SowListPage (the list loads all SOWs) using the same idiom as RateCardsPage (#78): a `sort` state (null = API default, most-recent-first), `toggleSort` (asc↔desc), a `SortTh` header button with a ▲/▼ arrow, and a `useMemo` sort via `localeCompare(..., {numeric:true})`. Sortable headers: Number, Title, Estimate, Client, Status. Actions column stays unsorted.
+- **Files touched:** apps/web/src/pages/SowListPage.tsx; living docs.
+- **Result:** Prettier clean; web tsc/e2e via CI. PR next.
