@@ -2,6 +2,7 @@ export * from './common';
 export * from './permissions';
 export * from './auth';
 export * from './audit';
+export * from './documents';
 export * from './rate-card';
 export * from './cloud-pricing';
 export * from './estimate';

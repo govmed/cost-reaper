@@ -117,3 +117,46 @@ export function downloadCsv(id: string, name: string): Promise<void> {
 export function downloadExcel(id: string, name: string): Promise<void> {
   return downloadExport(`/estimates/${id}/export-excel`, `${name || 'estimate'}.xlsx`);
 }
+
+/** Download a supporting document (auth header + browser save). */
+export function downloadDocument(
+  estimateId: string,
+  docId: string,
+  fileName: string,
+): Promise<void> {
+  return downloadExport(
+    `/estimates/${estimateId}/documents/${docId}/download`,
+    fileName || 'document',
+  );
+}
+
+/** Upload a supporting document via multipart/form-data (the browser sets the boundary). */
+export async function uploadDocument(
+  estimateId: string,
+  file: File,
+  documentType: string,
+  description: string,
+): Promise<void> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('documentType', documentType);
+  if (description) form.append('description', description);
+  const send = () =>
+    fetch(`${BASE}/estimates/${estimateId}/documents`, {
+      method: 'POST',
+      body: form,
+      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    });
+  let res = await send();
+  if (res.status === 401 && (await tryRefresh())) res = await send();
+  if (!res.ok) {
+    let message = 'Upload failed';
+    try {
+      const problem = (await res.json()) as { detail?: string; title?: string };
+      message = problem.detail ?? problem.title ?? message;
+    } catch {
+      /* non-JSON error */
+    }
+    throw new Error(message);
+  }
+}

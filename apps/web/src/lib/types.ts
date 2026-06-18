@@ -202,6 +202,18 @@ export interface Paginated<T> {
   pageSize: number;
 }
 
+/** A supporting document catalogued against an estimate (FR-29). */
+export interface EstimateDocument {
+  id: string;
+  fileName: string;
+  documentType: string;
+  description: string | null;
+  contentType: string;
+  sizeBytes: number;
+  uploadedByEmail: string | null;
+  uploadedAt: string;
+}
+
 /** An immutable audit-trail event (FR-11). */
 export interface AuditEvent {
   id: string;

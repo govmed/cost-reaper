@@ -1,10 +1,12 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { downloadCsv, downloadExcel } from '../lib/api';
+import { downloadCsv, downloadDocument, downloadExcel } from '../lib/api';
 import {
   useChecklist,
   useCloudPrices,
+  useDocumentMutations,
   useEstimate,
+  useEstimateDocuments,
   useEstimateMutations,
   useBaselines,
   useRateCards,
@@ -366,6 +368,7 @@ export default function EstimateEditorPage() {
       <NonLaborSection est={est} m={m} editable={editable} />
       <CloudSection est={est} prices={cloudPrices ?? []} m={m} editable={editable} />
       <AssumptionsSection est={est} m={m} editable={editable} />
+      <DocumentsSection est={est} />
       <CommentsSection est={est} m={m} />
     </div>
   );
@@ -1554,6 +1557,152 @@ function CommentsSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
         >
           Comment
         </button>
+      </div>
+    </Section>
+  );
+}
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Upload + catalog supporting documents for an estimate (FR-29). */
+function DocumentsSection({ est }: { est: EstimateDetail }) {
+  const { data: docs } = useEstimateDocuments(est.id);
+  const m = useDocumentMutations(est.id);
+  const types = useRefLabeler('DOCUMENT_TYPE');
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [docType, setDocType] = useState('');
+  const [description, setDescription] = useState('');
+
+  const canUpload = !!file && !!docType && !m.upload.isPending;
+  function upload() {
+    if (!file || !docType) return;
+    m.upload.mutate(
+      { file, documentType: docType, description },
+      {
+        onSuccess: () => {
+          setFile(null);
+          setDocType('');
+          setDescription('');
+          if (fileRef.current) fileRef.current.value = '';
+        },
+      },
+    );
+  }
+
+  return (
+    <Section title="Supporting documents" id="sec-documents">
+      <p className="text-xs text-slate-500 -mt-1">
+        Attach and catalog supporting files (proposals, contracts, diagrams, …). Pick the document
+        type so each file is classified. Max 10&nbsp;MB per file.
+      </p>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-slate-500 text-left">
+            <tr>
+              <th className="px-3 py-1">Document</th>
+              <th className="px-3 py-1">Type</th>
+              <th className="px-3 py-1">Description</th>
+              <th className="px-3 py-1 text-right">Size</th>
+              <th className="px-3 py-1">Uploaded</th>
+              <th className="px-3 py-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {(docs ?? []).length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-3 py-4 text-center text-slate-400">
+                  No documents yet.
+                </td>
+              </tr>
+            )}
+            {(docs ?? []).map((d) => (
+              <tr key={d.id} className="border-t border-slate-100">
+                <td className="px-3 py-2 font-medium break-all">{d.fileName}</td>
+                <td className="px-3 py-2">
+                  {types.ready ? types.label(d.documentType) : d.documentType}
+                </td>
+                <td className="px-3 py-2 text-slate-600 break-words">{d.description ?? '—'}</td>
+                <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">
+                  {formatBytes(d.sizeBytes)}
+                </td>
+                <td className="px-3 py-2 text-slate-500 whitespace-nowrap">
+                  {new Date(d.uploadedAt).toLocaleDateString()}
+                  {d.uploadedByEmail ? ` · ${d.uploadedByEmail}` : ''}
+                </td>
+                <td className="px-3 py-2 text-right whitespace-nowrap">
+                  <button
+                    onClick={() => void downloadDocument(est.id, d.id, d.fileName)}
+                    className="text-brand hover:underline text-xs"
+                  >
+                    Download
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Delete "${d.fileName}"?`)) m.remove.mutate(d.id);
+                    }}
+                    className="ml-3 text-rose-600 hover:underline text-xs"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="pt-3 border-t border-slate-100 space-y-2">
+        <div className="text-xs font-medium text-slate-500">Upload a document</div>
+        <div className="flex flex-wrap items-end gap-3">
+          <AddField label="File">
+            <input
+              ref={fileRef}
+              type="file"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="block text-sm w-64"
+            />
+          </AddField>
+          <AddField label="Document type">
+            <select
+              value={docType}
+              onChange={(e) => setDocType(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 text-sm min-w-56"
+            >
+              <option value="">Select a type…</option>
+              {types.options.map((o) => (
+                <option key={o.code} value={o.code}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </AddField>
+          <AddField label="Description (optional)">
+            <input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 text-sm w-56"
+              placeholder="notes about this file"
+            />
+          </AddField>
+          <button
+            onClick={upload}
+            disabled={!canUpload}
+            className="bg-slate-800 text-white rounded px-3 py-1.5 text-sm whitespace-nowrap disabled:opacity-50"
+          >
+            {m.upload.isPending ? 'Uploading…' : 'Upload'}
+          </button>
+        </div>
+        {m.upload.isError && (
+          <p className="text-rose-700 text-sm" role="alert">
+            {(m.upload.error as Error).message}
+          </p>
+        )}
       </div>
     </Section>
   );
