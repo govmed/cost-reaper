@@ -945,3 +945,11 @@ I changed a draft estimate and the Estimate update timestamp is the same. Take a
 ### [2026-06-17 15:58 UTC] — AGENT
 Diagnosed: estimate.updated_at only bumps on Estimate-row updates; line-item/assumption edits write child tables, so @updatedAt stayed stale (confirmed on SOW-8CED04 — estimate 06-14 vs SOW 06-18). Fix: touch(id) bumps estimate.updatedAt in all 8 content mutators (labor/non-labor/cloud add+delete, assumption add+delete). api tsc + prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 16:15 UTC] — USER
+Write a full Dashboard suite (~50 cases); for each test case I expect a log snippet or screenshot as evidence it passed. · What are your skillsets and credentials as a Tester?
+
+### [2026-06-17 16:25 UTC] — AGENT
+Added dashboard-card.spec.ts (51 cases) and ran it with vitest --reporter=verbose so each case prints a ✓ pass line (evidence). 51/51 pass in-container; prettier clean. Opening PR. (Answered the tester-credentials question in chat.)
+---
