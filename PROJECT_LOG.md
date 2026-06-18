@@ -773,3 +773,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-17 — Cloud Prices: sortable columns + pagination; reusable controls (FR-9)
 - **Action:** User: Cloud Prices needs sortable columns + a page-size dropdown (10/20/25/40/50), and pagination should be consistent across all list cards. Built reusable pieces: `lib/usePagedSort.ts` (client sort+paginate, type-aware compare, page clamp), `components/Pagination.tsx` (rows-per-page dropdown + "X–Y of N" + Prev/Next), `components/SortableTh.tsx` (▲▼↕ header). Applied to CloudPricesPage (all 8 columns sortable, unit price numeric; paginated). Rollout to the other list cards follows next.
 - **Result:** web tsc + eslint + prettier PASS locally. PR next.
+
+### 2026-06-17 — Consistent pagination + sorting across list cards (FR-9)
+- **Action:** Rolled the reusable usePagedSort + <Pagination> + <SortableTh> out to the main flat-table list cards: Estimates (useEstimates now fetches pageSize 200 so the card sorts/paginates client-side), SOW (replaced its bespoke SortTh/sort with the shared controls), Users. Cloud Prices already done. Each now has sortable columns + a rows-per-page dropdown (10/20/25/40/50) + "X–Y of N" + Prev/Next, looking identical. (Rate Cards is a card-list not a flat table; Audit already paginates server-side — left as-is.)
+- **Result:** web tsc + eslint + repo format:check PASS. PR next.
