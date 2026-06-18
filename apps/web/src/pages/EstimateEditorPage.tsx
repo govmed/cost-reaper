@@ -22,6 +22,7 @@ import { useAuth } from '../lib/auth';
 import { canAuthorEstimates } from '../lib/permissions';
 import { formatMoney } from '../lib/money';
 import type {
+  AvailableTransition,
   BillingPeriod,
   CapacityViolation,
   ChecklistResult,
@@ -393,6 +394,27 @@ function GovernanceSection({
   checkedAt: number;
   rechecking: boolean;
 }) {
+  // A transition can carry an optional note. We stage the chosen transition so
+  // the actor can add a reason (e.g. a GM returning an estimate to Draft tells
+  // the estimator why) before confirming.
+  const [pending, setPending] = useState<AvailableTransition | null>(null);
+  const [note, setNote] = useState('');
+  const isReturnToDraft = (tr: AvailableTransition) =>
+    tr.toStageKey === 'DRAFT' || /draft/i.test(tr.label);
+
+  function confirmTransition() {
+    if (!pending) return;
+    m.transition.mutate(
+      { toStageKey: pending.toStageKey, note: note.trim() || undefined },
+      {
+        onSuccess: () => {
+          setPending(null);
+          setNote('');
+        },
+      },
+    );
+  }
+
   return (
     <div className="grid md:grid-cols-2 gap-4">
       <Section title="Approval workflow">
@@ -413,7 +435,10 @@ function GovernanceSection({
                 key={tr.toStageKey}
                 disabled={disabled}
                 title={reason}
-                onClick={() => m.transition.mutate({ toStageKey: tr.toStageKey })}
+                onClick={() => {
+                  setPending(tr);
+                  setNote('');
+                }}
                 className="bg-brand text-white rounded px-3 py-1.5 text-sm disabled:opacity-40"
               >
                 {tr.label}
@@ -424,12 +449,64 @@ function GovernanceSection({
             <span className="text-slate-400 text-sm">No transitions from here.</span>
           )}
         </div>
+
+        {pending && (
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 space-y-2">
+            <div className="text-sm">
+              Confirm: <span className="font-medium text-brand">{pending.label}</span>
+            </div>
+            <label className="block text-sm">
+              <span className="text-slate-600">
+                {isReturnToDraft(pending)
+                  ? 'Reason for returning to Draft (the estimator will see this)'
+                  : 'Note (optional)'}
+              </span>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
+                autoFocus
+                placeholder={
+                  isReturnToDraft(pending)
+                    ? 'e.g. Labor rates look high for the QA role; please revisit before resubmitting.'
+                    : 'Add an optional note for the history…'
+                }
+                className="mt-1 w-full border border-slate-300 rounded px-2 py-1 text-sm"
+              />
+            </label>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={confirmTransition}
+                disabled={m.transition.isPending}
+                className="bg-brand text-white rounded px-3 py-1.5 text-sm disabled:opacity-50"
+              >
+                {m.transition.isPending ? 'Saving…' : `Confirm: ${pending.label}`}
+              </button>
+              <button
+                onClick={() => {
+                  setPending(null);
+                  setNote('');
+                }}
+                className="rounded border border-slate-300 px-3 py-1.5 text-sm hover:bg-white"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
         {workflow && workflow.history.length > 0 && (
-          <ul className="text-xs text-slate-500 space-y-0.5 pt-2 border-t border-slate-100">
+          <ul className="text-xs text-slate-500 space-y-1 pt-2 border-t border-slate-100">
             {workflow.history.map((h) => (
               <li key={h.id}>
-                {(h.fromStageKey ?? 'start') + ' → ' + h.toStageKey} ·{' '}
-                {new Date(h.occurredAt).toLocaleString()}
+                <div>
+                  {(h.fromStageKey ?? 'start') + ' → ' + h.toStageKey} ·{' '}
+                  {new Date(h.occurredAt).toLocaleString()}
+                </div>
+                {h.note && (
+                  <div className="text-slate-600 italic border-l-2 border-slate-300 pl-2 mt-0.5">
+                    “{h.note}”
+                  </div>
+                )}
               </li>
             ))}
           </ul>
