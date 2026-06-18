@@ -1,4 +1,5 @@
 import type { LoginResponse } from './types';
+import { getClientLocation } from './clientLocation';
 
 const BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1';
 
@@ -18,6 +19,8 @@ function request(path: string, init: RequestInit, auth: boolean): Promise<Respon
   const headers = new Headers(init.headers);
   if (init.body) headers.set('Content-Type', 'application/json');
   if (auth && accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
+  const loc = getClientLocation();
+  if (loc) headers.set('X-Client-Location', loc);
   return fetch(`${BASE}${path}`, { ...init, headers });
 }
 

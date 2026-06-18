@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import type { AuditEventDto, AuditListQuery, Page } from '@cost-reaper/types';
 import { PrismaService } from '../prisma/prisma.service';
 import { pageSkipTake } from '../pagination';
+import { getRequestContext } from '../request-context';
 
 /** Records and reads create/modify actions on governed entities (FR-11). */
 @Injectable()
@@ -15,8 +16,16 @@ export class AuditService {
     action: string,
     actorId?: string | null,
   ): Promise<void> {
+    const ctx = getRequestContext();
     await this.prisma.auditEvent.create({
-      data: { entityType, entityId, action, actorId: actorId ?? null },
+      data: {
+        entityType,
+        entityId,
+        action,
+        actorId: actorId ?? null,
+        ipAddress: ctx?.ip ?? null,
+        location: ctx?.location ?? null,
+      },
     });
   }
 
@@ -45,6 +54,8 @@ export class AuditService {
         action: r.action,
         actorId: r.actorId,
         actorEmail: r.actor?.email ?? null,
+        ipAddress: r.ipAddress ?? null,
+        location: r.location ?? null,
         occurredAt: r.occurredAt.toISOString(),
       })),
       total,

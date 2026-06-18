@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { AuthUser } from './types';
 import { login as apiLogin, setTokens } from './api';
+import { captureClientLocation } from './clientLocation';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -29,12 +30,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const u = await apiLogin(email, password);
     localStorage.setItem('user', JSON.stringify(u));
     setUser(u);
+    // Best-effort: prompt once for location so audited changes can record it.
+    captureClientLocation();
   }
 
   function completeSso(access: string, refresh: string, u: AuthUser): void {
     setTokens(access, refresh);
     localStorage.setItem('user', JSON.stringify(u));
     setUser(u);
+    captureClientLocation();
   }
 
   function logout(): void {

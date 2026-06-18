@@ -226,6 +226,8 @@ export interface AuditEvent {
   action: string;
   actorId: string | null;
   actorEmail: string | null;
+  ipAddress: string | null;
+  location: string | null;
   occurredAt: string;
 }
 

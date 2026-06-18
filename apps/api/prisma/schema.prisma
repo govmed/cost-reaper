@@ -507,6 +507,8 @@ model AuditEvent {
   action     String
   actorId    String?  @map("actor_id") @db.Uuid
   actor      User?    @relation(fields: [actorId], references: [id])
+  ipAddress  String?  @map("ip_address")
+  location   String?
   occurredAt DateTime @default(now()) @map("occurred_at")
 
   @@index([entityType, entityId])

@@ -10,6 +10,10 @@ export const AuditEventDto = z.object({
   action: z.string(),
   actorId: z.string().uuid().nullable(),
   actorEmail: z.string().nullable(),
+  /** Caller's IP address at the time of the action (proxy-aware). */
+  ipAddress: z.string().nullable(),
+  /** Caller's coarse location if location services were enabled, else null. */
+  location: z.string().nullable(),
   /** UTC ISO timestamp. */
   occurredAt: z.string(),
 });

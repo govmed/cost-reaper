@@ -58,6 +58,8 @@ describe('Audit · event DTO shape', () => {
     action: 'UPDATE',
     actorId: UUID,
     actorEmail: 'admin@example.com',
+    ipAddress: '203.0.113.7',
+    location: '37.7749,-122.4194',
     occurredAt: '2026-06-17T00:00:00.000Z',
     ...o,
   });
@@ -74,6 +76,14 @@ describe('Audit · event DTO shape', () => {
   });
   it('AU-14 rejects a non-uuid id', () => {
     expect(AuditEventDto.safeParse(base({ id: 'not-a-uuid' })).success).toBe(false);
+  });
+  it('AU-17 allows a null IP and location (captured best-effort)', () => {
+    expect(AuditEventDto.safeParse(base({ ipAddress: null, location: null })).success).toBe(true);
+  });
+  it('AU-18 rejects a missing ipAddress field', () => {
+    const o = base();
+    delete (o as Record<string, unknown>).ipAddress;
+    expect(AuditEventDto.safeParse(o).success).toBe(false);
   });
 });
 
