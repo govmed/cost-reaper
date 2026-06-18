@@ -993,3 +993,11 @@ Extracted pure pagination helpers (pageSkipTake/lastPage/paginate), wired pageSk
 ### [2026-06-17 18:45 UTC] — AGENT
 Added shared gm-scope helper (+13 tests) and applied GM scoping: estimates list, dashboard summary/byStage/totals, dashboard recent=own-activity, stage drill guard, hidden create form (web), Governance nav Admin-only. User Guide "GM scope" note added. api tsc + prettier clean; live-verified (3 visible estimates, byStage limited, create 403, draft drill empty). Opening PR. (Also noted two new requests: record IP/location on changes; embed the estimate as a professional table inside the SOW — to follow.)
 ---
+
+---
+### [2026-06-17 20:30 UTC] — USER
+The status and WF are two separate things — confusing. How do we distinguish? → (chose) Remove Status entirely; use the workflow stage everywhere.
+
+### [2026-06-17 20:55 UTC] — AGENT
+Removed estimate.status end-to-end: Prisma column dropped (migration), EstimateStatus type + ESTIMATE_STATUS reference removed, DTOs carry currentStageKey/Label, dashboard byStatus→byStage, web Status dropdown removed (read-only Stage badge), list Status→Stage column. Tests adjusted; api 795 pass; web tsc/eslint/format pass; migration+seed verified locally. Opening PR.
+---

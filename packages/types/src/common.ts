@@ -51,12 +51,8 @@ export const UNASSIGNED_PHASE = 'Unassigned';
 export const RateUnit = z.enum(['HOUR', 'DAY']);
 export type RateUnit = z.infer<typeof RateUnit>;
 
-/**
- * Estimate status is data-driven (FR-29) — values live in the `ESTIMATE_STATUS`
- * reference table and are validated server-side. This is a plain code string.
- */
-export const EstimateStatus = z.string().max(40);
-export type EstimateStatus = z.infer<typeof EstimateStatus>;
+// NOTE: the manual estimate "status" was removed — the workflow stage
+// (currentStage) is the single source of truth for an estimate's lifecycle.
 
 export const CloudProvider = z.enum(['AWS', 'GCP', 'AZURE', 'SAAS']);
 export type CloudProvider = z.infer<typeof CloudProvider>;

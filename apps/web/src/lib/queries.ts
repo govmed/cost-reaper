@@ -30,10 +30,9 @@ import type {
   WorkflowSummary,
 } from './types';
 
-export function useEstimates(params: { q?: string; status?: string }) {
+export function useEstimates(params: { q?: string }) {
   const qs = new URLSearchParams();
   if (params.q) qs.set('q', params.q);
-  if (params.status) qs.set('status', params.status);
   // Fetch a full page so the list card can sort + paginate client-side (FR-9).
   qs.set('pageSize', '200');
   return useQuery({

@@ -179,7 +179,6 @@ export default function EstimateEditorPage() {
     dataUpdatedAt: checklistCheckedAt,
     isFetching: checklistFetching,
   } = useChecklist(id);
-  const { data: statuses } = useReferenceValues('ESTIMATE_STATUS');
 
   if (isLoading) return <p className="text-slate-500">Loading…</p>;
   if (error) return <p className="text-rose-700">{(error as Error).message}</p>;
@@ -207,37 +206,15 @@ export default function EstimateEditorPage() {
           <h1 className="text-2xl font-semibold">{est.name}</h1>
         </div>
         <div className="flex items-end gap-2">
-          <label className="text-sm">
-            <span className="block text-xs text-slate-500 mb-0.5">Status</span>
-            <select
-              value={est.status}
-              onChange={(e) => m.patch.mutate({ status: e.target.value })}
-              disabled={!editable}
-              title={
-                editable
-                  ? 'Set the estimate status'
-                  : 'Locked — return the estimate to Draft to change its status'
-              }
-              className="border border-slate-300 rounded px-2 py-1 text-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+          <div className="text-sm">
+            <span className="block text-xs text-slate-500 mb-0.5">Stage</span>
+            <span
+              className="inline-block rounded border border-slate-200 bg-slate-50 px-2 py-1 text-sm font-medium text-brand"
+              title="The estimate's workflow stage — change it in the Governance panel below"
             >
-              {(statuses && statuses.length
-                ? statuses
-                    .filter((s) => s.isActive)
-                    .map((s) => ({ code: s.code, label: s.displayName }))
-                : [
-                    { code: 'DRAFT', label: 'Draft' },
-                    { code: 'IN_REVIEW', label: 'In Review' },
-                    { code: 'APPROVED', label: 'Approved' },
-                    { code: 'FINAL', label: 'Final' },
-                    { code: 'ARCHIVED', label: 'Archived' },
-                  ]
-              ).map((s) => (
-                <option key={s.code} value={s.code}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              {est.currentStageLabel ?? '—'}
+            </span>
+          </div>
           <Link
             to={`/estimates/${est.id}/print`}
             className="border border-brand text-brand rounded px-3 py-1.5 text-sm font-medium hover:bg-teal-50"
@@ -1557,7 +1534,7 @@ function ScenariosSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
         <thead className="text-slate-500 text-left">
           <tr>
             <th className="px-2 py-1">Name</th>
-            <th className="px-2 py-1">Status</th>
+            <th className="px-2 py-1">Stage</th>
             <th className="px-2 py-1 text-right">Grand total (cost)</th>
             <th className="px-2 py-1 text-right">Client price</th>
           </tr>
@@ -1574,7 +1551,7 @@ function ScenariosSection({ est, m }: { est: EstimateDetail; m: Mutations }) {
                 </Link>
                 {s.isRoot && <span className="text-slate-400 text-xs"> · base</span>}
               </td>
-              <td className="px-2 py-1">{s.status}</td>
+              <td className="px-2 py-1">{s.currentStageLabel ?? '—'}</td>
               <td className="px-2 py-1 text-right tabular-nums">
                 {formatMoney(s.grandTotal, s.currency)}
               </td>

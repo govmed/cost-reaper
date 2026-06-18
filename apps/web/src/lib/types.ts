@@ -145,10 +145,11 @@ export interface EstimateDetail {
   id: string;
   name: string;
   description: string | null;
-  status: string;
   currency: string;
   rateCardId: string | null;
   ownerId: string;
+  currentStageKey: string | null;
+  currentStageLabel: string | null;
   globalUpchargePercent: number;
   contingencyPercent: number;
   marginPercent: number;
@@ -179,7 +180,7 @@ export interface Baseline {
 export interface Scenario {
   id: string;
   name: string;
-  status: string;
+  currentStageLabel: string | null;
   currency: string;
   grandTotal: string;
   clientPrice: string;
@@ -191,9 +192,10 @@ export interface Scenario {
 export interface EstimateSummary {
   id: string;
   name: string;
-  status: string;
   currency: string;
   ownerId: string;
+  currentStageKey: string | null;
+  currentStageLabel: string | null;
   grandTotal: string;
   updatedAt: string;
 }
@@ -266,7 +268,6 @@ export interface FxRate {
 
 export interface DashboardSummary {
   totalEstimates: number;
-  byStatus: { status: string; count: number }[];
   byStage: { stageKey: string; stageLabel: string; count: number }[];
   totalsByCurrency: { currency: string; grandTotal: string }[];
   baseCurrency: string;
@@ -274,7 +275,6 @@ export interface DashboardSummary {
   recent: {
     id: string;
     name: string;
-    status: string;
     currency: string;
     currentStageKey: string | null;
     grandTotal: string;
@@ -285,7 +285,6 @@ export interface DashboardSummary {
 export interface DashboardStageEstimate {
   id: string;
   name: string;
-  status: string;
   currency: string;
   grandTotal: string;
   updatedAt: string;

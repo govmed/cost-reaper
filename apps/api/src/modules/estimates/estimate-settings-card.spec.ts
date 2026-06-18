@@ -119,8 +119,9 @@ describe('Settings card · update — partial edits', () => {
   it('TC-32 update just the name', () => {
     expect(uOk({ name: 'Renamed' })).toBe(true);
   });
-  it('TC-33 update the status (free reference string)', () => {
-    expect(uOk({ status: 'APPROVED' })).toBe(true);
+  it('TC-33 update no longer carries a status (workflow stage is the source of truth)', () => {
+    const r = UpdateEstimateRequest.parse({ status: 'APPROVED' } as Record<string, unknown>);
+    expect('status' in r).toBe(false);
   });
   it('TC-34 update only the global upcharge', () => {
     expect(uOk({ globalUpchargePercent: 30 })).toBe(true);
@@ -145,11 +146,11 @@ describe('Settings card · update — partial edits', () => {
     const r = UpdateEstimateRequest.parse({ currency: 'EUR' } as Record<string, unknown>);
     expect('currency' in r).toBe(false);
   });
-  it('TC-41 accepts a status up to 40 chars', () => {
-    expect(uOk({ status: 's'.repeat(40) })).toBe(true);
+  it('TC-41 accepts a name at the 200-char bound', () => {
+    expect(uOk({ name: 'n'.repeat(200) })).toBe(true);
   });
-  it('TC-42 rejects a status over 40 chars', () => {
-    expect(uOk({ status: 's'.repeat(41) })).toBe(false);
+  it('TC-42 rejects a name over 200 chars', () => {
+    expect(uOk({ name: 'n'.repeat(201) })).toBe(false);
   });
   it('TC-43 rejects an empty name on update', () => {
     expect(uOk({ name: '' })).toBe(false);
@@ -182,7 +183,6 @@ describe('Settings card · update — partial edits', () => {
     expect(
       uOk({
         name: 'Full',
-        status: 'DRAFT',
         rateCardId: UUID,
         globalUpchargePercent: 10,
         contingencyPercent: 10,

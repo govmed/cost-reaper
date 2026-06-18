@@ -60,10 +60,8 @@ describe('Pagination · EstimateListQuery contract', () => {
     expect(r.page).toBe(2);
     expect(r.pageSize).toBe(10);
   });
-  it('PG-13 accepts a search term, status, and ownerId', () => {
-    expect(EstimateListQuery.safeParse({ q: 'bid', status: 'DRAFT', ownerId: UUID }).success).toBe(
-      true,
-    );
+  it('PG-13 accepts a search term and ownerId', () => {
+    expect(EstimateListQuery.safeParse({ q: 'bid', ownerId: UUID }).success).toBe(true);
   });
   it('PG-14 rejects a non-uuid ownerId', () => {
     expect(EstimateListQuery.safeParse({ ownerId: 'me' }).success).toBe(false);
