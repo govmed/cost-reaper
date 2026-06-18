@@ -1000,19 +1000,8 @@ const REFERENCE_DATA: RefType[] = [
       },
     ],
   },
-  {
-    code: 'ESTIMATE_STATUS',
-    name: 'Estimate Status',
-    // Aligned with the default workflow stages (FR-24); data-driven (FR-29) so an
-    // admin can add/rename/reorder these without a code change.
-    values: [
-      { code: 'DRAFT', name: 'Draft' },
-      { code: 'IN_REVIEW', name: 'In Review' },
-      { code: 'APPROVED', name: 'Approved' },
-      { code: 'FINAL', name: 'Final' },
-      { code: 'ARCHIVED', name: 'Archived' },
-    ],
-  },
+  // (ESTIMATE_STATUS reference removed — the workflow stage is the single source
+  // of truth for an estimate's lifecycle; see the default WorkflowDefinition.)
   {
     code: 'BILLING_PERIOD',
     name: 'Billing Period',
@@ -1287,7 +1276,6 @@ async function seedSampleEstimate(adminId: string) {
     data: {
       name,
       description: 'A worked example, already approved — ready to turn into a Statement of Work.',
-      status: 'FINAL',
       currency: rateCard.currency,
       globalUpchargePercent: '10',
       contingencyPercent: '15',

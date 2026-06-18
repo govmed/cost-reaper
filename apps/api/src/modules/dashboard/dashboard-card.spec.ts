@@ -1,6 +1,6 @@
 /**
  * Dashboard card — full QA (FR-18). 51 cases against the pure `summarizeDashboard`
- * aggregator: totals, by-status, by-stage (incl. Unassigned), per-currency exact
+ * aggregator: totals, by-stage (incl. Unassigned), per-currency exact
  * sums, the recent list (ordering / cap), and FX roll-up to the base currency.
  */
 import { describe, it, expect } from 'vitest';
@@ -10,7 +10,6 @@ import { summarizeDashboard, type DashboardRow } from './dashboard-summary';
 const row = (p: Partial<DashboardRow> = {}): DashboardRow => ({
   id: p.id ?? 'e',
   name: p.name ?? 'E',
-  status: p.status ?? 'DRAFT',
   currency: p.currency ?? 'USD',
   currentStageKey: p.currentStageKey === undefined ? 'DRAFT' : p.currentStageKey,
   currentStageLabel: p.currentStageLabel === undefined ? 'Draft' : p.currentStageLabel,
@@ -22,8 +21,8 @@ describe('Dashboard · empty input', () => {
   it('DB-01 totalEstimates is 0 for no estimates', () => {
     expect(summarizeDashboard([]).totalEstimates).toBe(0);
   });
-  it('DB-02 byStatus is empty', () => {
-    expect(summarizeDashboard([]).byStatus).toEqual([]);
+  it('DB-02 has no byStatus field (status removed; stage is the source of truth)', () => {
+    expect('byStatus' in summarizeDashboard([])).toBe(false);
   });
   it('DB-03 byStage is empty', () => {
     expect(summarizeDashboard([]).byStage).toEqual([]);
@@ -55,48 +54,57 @@ describe('Dashboard · total count', () => {
   });
 });
 
-describe('Dashboard · by status', () => {
-  it('DB-11 a single status is counted', () => {
-    const s = summarizeDashboard([row({ status: 'DRAFT' })]);
-    expect(s.byStatus).toEqual([{ status: 'DRAFT', count: 1 }]);
+describe('Dashboard · by stage (counts)', () => {
+  it('DB-11 a single stage is counted', () => {
+    const s = summarizeDashboard([row({ currentStageKey: 'DRAFT', currentStageLabel: 'Draft' })]);
+    expect(s.byStage.find((x) => x.stageKey === 'DRAFT')?.count).toBe(1);
   });
-  it('DB-12 multiple statuses are counted separately', () => {
+  it('DB-12 multiple stages are counted separately', () => {
     const s = summarizeDashboard([
-      row({ status: 'DRAFT' }),
-      row({ status: 'FINAL' }),
-      row({ status: 'DRAFT' }),
+      row({ currentStageKey: 'DRAFT', currentStageLabel: 'Draft' }),
+      row({ currentStageKey: 'APPROVED', currentStageLabel: 'Approved' }),
+      row({ currentStageKey: 'DRAFT', currentStageLabel: 'Draft' }),
     ]);
-    expect(s.byStatus.find((x) => x.status === 'DRAFT')?.count).toBe(2);
-    expect(s.byStatus.find((x) => x.status === 'FINAL')?.count).toBe(1);
+    expect(s.byStage.find((x) => x.stageKey === 'DRAFT')?.count).toBe(2);
+    expect(s.byStage.find((x) => x.stageKey === 'APPROVED')?.count).toBe(1);
   });
-  it('DB-13 byStatus is sorted alphabetically', () => {
+  it('DB-13 In Review and Approved coexist as distinct buckets', () => {
     const s = summarizeDashboard([
-      row({ status: 'FINAL' }),
-      row({ status: 'APPROVED' }),
-      row({ status: 'DRAFT' }),
+      row({ currentStageKey: 'IN_REVIEW', currentStageLabel: 'In Review' }),
+      row({ currentStageKey: 'APPROVED', currentStageLabel: 'Approved' }),
     ]);
-    expect(s.byStatus.map((x) => x.status)).toEqual(['APPROVED', 'DRAFT', 'FINAL']);
+    expect(s.byStage).toHaveLength(2);
   });
-  it('DB-14 the same status aggregates into one bucket', () => {
-    const s = summarizeDashboard([row({ status: 'DRAFT' }), row({ status: 'DRAFT' })]);
-    expect(s.byStatus).toHaveLength(1);
+  it('DB-14 the same stage aggregates into one bucket', () => {
+    const s = summarizeDashboard([
+      row({ currentStageKey: 'DRAFT', currentStageLabel: 'Draft' }),
+      row({ currentStageKey: 'DRAFT', currentStageLabel: 'Draft' }),
+    ]);
+    expect(s.byStage.filter((x) => x.stageKey === 'DRAFT')).toHaveLength(1);
   });
-  it('DB-15 accepts arbitrary (data-driven) status codes', () => {
-    const s = summarizeDashboard([row({ status: 'IN_REVIEW' }), row({ status: 'ARCHIVED' })]);
-    expect(s.byStatus.map((x) => x.status)).toEqual(['ARCHIVED', 'IN_REVIEW']);
+  it('DB-15 accepts arbitrary (data-driven) stage keys', () => {
+    const s = summarizeDashboard([
+      row({ currentStageKey: 'CUSTOM_X', currentStageLabel: 'Custom X' }),
+      row({ currentStageKey: 'ARCHIVED', currentStageLabel: 'Archived' }),
+    ]);
+    expect(s.byStage.map((x) => x.stageKey).sort()).toEqual(['ARCHIVED', 'CUSTOM_X']);
   });
-  it('DB-16 status counts sum to the total', () => {
-    const rows = [row({ status: 'DRAFT' }), row({ status: 'FINAL' }), row({ status: 'FINAL' })];
+  it('DB-16 stage counts sum to the total', () => {
+    const rows = [
+      row({ currentStageKey: 'DRAFT', currentStageLabel: 'Draft' }),
+      row({ currentStageKey: 'FINAL', currentStageLabel: 'Final' }),
+      row({ currentStageKey: 'FINAL', currentStageLabel: 'Final' }),
+    ];
     const s = summarizeDashboard(rows);
-    expect(s.byStatus.reduce((a, x) => a + x.count, 0)).toBe(rows.length);
+    expect(s.byStage.reduce((a, x) => a + x.count, 0)).toBe(rows.length);
   });
-  it('DB-17 a status bucket exists per distinct status', () => {
+  it('DB-17 a bucket exists per distinct stage', () => {
     const s = summarizeDashboard([
-      row({ status: 'A' }),
-      row({ status: 'B' }),
-      row({ status: 'C' }),
+      row({ currentStageKey: 'A', currentStageLabel: 'A' }),
+      row({ currentStageKey: 'B', currentStageLabel: 'B' }),
+      row({ currentStageKey: 'C', currentStageLabel: 'C' }),
     ]);
-    expect(s.byStatus).toHaveLength(3);
+    expect(s.byStage).toHaveLength(3);
   });
 });
 
@@ -247,18 +255,18 @@ describe('Dashboard · recent estimates', () => {
       row({
         id: 'x',
         name: 'Big Bid',
-        status: 'FINAL',
         currency: 'EUR',
         grandTotal: '99',
+        currentStageKey: 'APPROVED',
         updatedAt: ts('20'),
       }),
     ]);
     expect(s.recent[0]).toMatchObject({
       id: 'x',
       name: 'Big Bid',
-      status: 'FINAL',
       currency: 'EUR',
       grandTotal: '99',
+      currentStageKey: 'APPROVED',
     });
   });
   it('DB-41 a recent row preserves a null stage key', () => {
@@ -330,7 +338,6 @@ describe('Dashboard · output shape', () => {
         'baseCurrency',
         'baseCurrencyTotal',
         'byStage',
-        'byStatus',
         'recent',
         'totalEstimates',
         'totalsByCurrency',

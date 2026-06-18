@@ -140,7 +140,7 @@ _Source: `apps/api/src/common/pagination.spec.ts` — 42 cases_
 
 - PG-11 defaults to page 1, pageSize 20
 - PG-12 coerces numeric query strings
-- PG-13 accepts a search term, status, and ownerId
+- PG-13 accepts a search term and ownerId
 - PG-14 rejects a non-uuid ownerId
 - PG-15 rejects page below 1
 - PG-16 rejects pageSize above 200
@@ -238,7 +238,7 @@ _Source: `apps/api/src/modules/dashboard/dashboard-card.spec.ts` — 51 cases_
 **Dashboard · empty input**
 
 - DB-01 totalEstimates is 0 for no estimates
-- DB-02 byStatus is empty
+- DB-02 has no byStatus field (status removed; stage is the source of truth)
 - DB-03 byStage is empty
 - DB-04 totalsByCurrency is empty
 - DB-05 recent is empty
@@ -251,15 +251,15 @@ _Source: `apps/api/src/modules/dashboard/dashboard-card.spec.ts` — 51 cases_
 - DB-09 counts several estimates
 - DB-10 counts a large volume
 
-**Dashboard · by status**
+**Dashboard · by stage (counts)**
 
-- DB-11 a single status is counted
-- DB-12 multiple statuses are counted separately
-- DB-13 byStatus is sorted alphabetically
-- DB-14 the same status aggregates into one bucket
-- DB-15 accepts arbitrary (data-driven) status codes
-- DB-16 status counts sum to the total
-- DB-17 a status bucket exists per distinct status
+- DB-11 a single stage is counted
+- DB-12 multiple stages are counted separately
+- DB-13 In Review and Approved coexist as distinct buckets
+- DB-14 the same stage aggregates into one bucket
+- DB-15 accepts arbitrary (data-driven) stage keys
+- DB-16 stage counts sum to the total
+- DB-17 a bucket exists per distinct stage
 
 **Dashboard · by stage**
 
@@ -317,7 +317,7 @@ _Source: `apps/api/src/modules/dashboard/dashboard-summary.spec.ts` — 5 cases_
 **summarizeDashboard (FR-18)**
 
 - returns zeros for no estimates
-- counts by status and stage, and sums grand totals per currency exactly
+- counts by stage, and sums grand totals per currency exactly
 - returns the most-recently-updated estimates, newest first, capped
 - converts per-currency totals to the base currency via FX (FR-17)
 - buckets estimates with no stage under Unassigned
@@ -627,7 +627,7 @@ _Source: `apps/api/src/modules/estimates/estimate-settings-card.spec.ts` — 52 
 
 - TC-31 an empty update is valid (no-op)
 - TC-32 update just the name
-- TC-33 update the status (free reference string)
+- TC-33 update no longer carries a status (workflow stage is the source of truth)
 - TC-34 update only the global upcharge
 - TC-35 update only the contingency
 - TC-36 update margin + tax together
@@ -635,8 +635,8 @@ _Source: `apps/api/src/modules/estimates/estimate-settings-card.spec.ts` — 52 
 - TC-38 clear the rate card with null
 - TC-39 set a rate card by uuid
 - TC-40 update does NOT accept a currency change (fixed at create)
-- TC-41 accepts a status up to 40 chars
-- TC-42 rejects a status over 40 chars
+- TC-41 accepts a name at the 200-char bound
+- TC-42 rejects a name over 200 chars
 - TC-43 rejects an empty name on update
 - TC-44 rejects an upcharge over 100 on update
 - TC-45 rejects a negative contingency on update

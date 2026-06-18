@@ -187,7 +187,6 @@ model Estimate {
   id                    String              @id @default(uuid()) @db.Uuid
   name                  String
   description           String?
-  status                String              @default("DRAFT")
   currency              String              @db.Char(3)
   globalUpchargePercent Decimal             @default(0) @map("global_upcharge_percent") @db.Decimal(5, 2)
   contingencyPercent    Decimal             @default(0) @map("contingency_percent") @db.Decimal(5, 2)
@@ -218,7 +217,6 @@ model Estimate {
   statementsOfWork  StatementOfWork[]
 
   @@index([ownerId])
-  @@index([status])
   @@index([scenarioOfId])
   @@map("estimates")
 }

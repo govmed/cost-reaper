@@ -58,7 +58,7 @@ Estimators build from governed lists. As an Admin you can curate them first.
 ### Reference data (phases, categories, …)
 
 Open **Reference data** to manage every configurable list (SDLC phases and their
-tasks, **cost categories**, statuses, priorities, providers, and more):
+tasks, **cost categories**, priorities, providers, units, and more):
 
 - Pick a type on the left, then **add**, **rename**, **re-order**, or
   **activate/deactivate** values. Built-in values can be retired but not deleted.

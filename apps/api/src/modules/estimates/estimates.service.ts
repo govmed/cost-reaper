@@ -111,7 +111,6 @@ export class EstimatesService {
   async list(query: EstimateListQuery, user?: AuthUser) {
     const where: any = {};
     if (query.q) where.name = { contains: query.q, mode: 'insensitive' };
-    if (query.status) where.status = query.status;
     if (query.ownerId) where.ownerId = query.ownerId;
     // A GM (approver) only sees the estimates in their queue — those awaiting
     // review and the ones they've approved.
@@ -131,7 +130,7 @@ export class EstimatesService {
       data: rows.map((e: any) => ({
         id: e.id,
         name: e.name,
-        status: e.status,
+        currentStageLabel: e.currentStage?.label ?? null,
         currency: e.currency,
         ownerId: e.ownerId,
         currentStageKey: e.currentStage?.key ?? null,
@@ -152,14 +151,11 @@ export class EstimatesService {
 
   async update(id: string, dto: UpdateEstimateRequest, actorId: string) {
     await this.ensureEditable(id);
-    // Estimate status is governed by the ESTIMATE_STATUS reference list (FR-29).
-    if (dto.status) await this.reference.assertActiveCode('ESTIMATE_STATUS', dto.status);
     await this.prisma.estimate.update({
       where: { id },
       data: {
         name: dto.name,
         description: dto.description,
-        status: dto.status,
         rateCardId: dto.rateCardId,
         globalUpchargePercent: dto.globalUpchargePercent,
         contingencyPercent: dto.contingencyPercent,
@@ -271,7 +267,7 @@ export class EstimatesService {
       return {
         id: e.id,
         name: e.name,
-        status: e.status,
+        currentStageLabel: e.currentStage?.label ?? null,
         currency: e.currency,
         grandTotal: totals.grandTotal,
         clientPrice: totals.clientPrice,
@@ -624,7 +620,6 @@ export class EstimatesService {
       id: e.id,
       name: e.name,
       description: e.description,
-      status: e.status,
       currency: e.currency,
       rateCardId: e.rateCardId,
       ownerId: e.ownerId,

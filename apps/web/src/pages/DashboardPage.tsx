@@ -43,8 +43,8 @@ export default function DashboardPage() {
   if (error) return <p className="text-rose-700">{(error as Error).message}</p>;
   if (!data) return null;
 
-  const draft = data.byStatus.find((s) => s.status === 'DRAFT')?.count ?? 0;
-  const final = data.byStatus.find((s) => s.status === 'FINAL')?.count ?? 0;
+  const draft = data.byStage.find((s) => s.stageKey === 'DRAFT')?.count ?? 0;
+  const final = data.byStage.find((s) => s.stageKey === 'FINAL')?.count ?? 0;
 
   return (
     <div className="space-y-5">

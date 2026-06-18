@@ -1,11 +1,10 @@
 import { scaleMoney, sumMoney } from '@cost-reaper/engine';
-import { BASE_CURRENCY, type DashboardSummary, type EstimateStatus } from '@cost-reaper/types';
+import { BASE_CURRENCY, type DashboardSummary } from '@cost-reaper/types';
 
 /** One estimate's already-computed headline figures (the aggregator's input). */
 export interface DashboardRow {
   id: string;
   name: string;
-  status: EstimateStatus;
   currency: string;
   currentStageKey: string | null;
   currentStageLabel: string | null;
@@ -14,7 +13,7 @@ export interface DashboardRow {
 }
 
 /**
- * Pure dashboard aggregation (FR-18) — counts by status & stage, grand totals
+ * Pure dashboard aggregation (FR-18) — counts by workflow stage, grand totals
  * per currency (exact decimal sum), and the most-recently-updated estimates.
  * I/O-free so it's unit-testable in isolation.
  */
@@ -23,12 +22,6 @@ export function summarizeDashboard(
   recentLimit = 5,
   fxRates: Record<string, number> = {},
 ): DashboardSummary {
-  const statusCounts = new Map<EstimateStatus, number>();
-  for (const r of rows) statusCounts.set(r.status, (statusCounts.get(r.status) ?? 0) + 1);
-  const byStatus = [...statusCounts.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([status, count]) => ({ status, count }));
-
   const stageMap = new Map<string, { label: string; count: number }>();
   for (const r of rows) {
     const key = r.currentStageKey ?? 'UNASSIGNED';
@@ -58,7 +51,6 @@ export function summarizeDashboard(
     .map((r) => ({
       id: r.id,
       name: r.name,
-      status: r.status,
       currency: r.currency,
       currentStageKey: r.currentStageKey,
       grandTotal: r.grandTotal,
@@ -75,7 +67,6 @@ export function summarizeDashboard(
 
   return {
     totalEstimates: rows.length,
-    byStatus,
     byStage,
     totalsByCurrency,
     baseCurrency: BASE_CURRENCY,

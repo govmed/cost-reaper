@@ -36,7 +36,7 @@ export default function PrintSummaryPage() {
       <header className="border-b border-slate-300 pb-3 mt-3">
         <h1 className="text-2xl font-bold">{est.name}</h1>
         <p className="text-sm text-slate-500">
-          {est.status} · {cur}
+          {est.currentStageLabel ?? '—'} · {cur}
           {est.description ? ` · ${est.description}` : ''}
         </p>
         <p className="text-xs text-slate-400">

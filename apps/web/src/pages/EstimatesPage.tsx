@@ -87,8 +87,8 @@ export default function EstimatesPage() {
                   onSort={grid.toggleSort}
                 />
                 <SortableTh
-                  label="Status"
-                  sortKey="status"
+                  label="Stage"
+                  sortKey="currentStageKey"
                   activeKey={grid.sortKey}
                   dir={grid.dir}
                   onSort={grid.toggleSort}
@@ -125,7 +125,7 @@ export default function EstimatesPage() {
                   onClick={() => navigate(`/estimates/${e.id}`)}
                 >
                   <td className="px-4 py-2 font-medium text-brand">{e.name}</td>
-                  <td className="px-4 py-2">{e.status}</td>
+                  <td className="px-4 py-2">{e.currentStageLabel ?? '—'}</td>
                   <td className="px-4 py-2">{e.currency}</td>
                   <td className="px-4 py-2 text-right tabular-nums">
                     {formatMoney(e.grandTotal, e.currency)}

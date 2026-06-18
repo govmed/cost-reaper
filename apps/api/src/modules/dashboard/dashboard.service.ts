@@ -26,7 +26,6 @@ export class DashboardService {
     const rows: DashboardRow[] = estimates.map((e: any) => ({
       id: e.id,
       name: e.name,
-      status: e.status,
       currency: e.currency,
       currentStageKey: e.currentStage?.key ?? null,
       currentStageLabel: e.currentStage?.label ?? null,
@@ -78,7 +77,6 @@ export class DashboardService {
       .map((e: any) => ({
         id: e.id,
         name: e.name,
-        status: e.status,
         currency: e.currency,
         currentStageKey: e.currentStage?.key ?? null,
         grandTotal: computeEstimate(buildEngineInput(toMappableEstimate(e))).grandTotal,
@@ -104,7 +102,6 @@ export class DashboardService {
     return estimates.map((e: any) => ({
       id: e.id,
       name: e.name,
-      status: e.status,
       currency: e.currency,
       grandTotal: computeEstimate(buildEngineInput(toMappableEstimate(e))).grandTotal,
       updatedAt: e.updatedAt.toISOString(),
