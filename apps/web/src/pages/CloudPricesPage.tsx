@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useCloudPrices, useCloudSync, useLastPulled } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
+import { usePagedSort } from '../lib/usePagedSort';
+import { Pagination } from '../components/Pagination';
+import { SortableTh } from '../components/SortableTh';
 import { formatMoney } from '../lib/money';
 
 // Fallback provider codes used until the DB reference labels load (FR-29).
@@ -51,6 +54,13 @@ export default function CloudPricesPage() {
           `${p.category} ${p.region} ${p.service} ${p.skuOrInstance}`.toLowerCase().includes(ql)),
     );
   }, [data, provider, category, q]);
+
+  // Sort by raw fields (unitPrice numerically); paginate with a page-size dropdown.
+  const grid = usePagedSort(rows, {
+    initialSort: 'provider',
+    getValue: (p, k) =>
+      k === 'unitPrice' ? Number(p.unitPrice) : (p as unknown as Record<string, unknown>)[k],
+  });
 
   return (
     <div className="space-y-5">
@@ -137,43 +147,104 @@ export default function CloudPricesPage() {
       {isLoading && <p className="text-slate-500">Loading…</p>}
       {error && <p className="text-rose-700">{(error as Error).message}</p>}
       {data && (
-        <table className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden text-sm">
-          <thead className="bg-slate-100 text-slate-600 text-left">
-            <tr>
-              <th className="px-4 py-2">Provider</th>
-              <th className="px-4 py-2">Category</th>
-              <th className="px-4 py-2">Region</th>
-              <th className="px-4 py-2">Service</th>
-              <th className="px-4 py-2">Instance / SKU</th>
-              <th className="px-4 py-2">Unit</th>
-              <th className="px-4 py-2 text-right">Unit price</th>
-              <th className="px-4 py-2">Cur</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((p) => (
-              <tr key={p.id} className="border-t border-slate-100">
-                <td className="px-4 py-2 font-medium">{prov.label(p.provider)}</td>
-                <td className="px-4 py-2 text-slate-500">{p.category}</td>
-                <td className="px-4 py-2">{p.region}</td>
-                <td className="px-4 py-2">{p.service}</td>
-                <td className="px-4 py-2">{p.skuOrInstance}</td>
-                <td className="px-4 py-2">{unitLabeler.label(p.unit)}</td>
-                <td className="px-4 py-2 text-right tabular-nums">
-                  {formatMoney(p.unitPrice, p.currency)}
-                </td>
-                <td className="px-4 py-2">{p.currency}</td>
-              </tr>
-            ))}
-            {rows.length === 0 && (
+        <div className="space-y-3">
+          <table className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden text-sm">
+            <thead className="bg-slate-100 text-slate-600 text-left">
               <tr>
-                <td colSpan={8} className="px-4 py-6 text-center text-slate-500">
-                  No matching prices.
-                </td>
+                <SortableTh
+                  label="Provider"
+                  sortKey="provider"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Category"
+                  sortKey="category"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Region"
+                  sortKey="region"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Service"
+                  sortKey="service"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Instance / SKU"
+                  sortKey="skuOrInstance"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Unit"
+                  sortKey="unit"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Unit price"
+                  sortKey="unitPrice"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                  align="right"
+                />
+                <SortableTh
+                  label="Cur"
+                  sortKey="currency"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {grid.pageRows.map((p) => (
+                <tr key={p.id} className="border-t border-slate-100">
+                  <td className="px-4 py-2 font-medium">{prov.label(p.provider)}</td>
+                  <td className="px-4 py-2 text-slate-500">{p.category}</td>
+                  <td className="px-4 py-2">{p.region}</td>
+                  <td className="px-4 py-2">{p.service}</td>
+                  <td className="px-4 py-2">{p.skuOrInstance}</td>
+                  <td className="px-4 py-2">{unitLabeler.label(p.unit)}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {formatMoney(p.unitPrice, p.currency)}
+                  </td>
+                  <td className="px-4 py-2">{p.currency}</td>
+                </tr>
+              ))}
+              {grid.total === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-4 py-6 text-center text-slate-500">
+                    No matching prices.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <Pagination
+            page={grid.page}
+            lastPage={grid.lastPage}
+            pageSize={grid.pageSize}
+            total={grid.total}
+            rangeStart={grid.rangeStart}
+            rangeEnd={grid.rangeEnd}
+            onPage={grid.setPage}
+            onPageSize={grid.setPageSize}
+          />
+        </div>
       )}
     </div>
   );
