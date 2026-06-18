@@ -53,7 +53,7 @@ const NAV: NavEntry[] = [
     items: [
       { to: '/workflows', label: 'Workflows', admin: true },
       { to: '/checklist-rules', label: 'Checklist Rules', admin: true },
-      { to: '/roles', label: 'Roles' },
+      { to: '/roles', label: 'Roles', admin: true },
     ],
   },
   {

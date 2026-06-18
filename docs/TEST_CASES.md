@@ -4,7 +4,7 @@ A human-readable catalog of **every automated test case** in the project, derive
 directly from the test suites (`*.spec.ts` / `*.test.ts`). Each case is one `it()`
 assertion; suites are grouped by the card / area they exercise.
 
-**Total: 820 test cases across 32 suites.** All run in CI
+**Total: 833 test cases across 33 suites.** All run in CI
 (build → format → lint → typecheck → **test** → build) and must pass before merge;
 the Playwright suite additionally runs the full stack end-to-end.
 
@@ -16,8 +16,9 @@ the Playwright suite additionally runs the full stack end-to-end.
 | Area                                        | Source file                                                                  |   Cases |
 | ------------------------------------------- | ---------------------------------------------------------------------------- | ------: |
 | Audit log                                   | `apps/api/src/common/audit/audit.spec.ts`                                    |      16 |
+| GM visibility scope (FR-2)                  | `apps/api/src/common/gm-scope.spec.ts`                                       |      13 |
 | RFC7807 problem+json                        | `apps/api/src/common/http/problem-details.spec.ts`                           |       2 |
-| pagination                                  | `apps/api/src/common/pagination.spec.ts`                                     |      42 |
+| Pagination (FR-9)                           | `apps/api/src/common/pagination.spec.ts`                                     |      42 |
 | Zod validation pipe                         | `apps/api/src/common/pipes/zod-validation.pipe.spec.ts`                      |       3 |
 | Auth service                                | `apps/api/src/modules/auth/auth.service.spec.ts`                             |       4 |
 | SSO config                                  | `apps/api/src/modules/auth/sso/sso-config.spec.ts`                           |       5 |
@@ -47,7 +48,7 @@ the Playwright suite additionally runs the full stack end-to-end.
 | smoke                                       | `apps/web/e2e/smoke.spec.ts`                                                 |      13 |
 | Estimation engine                           | `packages/engine/src/estimation-engine.test.ts`                              |      19 |
 | Resource capacity (FR-27)                   | `packages/engine/src/resource-capacity.test.ts`                              |       6 |
-| **Total**                                   |                                                                              | **820** |
+| **Total**                                   |                                                                              | **833** |
 
 ---
 
@@ -80,6 +81,35 @@ _Source: `apps/api/src/common/audit/audit.spec.ts` — 16 cases_
 - AU-15 audit.view is a valid permission
 - AU-16 audit.view is in the permission catalog
 
+## GM visibility scope (FR-2)
+
+_Source: `apps/api/src/common/gm-scope.spec.ts` — 13 cases_
+
+**GM scope · visible stages**
+
+- GM-01 the queue is exactly In Review + Approved
+
+**GM scope · isGmScoped**
+
+- GM-02 a GM is scoped
+- GM-03 Admin / Estimator / Viewer are not scoped
+- GM-04 a custom role is not scoped
+- GM-05 a missing / null user is not scoped
+
+**GM scope · gmStageWhere**
+
+- GM-06 a GM is limited to the queue stages
+- GM-07 everyone else gets no restriction
+- GM-08 the fragment is a fresh object (no shared mutable state)
+
+**GM scope · gmCanViewStage**
+
+- GM-09 a GM may view In Review
+- GM-10 a GM may view Approved
+- GM-11 a GM may not view Draft
+- GM-12 a GM may not view Final / Archived / Unassigned
+- GM-13 a non-GM may view any stage
+
 ## RFC7807 problem+json
 
 _Source: `apps/api/src/common/http/problem-details.spec.ts` — 2 cases_
@@ -89,7 +119,7 @@ _Source: `apps/api/src/common/http/problem-details.spec.ts` — 2 cases_
 - builds a minimal problem+json document
 - includes optional fields when provided
 
-## pagination
+## Pagination (FR-9)
 
 _Source: `apps/api/src/common/pagination.spec.ts` — 42 cases_
 
