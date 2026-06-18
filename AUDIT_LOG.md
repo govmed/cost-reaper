@@ -900,3 +900,11 @@ Added an Admin → Audit Log read-only viewer (FR-11).
 - AuditEventDto/AuditListQuery types; web AuditPage (table + action badges + search/entity-type filter + Prev/Next pagination); nav item Admin → Audit Log + route.
 - audit.spec.ts (16); api tsc + 52 specs pass in-container; prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 14:05 UTC] — USER
+When creating rules the Rule needs to be a dropdown (user doesn't know the rule_key); use the rule key description instead of the rule [key]. · rule-key value · Show me the test cases written for Rule sets.
+
+### [2026-06-17 14:15 UTC] — AGENT
+Made the checklist-rule create field a dropdown of built-in rules by description (CHECKLIST_RULE_CATALOG, 9 engine built-ins), auto-filling key/description/severity/scope; kept a "Custom advisory rule" escape hatch. Built-ins not already in the set are offered. Prettier clean; PR opening. (Rule-sets test cases addressed separately.)
+---

@@ -707,3 +707,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Why:** FR-11 — surface the append-only audit trail to admins without any mutation path (read-only).
 - **Files touched:** packages/types/src/{audit.ts(new),permissions.ts,index.ts}; apps/api/src/common/audit/{audit.service.ts,audit.controller.ts(new),audit.module.ts,audit.spec.ts(new)}; apps/web/src/{lib/types.ts,lib/queries.ts,pages/AuditPage.tsx(new),App.tsx}; living docs.
 - **Result:** In-container: api tsc PASS; audit(16)+roles(36)=52 specs pass; prettier clean. ADMIN wildcard grants audit.view (no re-seed needed). Web tsc/e2e via CI. PR next.
+
+### 2026-06-17 — Checklist rules: pick a rule from a dropdown by description (FR-25)
+- **Action:** User: when creating a checklist rule the Rule field should be a dropdown (users don't know the rule_key), and show the description instead of the raw key. Added a `CHECKLIST_RULE_CATALOG` (the 9 engine built-ins: key + description + default severity/scope) to apps/web/src/lib/types.ts, mirroring the seed/engine. Rewrote AddRuleRow on ChecklistRulesPage: a **Rule dropdown** listing built-ins **by description** (only those not already in the set), which auto-fills key + description + default severity/scope on select; a "➕ Custom advisory rule…" option still allows a free-text lower_snake_case key for custom reminders. Scope/severity stay adjustable (pre-filled). The raw rule_key is no longer typed for built-ins.
+- **Files touched:** apps/web/src/lib/types.ts, apps/web/src/pages/ChecklistRulesPage.tsx; living docs.
+- **Result:** Prettier clean; web tsc/e2e via CI. PR next.

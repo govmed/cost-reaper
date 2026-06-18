@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { useChecklistRules, useChecklistRuleMutations, useChecklistRuleSets } from '../lib/queries';
 import { useRefLabeler } from '../lib/refLabels';
+import { CHECKLIST_RULE_CATALOG } from '../lib/types';
 import type { ChecklistRuleAdmin } from '../lib/types';
 
 // Fallback option lists (codes) used until the DB reference labels load (FR-29).
@@ -75,7 +76,13 @@ export default function ChecklistRulesPage() {
               ))}
             </tbody>
           </table>
-          {isAdmin && <AddRuleRow m={m} ruleSetId={ruleSetId} />}
+          {isAdmin && (
+            <AddRuleRow
+              m={m}
+              ruleSetId={ruleSetId}
+              existingKeys={new Set((data ?? []).map((r) => r.key))}
+            />
+          )}
           <p className="text-xs text-slate-400">
             “Advisory” rules have no built-in check, so they always pass — useful as reminders.
             Built-in rules can be deactivated or re-tuned but not deleted.
@@ -167,7 +174,17 @@ function RuleRow({ r, isAdmin, m }: { r: ChecklistRuleAdmin; isAdmin: boolean; m
   );
 }
 
-function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
+const CUSTOM = '__custom__';
+
+function AddRuleRow({
+  m,
+  ruleSetId,
+  existingKeys,
+}: {
+  m: Mutations;
+  ruleSetId?: string;
+  existingKeys: Set<string>;
+}) {
   const sevLabeler = useRefLabeler('CHECKLIST_SEVERITY');
   const scopeLabeler = useRefLabeler('CHECKLIST_SCOPE');
   const sevOptions = sevLabeler.ready
@@ -176,46 +193,94 @@ function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
   const scopeOptions = scopeLabeler.ready
     ? scopeLabeler.options
     : SCOPES.map((c) => ({ code: c, label: c }));
-  const [key, setKey] = useState('');
+
+  // Pick a real built-in rule by its description; only offer ones not already in
+  // this set. The rule key + sensible defaults come from the catalog (FR-25), so
+  // the user never has to know the underlying rule_key.
+  const available = CHECKLIST_RULE_CATALOG.filter((r) => !existingKeys.has(r.key));
+
+  const [selected, setSelected] = useState(''); // a catalog key, CUSTOM, or ''
+  const [customKey, setCustomKey] = useState('');
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState('WARNING');
   const [scope, setScope] = useState('ESTIMATE');
+  const isCustom = selected === CUSTOM;
 
+  function onSelect(v: string) {
+    setSelected(v);
+    if (v === CUSTOM || v === '') {
+      setCustomKey('');
+      setDescription('');
+      setSeverity('WARNING');
+      setScope('ESTIMATE');
+      return;
+    }
+    const e = CHECKLIST_RULE_CATALOG.find((r) => r.key === v);
+    if (e) {
+      setDescription(e.description);
+      setSeverity(e.severity);
+      setScope(e.scope);
+    }
+  }
+
+  const effectiveKey = isCustom ? customKey.trim().toLowerCase() : selected;
+  const keyOk = !isCustom || /^[a-z][a-z0-9_]*$/.test(effectiveKey);
+  const valid = !!effectiveKey && description.trim().length > 0 && keyOk;
+
+  function reset() {
+    setSelected('');
+    setCustomKey('');
+    setDescription('');
+    setSeverity('WARNING');
+    setScope('ESTIMATE');
+  }
   function add() {
-    const k = key.trim().toLowerCase();
-    if (!k || !description.trim()) return;
+    if (!valid) return;
     m.create.mutate(
-      { key: k, description: description.trim(), severity, scope, ruleSetId },
-      {
-        onSuccess: () => {
-          setKey('');
-          setDescription('');
-          setSeverity('WARNING');
-          setScope('ESTIMATE');
-        },
-      },
+      { key: effectiveKey, description: description.trim(), severity, scope, ruleSetId },
+      { onSuccess: reset },
     );
   }
 
   return (
     <div className="flex flex-wrap gap-2 items-center pt-2 border-t border-slate-100">
-      <input
-        value={key}
-        onChange={(e) => setKey(e.target.value)}
-        className="border border-slate-300 rounded px-2 py-1 text-sm w-44 font-mono"
-        placeholder="rule_key"
-      />
-      <input
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="border border-slate-300 rounded px-2 py-1 text-sm flex-1 min-w-56"
-        placeholder="What this rule checks"
-      />
+      <select
+        value={selected}
+        onChange={(e) => onSelect(e.target.value)}
+        className="border border-slate-300 rounded px-2 py-1 text-sm min-w-72"
+        title="Rule"
+      >
+        <option value="">Select a rule…</option>
+        {available.map((r) => (
+          <option key={r.key} value={r.key}>
+            {r.description}
+          </option>
+        ))}
+        <option value={CUSTOM}>➕ Custom advisory rule…</option>
+      </select>
+      {isCustom && (
+        <>
+          <input
+            value={customKey}
+            onChange={(e) => setCustomKey(e.target.value)}
+            className="border border-slate-300 rounded px-2 py-1 text-sm w-40 font-mono"
+            placeholder="rule_key"
+            title="lower_snake_case key"
+          />
+          <input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="border border-slate-300 rounded px-2 py-1 text-sm flex-1 min-w-56"
+            placeholder="What this rule checks"
+          />
+        </>
+      )}
       <select
         value={scope}
         onChange={(e) => setScope(e.target.value)}
         className="border border-slate-300 rounded px-2 py-1 text-sm"
         title="Scope"
+        disabled={!selected}
       >
         {scopeOptions.map((o) => (
           <option key={o.code} value={o.code}>
@@ -228,6 +293,7 @@ function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
         onChange={(e) => setSeverity(e.target.value)}
         className="border border-slate-300 rounded px-2 py-1 text-sm"
         title="Severity"
+        disabled={!selected}
       >
         {sevOptions.map((o) => (
           <option key={o.code} value={o.code}>
@@ -237,7 +303,7 @@ function AddRuleRow({ m, ruleSetId }: { m: Mutations; ruleSetId?: string }) {
       </select>
       <button
         onClick={add}
-        disabled={!key.trim() || !description.trim() || m.create.isPending}
+        disabled={!valid || m.create.isPending}
         className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
       >
         Add rule
