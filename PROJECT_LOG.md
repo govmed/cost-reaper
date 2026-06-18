@@ -751,3 +751,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** User noted USER_GUIDE.md lacked the GM role. Added the **GM (General Manager)** row to the "Roles at a glance" table (review/approve estimates or return to draft; cannot create/edit), refreshed the Admin row (now also manages roles + audit log), and added a note that roles are data-driven (Admin → Roles & permissions can create custom roles, FR-30).
 - **Files touched:** docs/USER_GUIDE.md; living docs.
 - **Result:** prettier clean (table re-aligned). No USER_GUIDE.docx counterpart exists. PR next.
+
+### 2026-06-17 — Deliverable: Test Case Catalog (docs/TEST_CASES.md + .docx)
+- **Action:** User couldn't find "test case documents" (tests were only `.spec.ts` source). Added `scripts/gen-test-catalog.py` that parses every `*.spec.ts`/`*.test.ts` (describe/it titles) and writes `docs/TEST_CASES.md` — a readable catalog: intro + summary table (Area | file | count) + per-suite describe/it listings. **778 cases across 31 suites.** Rendered `docs/TEST_CASES.docx` via the pandoc/core container (deliverable-format rule). Regenerate with `python3 scripts/gen-test-catalog.py`.
+- **Files touched:** scripts/gen-test-catalog.py (new), docs/TEST_CASES.md (new), docs/TEST_CASES.docx (new); living docs.
+- **Result:** prettier clean; docx rendered. PR next.

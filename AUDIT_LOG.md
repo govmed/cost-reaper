@@ -969,3 +969,11 @@ USER_GUIDE.md does not have the GM Role.
 ### [2026-06-17 17:08 UTC] — AGENT
 Added the GM (General Manager) role to USER_GUIDE.md "Roles at a glance" (approve/return-to-draft, no create/edit), updated the Admin row (roles + audit log), and noted custom data-driven roles (FR-30). Prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 17:20 UTC] — USER
+I looked and cannot find the test case documents.
+
+### [2026-06-17 17:30 UTC] — AGENT
+The tests existed only as *.spec.ts source. Generated a readable Test Case Catalog: scripts/gen-test-catalog.py parses all describe/it titles → docs/TEST_CASES.md (summary table + per-suite case lists, 778 cases / 31 suites) + docs/TEST_CASES.docx (pandoc). Prettier clean. Opening PR.
+---
