@@ -97,6 +97,39 @@ export default function SowPrintPage() {
         <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
           9. Pricing
         </h2>
+        {p.categories.length > 0 && (
+          <>
+            <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
+              Cost breakdown by category (post-upcharge, pre-contingency)
+            </p>
+            <table className="w-full text-sm mb-4">
+              <thead>
+                <tr className="text-slate-500 text-left border-b border-slate-300">
+                  <th className="py-1">Cost category</th>
+                  <th className="py-1 text-right">One-time</th>
+                  <th className="py-1 text-right">Monthly</th>
+                  <th className="py-1 text-right">Yearly</th>
+                </tr>
+              </thead>
+              <tbody>
+                {p.categories.map((c) => (
+                  <tr key={c.category} className="border-t border-slate-100">
+                    <td className="py-1">{c.category}</td>
+                    <td className="py-1 text-right tabular-nums">{money(c.oneTime)}</td>
+                    <td className="py-1 text-right tabular-nums">{money(c.monthly)}</td>
+                    <td className="py-1 text-right tabular-nums">{money(c.yearly)}</td>
+                  </tr>
+                ))}
+                <tr className="border-t border-slate-300 font-semibold">
+                  <td className="py-1">Subtotal</td>
+                  <td className="py-1 text-right tabular-nums">{money(p.oneTimeSubtotal)}</td>
+                  <td className="py-1 text-right tabular-nums">{money(p.monthlySubtotal)}</td>
+                  <td className="py-1 text-right tabular-nums">{money(p.yearlySubtotal)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </>
+        )}
         <table className="w-full text-sm">
           <tbody>
             <Row label="One-time total" value={money(p.oneTimeTotal)} />
