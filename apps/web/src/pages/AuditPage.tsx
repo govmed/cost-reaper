@@ -80,12 +80,14 @@ export default function AuditPage() {
                   <th className="px-4 py-2">Action</th>
                   <th className="px-4 py-2">Entity</th>
                   <th className="px-4 py-2">Reference</th>
+                  <th className="px-4 py-2 whitespace-nowrap">IP</th>
+                  <th className="px-4 py-2 whitespace-nowrap">Location</th>
                 </tr>
               </thead>
               <tbody>
                 {data.data.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                    <td colSpan={7} className="px-4 py-6 text-center text-slate-400">
                       No audit entries match.
                     </td>
                   </tr>
@@ -102,6 +104,12 @@ export default function AuditPage() {
                     <td className="px-4 py-2 font-medium text-slate-800">{e.entityType}</td>
                     <td className="px-4 py-2 font-mono text-xs text-slate-500 break-all">
                       {e.entityId}
+                    </td>
+                    <td className="px-4 py-2 font-mono text-xs text-slate-500 whitespace-nowrap">
+                      {e.ipAddress ?? '—'}
+                    </td>
+                    <td className="px-4 py-2 text-xs text-slate-500 whitespace-nowrap">
+                      {e.location ?? '—'}
                     </td>
                   </tr>
                 ))}
