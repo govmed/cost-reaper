@@ -977,3 +977,11 @@ I looked and cannot find the test case documents.
 ### [2026-06-17 17:30 UTC] — AGENT
 The tests existed only as *.spec.ts source. Generated a readable Test Case Catalog: scripts/gen-test-catalog.py parses all describe/it titles → docs/TEST_CASES.md (summary table + per-suite case lists, 778 cases / 31 suites) + docs/TEST_CASES.docx (pandoc). Prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 17:45 UTC] — USER
+Yes, write the pagination suite.
+
+### [2026-06-17 17:55 UTC] — AGENT
+Extracted pure pagination helpers (pageSkipTake/lastPage/paginate), wired pageSkipTake into the real estimates + audit list() services, and added pagination.spec.ts (42 cases: contracts + skip/take + slice semantics). 58 pass in-container (verbose ✓ per case); api tsc + prettier clean. Regenerated TEST_CASES catalog. Opening PR.
+---

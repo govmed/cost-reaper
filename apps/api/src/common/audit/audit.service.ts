@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import type { AuditEventDto, AuditListQuery, Page } from '@cost-reaper/types';
 import { PrismaService } from '../prisma/prisma.service';
+import { pageSkipTake } from '../pagination';
 
 /** Records and reads create/modify actions on governed entities (FR-11). */
 @Injectable()
@@ -32,8 +33,7 @@ export class AuditService {
         where,
         include: { actor: { select: { email: true } } },
         orderBy: { occurredAt: 'desc' },
-        skip: (query.page - 1) * query.pageSize,
-        take: query.pageSize,
+        ...pageSkipTake(query.page, query.pageSize),
       }),
       this.prisma.auditEvent.count({ where }),
     ]);

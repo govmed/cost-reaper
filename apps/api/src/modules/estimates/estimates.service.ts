@@ -30,6 +30,7 @@ import type {
 } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
+import { pageSkipTake } from '../../common/pagination';
 import { ReferenceService } from '../reference/reference.service';
 import { buildEngineInput, toMappableEstimate } from './engine-mapping';
 import { CsvLine, exportRows, toCsv } from './estimate-csv';
@@ -117,8 +118,7 @@ export class EstimatesService {
       this.prisma.estimate.findMany({
         where,
         orderBy: { updatedAt: 'desc' },
-        skip: (query.page - 1) * query.pageSize,
-        take: query.pageSize,
+        ...pageSkipTake(query.page, query.pageSize),
         include: DETAIL_INCLUDE,
       }),
     ]);

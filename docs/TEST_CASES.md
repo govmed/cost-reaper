@@ -4,7 +4,7 @@ A human-readable catalog of **every automated test case** in the project, derive
 directly from the test suites (`*.spec.ts` / `*.test.ts`). Each case is one `it()`
 assertion; suites are grouped by the card / area they exercise.
 
-**Total: 778 test cases across 31 suites.** All run in CI
+**Total: 820 test cases across 32 suites.** All run in CI
 (build → format → lint → typecheck → **test** → build) and must pass before merge;
 the Playwright suite additionally runs the full stack end-to-end.
 
@@ -17,6 +17,7 @@ the Playwright suite additionally runs the full stack end-to-end.
 | ------------------------------------------- | ---------------------------------------------------------------------------- | ------: |
 | Audit log                                   | `apps/api/src/common/audit/audit.spec.ts`                                    |      16 |
 | RFC7807 problem+json                        | `apps/api/src/common/http/problem-details.spec.ts`                           |       2 |
+| pagination                                  | `apps/api/src/common/pagination.spec.ts`                                     |      42 |
 | Zod validation pipe                         | `apps/api/src/common/pipes/zod-validation.pipe.spec.ts`                      |       3 |
 | Auth service                                | `apps/api/src/modules/auth/auth.service.spec.ts`                             |       4 |
 | SSO config                                  | `apps/api/src/modules/auth/sso/sso-config.spec.ts`                           |       5 |
@@ -46,7 +47,7 @@ the Playwright suite additionally runs the full stack end-to-end.
 | smoke                                       | `apps/web/e2e/smoke.spec.ts`                                                 |      13 |
 | Estimation engine                           | `packages/engine/src/estimation-engine.test.ts`                              |      19 |
 | Resource capacity (FR-27)                   | `packages/engine/src/resource-capacity.test.ts`                              |       6 |
-| **Total**                                   |                                                                              | **778** |
+| **Total**                                   |                                                                              | **820** |
 
 ---
 
@@ -87,6 +88,67 @@ _Source: `apps/api/src/common/http/problem-details.spec.ts` — 2 cases_
 
 - builds a minimal problem+json document
 - includes optional fields when provided
+
+## pagination
+
+_Source: `apps/api/src/common/pagination.spec.ts` — 42 cases_
+
+**Pagination · PaginationQuery contract**
+
+- PG-01 defaults to page 1, pageSize 20, order desc
+- PG-02 coerces numeric query strings
+- PG-03 accepts order asc
+- PG-04 rejects an unknown order
+- PG-05 accepts an optional sort field
+- PG-06 rejects page below 1
+- PG-07 rejects pageSize above 200
+- PG-08 rejects pageSize below 1
+- PG-09 rejects a non-integer page
+- PG-10 accepts pageSize at the bounds (1 and 200)
+
+**Pagination · EstimateListQuery contract**
+
+- PG-11 defaults to page 1, pageSize 20
+- PG-12 coerces numeric query strings
+- PG-13 accepts a search term, status, and ownerId
+- PG-14 rejects a non-uuid ownerId
+- PG-15 rejects page below 1
+- PG-16 rejects pageSize above 200
+- PG-17 rejects pageSize below 1
+- PG-18 rejects a non-integer pageSize
+- PG-19 accepts pageSize at the 200 bound
+
+**Pagination · pageSkipTake (DB skip/take)**
+
+- PG-20 page 1 starts at skip 0
+- PG-21 page 2 skips one page
+- PG-22 page 3 skips two pages (size 50)
+- PG-23 take equals pageSize
+- PG-24 page 1 size 1
+- PG-25 never returns a negative skip
+
+**Pagination · lastPage**
+
+- PG-26 zero rows is still 1 page
+- PG-27 an exact multiple
+- PG-28 a partial last page rounds up
+- PG-29 fewer than one page is 1 page
+- PG-30 exactly one full page
+- PG-31 one over a page
+
+**Pagination · paginate (slice semantics)**
+
+- PG-32 an empty list yields no data, total 0
+- PG-33 returns the first page slice
+- PG-34 returns the second page slice (rows 21–40)
+- PG-35 the last page may be partial
+- PG-36 an out-of-range page returns no data but keeps the total
+- PG-37 a page holds at most pageSize items
+- PG-38 total is the full count regardless of page
+- PG-39 echoes the requested page and pageSize
+- PG-40 a single item on page 1
+- PG-41 an exact page boundary fills the last page
+- PG-42 pageSize 1 returns one item per page
 
 ## Zod validation pipe
 
