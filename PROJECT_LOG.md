@@ -718,3 +718,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Why:** FR-29 — attach + classify supporting files against an estimate using a data-driven document-type catalog.
 - **Files touched:** schema + migration + seed; packages/types/src/{documents.ts(new),index.ts}; apps/api/src/app.module.ts + modules/documents/* (new); apps/web/src/{lib/types.ts,lib/api.ts,lib/queries.ts,pages/EstimateEditorPage.tsx}; living docs.
 - **Result:** In-container: api tsc PASS; documents.spec (6) pass; prettier clean. PR next; CI runs web tsc/e2e. Needs migrate + seed locally to surface the new table + doc types.
+
+### 2026-06-17 — Tests: Checklist Rule Sets contract suite (FR-25)
+- **Action:** User asked for a proper Rule Sets suite (~50 cases). Added `apps/api/src/modules/workflow/checklist-rule-sets.spec.ts` — **61 cases** against the shared contracts: severity/scope enums; `ChecklistRuleSetDto`; `CreateChecklistRuleSetRequest`/`UpdateChecklistRuleSetRequest`; `ChecklistRuleDto`; `CreateChecklistRuleRequest` (incl. the lower_snake_case key rule, bounds, severity/scope, optional ruleSetId); `UpdateChecklistRuleRequest`; and the gating `ChecklistResult` (completeness 0..1, item defaults). Closes the gap (the card previously had only 8 engine-evaluation tests).
+- **Result:** 61/61 pass in-container; prettier clean. PR next.
