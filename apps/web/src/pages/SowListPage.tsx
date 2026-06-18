@@ -4,7 +4,14 @@ import { useAuth } from '../lib/auth';
 import { useSows, useCreateSow, useSowMutations, useEligibleEstimates } from '../lib/queries';
 import type { SowSummary } from '../lib/types';
 
-type SortKey = 'number' | 'title' | 'estimateName' | 'clientName' | 'status' | 'updatedAt';
+type SortKey =
+  | 'number'
+  | 'title'
+  | 'estimateName'
+  | 'clientName'
+  | 'status'
+  | 'updatedAt'
+  | 'estimateUpdatedAt';
 
 /** Statements of Work (BR-7) — list + create from an *approved* estimate. */
 export default function SowListPage() {
@@ -109,13 +116,19 @@ export default function SowListPage() {
                 <SortTh label="Estimate" k="estimateName" onSort={toggleSort} arrow={arrow} />
                 <SortTh label="Client" k="clientName" onSort={toggleSort} arrow={arrow} />
                 <SortTh label="Status" k="status" onSort={toggleSort} arrow={arrow} center />
+                <SortTh
+                  label="Estimate updated"
+                  k="estimateUpdatedAt"
+                  onSort={toggleSort}
+                  arrow={arrow}
+                />
                 <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
               {sorted!.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+                  <td colSpan={7} className="px-4 py-6 text-center text-slate-400">
                     No statements of work yet.
                   </td>
                 </tr>
@@ -178,6 +191,12 @@ function SowRow({ s, canEdit }: { s: SowSummary; canEdit: boolean }) {
         >
           {s.status === 'ISSUED' ? 'Issued' : 'Draft'}
         </span>
+      </td>
+      <td
+        className="px-4 py-2 text-slate-500 whitespace-nowrap"
+        title="When the source estimate was last updated"
+      >
+        {new Date(s.estimateUpdatedAt).toLocaleString()}
       </td>
       <td className="px-4 py-2 text-right whitespace-nowrap">
         <Link to={`/sow/${s.id}/print`} className="text-brand hover:underline text-xs">
