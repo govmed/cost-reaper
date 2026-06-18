@@ -226,7 +226,10 @@ export default function EstimateEditorPage() {
                     .map((s) => ({ code: s.code, label: s.displayName }))
                 : [
                     { code: 'DRAFT', label: 'Draft' },
+                    { code: 'IN_REVIEW', label: 'In Review' },
+                    { code: 'APPROVED', label: 'Approved' },
                     { code: 'FINAL', label: 'Final' },
+                    { code: 'ARCHIVED', label: 'Archived' },
                   ]
               ).map((s) => (
                 <option key={s.code} value={s.code}>

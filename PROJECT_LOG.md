@@ -785,3 +785,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-17 — Workflow: add a note when transitioning (esp. GM Return to draft) (FR-24)
 - **Action:** User: when a GM clicks "Return to draft", let them add a comment so the estimator knows why. Backend already supported `TransitionRequest.note` + stores it on `WorkflowTransitionEvent`. Web: clicking a transition now stages it and reveals a textarea (Confirm/Cancel) — for return-to-draft the prompt asks for a reason ("the estimator will see this"); other transitions get an optional note. The workflow **history** now renders each event's note (so the estimator sees the reason). Detection: toStageKey==='DRAFT' or label matches /draft/i.
 - **Result:** web tsc + eslint + format:check PASS; live-verified the note persists (GM IN_REVIEW→DRAFT with note stored on the event). PR next.
+
+### 2026-06-17 — Estimate Status dropdown: add missing statuses (FR-29/FR-24)
+- **Action:** User: the Status dropdown has missing statuses. The ESTIMATE_STATUS seed defined only DRAFT+FINAL (DB also had ARCHIVED from a migration) — missing IN_REVIEW and APPROVED. Aligned ESTIMATE_STATUS with the 5 default workflow stages: Draft, In Review, Approved, Final, Archived (seed + web fallback in EstimateEditorPage). Data-driven (FR-29) so an admin can still add/rename/reorder.
+- **Result:** web tsc + format:check PASS; rebuilt api + re-seeded → ESTIMATE_STATUS now 5 values in order. PR next.

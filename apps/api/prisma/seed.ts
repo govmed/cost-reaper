@@ -1003,9 +1003,14 @@ const REFERENCE_DATA: RefType[] = [
   {
     code: 'ESTIMATE_STATUS',
     name: 'Estimate Status',
+    // Aligned with the default workflow stages (FR-24); data-driven (FR-29) so an
+    // admin can add/rename/reorder these without a code change.
     values: [
       { code: 'DRAFT', name: 'Draft' },
+      { code: 'IN_REVIEW', name: 'In Review' },
+      { code: 'APPROVED', name: 'Approved' },
       { code: 'FINAL', name: 'Final' },
+      { code: 'ARCHIVED', name: 'Archived' },
     ],
   },
   {
