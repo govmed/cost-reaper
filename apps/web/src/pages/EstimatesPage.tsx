@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateEstimate, useEstimates } from '../lib/queries';
 import { useAuth } from '../lib/auth';
 import { canAuthorEstimates } from '../lib/permissions';
+import { usePagedSort } from '../lib/usePagedSort';
+import { Pagination } from '../components/Pagination';
+import { SortableTh } from '../components/SortableTh';
 import { formatMoney } from '../lib/money';
 
 export default function EstimatesPage() {
@@ -16,6 +19,13 @@ export default function EstimatesPage() {
   // Only users who can author estimates see the create form (FR-30). A GM is an
   // approver — they review/approve, they don't create their own estimates.
   const canCreate = canAuthorEstimates(user);
+
+  const grid = usePagedSort(data?.data ?? [], {
+    initialSort: 'updatedAt',
+    initialDir: 'desc',
+    getValue: (e, k) =>
+      k === 'grandTotal' ? Number(e.grandTotal) : (e as unknown as Record<string, unknown>)[k],
+  });
 
   async function onCreate() {
     if (!name.trim()) return;
@@ -65,43 +75,86 @@ export default function EstimatesPage() {
       {isLoading && <p className="text-slate-500">Loading…</p>}
       {error && <p className="text-rose-700">{(error as Error).message}</p>}
       {data && (
-        <table className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden text-sm">
-          <thead className="bg-slate-100 text-slate-600 text-left">
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Currency</th>
-              <th className="px-4 py-2 text-right">Grand total</th>
-              <th className="px-4 py-2">Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.data.map((e) => (
-              <tr
-                key={e.id}
-                className="border-t border-slate-100 hover:bg-slate-50 cursor-pointer"
-                onClick={() => navigate(`/estimates/${e.id}`)}
-              >
-                <td className="px-4 py-2 font-medium text-brand">{e.name}</td>
-                <td className="px-4 py-2">{e.status}</td>
-                <td className="px-4 py-2">{e.currency}</td>
-                <td className="px-4 py-2 text-right tabular-nums">
-                  {formatMoney(e.grandTotal, e.currency)}
-                </td>
-                <td className="px-4 py-2 text-slate-500">
-                  {new Date(e.updatedAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-            {data.data.length === 0 && (
+        <div className="space-y-3">
+          <table className="w-full bg-white border border-slate-200 rounded-xl overflow-hidden text-sm">
+            <thead className="bg-slate-100 text-slate-600 text-left">
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
-                  No estimates yet.
-                </td>
+                <SortableTh
+                  label="Name"
+                  sortKey="name"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Status"
+                  sortKey="status"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Currency"
+                  sortKey="currency"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
+                <SortableTh
+                  label="Grand total"
+                  sortKey="grandTotal"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                  align="right"
+                />
+                <SortableTh
+                  label="Updated"
+                  sortKey="updatedAt"
+                  activeKey={grid.sortKey}
+                  dir={grid.dir}
+                  onSort={grid.toggleSort}
+                />
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {grid.pageRows.map((e) => (
+                <tr
+                  key={e.id}
+                  className="border-t border-slate-100 hover:bg-slate-50 cursor-pointer"
+                  onClick={() => navigate(`/estimates/${e.id}`)}
+                >
+                  <td className="px-4 py-2 font-medium text-brand">{e.name}</td>
+                  <td className="px-4 py-2">{e.status}</td>
+                  <td className="px-4 py-2">{e.currency}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">
+                    {formatMoney(e.grandTotal, e.currency)}
+                  </td>
+                  <td className="px-4 py-2 text-slate-500">
+                    {new Date(e.updatedAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+              {grid.total === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-center text-slate-500">
+                    No estimates yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <Pagination
+            page={grid.page}
+            lastPage={grid.lastPage}
+            pageSize={grid.pageSize}
+            total={grid.total}
+            rangeStart={grid.rangeStart}
+            rangeEnd={grid.rangeEnd}
+            onPage={grid.setPage}
+            onPageSize={grid.setPageSize}
+          />
+        </div>
       )}
     </div>
   );
