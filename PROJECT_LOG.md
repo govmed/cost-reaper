@@ -746,3 +746,8 @@ We are building **cost-reaper**, a production web app that estimates technology-
 - **Action:** Re-tailing logs showed the interceptor error-path still missed guard denials — NestJS runs guards BEFORE interceptors, so a denied (401/403) request never reaches the interceptor. Moved failure logging to the global `ProblemDetailsFilter` (which `@Catch()`-es everything: guard denials, validation 4xx, 404s, 5xx) and reverted the interceptor to success-only (no double-logging). Net: interceptor logs 2xx/3xx, filter logs every failure → complete request/audit log incl. permission denials.
 - **Files touched:** apps/api/src/common/interceptors/logging.interceptor.ts, apps/api/src/common/http/http-exception.filter.ts; living docs.
 - **Result:** api tsc PASS; problem-details spec green; prettier clean. PR next; will re-capture showing 403/404/401 logged.
+
+### 2026-06-17 — Docs: add GM role to the User Guide (FR-2/FR-30)
+- **Action:** User noted USER_GUIDE.md lacked the GM role. Added the **GM (General Manager)** row to the "Roles at a glance" table (review/approve estimates or return to draft; cannot create/edit), refreshed the Admin row (now also manages roles + audit log), and added a note that roles are data-driven (Admin → Roles & permissions can create custom roles, FR-30).
+- **Files touched:** docs/USER_GUIDE.md; living docs.
+- **Result:** prettier clean (table re-aligned). No USER_GUIDE.docx counterpart exists. PR next.

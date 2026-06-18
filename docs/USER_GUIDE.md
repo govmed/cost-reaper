@@ -9,14 +9,20 @@ from a governed rate card and cloud catalog through totals, governance, and expo
 
 ## 1. Roles at a glance
 
-| Role          | Can do                                                                                                    |
-| ------------- | --------------------------------------------------------------------------------------------------------- |
-| **Admin**     | Everything below, plus manage **users**, **rate cards**, **reference data**, and browse **cloud prices**. |
-| **Estimator** | Create and edit estimates, add line items, run the workflow, and export.                                  |
-| **Viewer**    | Read estimates they're authorized to see.                                                                 |
+| Role                     | Can do                                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| **Admin**                | Everything below, plus manage **users**, **roles**, **rate cards**, **reference data**, the **audit log**, and pricing. |
+| **GM** (General Manager) | Review and **approve** estimates (or **return them to draft**) via the workflow; **cannot create or edit** estimates.   |
+| **Estimator**            | Create and edit estimates, add line items, submit through the workflow, and export.                                     |
+| **Viewer**               | Read (and export) estimates they're authorized to see.                                                                  |
 
 Access is enforced server-side (deny-by-default), so menu items you don't have
 rights to simply won't appear or will be rejected.
+
+> **Custom roles (Admins).** Roles are data-driven — under **Admin → Roles &
+> permissions** an Admin can create new roles and toggle exactly which
+> permissions each one grants (e.g. a "Reviewer" that can approve but not edit).
+> The four above are the built-in baseline.
 
 ## 2. Sign in
 

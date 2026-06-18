@@ -961,3 +961,11 @@ If you can't do manual UX testing, can you tail the log and capture the output a
 ### [2026-06-17 16:50 UTC] — AGENT
 Yes — demonstrated by marking a log window, exercising the app (login/dashboard/estimate edit/forbidden), then `docker compose logs api --since` to capture only that window's structured JSON request logs (method/url/status/ms/requestId). The capture surfaced a real gap: guard denials (401/403) + handler errors weren't logged (success-only tap). Fixed the LoggingInterceptor to log the error path too (NFR-9). api tsc + prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 17:05 UTC] — USER
+USER_GUIDE.md does not have the GM Role.
+
+### [2026-06-17 17:08 UTC] — AGENT
+Added the GM (General Manager) role to USER_GUIDE.md "Roles at a glance" (approve/return-to-draft, no create/edit), updated the Admin row (roles + audit log), and noted custom data-driven roles (FR-30). Prettier clean. Opening PR.
+---
