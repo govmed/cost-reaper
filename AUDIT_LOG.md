@@ -920,3 +920,11 @@ Added a Supporting Documents card to the estimate editor with upload + catalog b
 - EstimateDocumentDto/MAX_DOCUMENT_BYTES types; web Supporting-documents card (table + upload form with a document-type dropdown showing the display name) + api/query hooks; uploads audited.
 - documents.spec.ts (6); api tsc + spec pass in-container; prettier clean. Opening PR.
 ---
+
+---
+### [2026-06-17 15:05 UTC] — USER
+write a proper Checklist Rule Sets suite (~50 cases) covering the rule-set
+
+### [2026-06-17 15:12 UTC] — AGENT
+Added checklist-rule-sets.spec.ts — 61 cases covering rule-set CRUD, rule create/update (lower_snake_case key), severity/scope enums, DTOs, and the gating result. 61/61 pass in-container; prettier clean. Opening PR. (SOW updated-date request handled next.)
+---
