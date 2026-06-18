@@ -117,10 +117,22 @@ default to **monthly**.
 
 Add free-text **assumptions & notes** at the bottom to record context.
 
+### Supporting documents
+
+Use the **Supporting documents** card to attach and catalog files (proposals,
+contracts, diagrams, …): pick a file (≤ 10 MB), choose a **Document type** (from
+reference data), add an optional description, and **Upload**. Each file lists its
+type, size, and uploader, with **Download** and **Delete**. Uploading/deleting
+needs authoring rights, so a **GM/Viewer can download but not add or remove**;
+every upload and delete is recorded in the **Audit Log**.
+
 ## 7. Governance — workflow & smart checklist
 
-Each estimate moves through an approval **workflow** (e.g. Draft → In Review →
-Approved → Final → Archived):
+Each estimate moves through an approval **workflow** (Draft → In Review →
+Approved → Final → Archived). **The workflow stage is the estimate's single
+lifecycle indicator — there is no separate "status" field.** The current stage
+shows (read-only) in the editor header and as the **Stage** column on the list;
+you change it only here in the Governance panel.
 
 - The **Smart checklist** continuously validates completeness — a rate card is
   selected, labor lines have roles/quantities, cloud lines are complete, amounts and
@@ -128,17 +140,24 @@ Approved → Final → Archived):
 - **Blocking** checklist items **gate** forward transitions: you can't advance an
   estimate until they pass. Transition buttons are disabled (with a reason) when a
   gate blocks them or your role isn't allowed.
-- Every transition is recorded with actor and timestamp (history is shown).
+- Picking a transition lets you add a **note** before confirming — when a **GM
+  returns an estimate to Draft**, that reason is shown so the estimator knows what
+  to fix.
+- Every transition is recorded with actor, timestamp, from→to, and the note.
 
 ## 8. Find, export, and print
 
-- **Estimates** list supports **search** by name and filters; open any estimate to
-  edit it.
+- **Estimates** list supports **search** by name, **sortable columns** (click a
+  header), and a **rows-per-page** dropdown (10/20/25/40/50) — the same pagination
+  used across the SOW, Users, and Cloud Prices lists. Open any estimate to edit it.
 - **Export CSV** (editor header) downloads the line items, totals, and per-phase
   summary.
 - **Printable summary** (editor header) opens a clean, print-ready document — line
   tables, all totals, per-phase and per-category breakdowns, and assumptions — with
   a **Print** button.
+- _(Admin)_ **Admin → Audit Log** is a read-only, append-only trail of who changed
+  what and when (estimate edits, document uploads, user/role changes, workflow
+  transitions); filter by entity type, search, and page through it.
 
 ## 9. Dashboard
 

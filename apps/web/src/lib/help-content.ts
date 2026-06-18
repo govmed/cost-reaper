@@ -85,21 +85,26 @@ export const HELP_USE_CASES: UseCase[] = [
   },
   {
     id: 'find-estimates',
-    title: 'Find an estimate (search & filter)',
+    title: 'Find an estimate (search, sort & paginate)',
     category: 'Getting started',
     persona: 'Estimator / Viewer',
-    goal: 'Locate an existing estimate by name, status, or date.',
+    goal: 'Locate an existing estimate by name, then sort and page through the list.',
     featureIds: ['FR-9', 'FE-26'],
     route: '/',
-    keywords: ['search', 'filter', 'list', 'find', 'paginate', 'status'],
+    keywords: ['search', 'sort', 'list', 'find', 'paginate', 'rows per page', 'stage'],
     steps: [
       { text: 'Go to “Estimates” in the top navigation.' },
       { text: 'Type part of a name in the search box to filter the list as you type.' },
       {
-        text: 'Use the status / date controls to narrow further; page through results at the bottom.',
-        detail: 'Viewers only see estimates they are authorized to view.',
+        text: 'Click any column header (Name, Stage, Currency, Grand total, Updated) to sort; click again to reverse.',
+        detail:
+          'Use the “Rows per page” dropdown (10/20/25/40/50) and Prev/Next at the bottom to page through. The Stage column shows each estimate’s current workflow stage.',
       },
-      { text: 'Click an estimate’s name to open it in the editor.' },
+      {
+        text: 'Click an estimate’s name to open it in the editor.',
+        detail:
+          'Viewers see only estimates they are authorized to view; a GM sees only estimates In Review or Approved (their review queue).',
+      },
     ],
     related: ['create-estimate', 'dashboard-overview'],
   },
@@ -119,8 +124,16 @@ export const HELP_USE_CASES: UseCase[] = [
         detail:
           'Per-currency totals are converted to the base currency (USD) using the FX rates so a single figure is comparable.',
       },
-      { text: 'Scan “By workflow stage” to see how many estimates sit in each stage.' },
-      { text: 'Use “Recent activity” to jump back into estimates you touched lately.' },
+      {
+        text: 'Scan “By workflow stage” to see how many estimates sit in each stage; click a stage to drill into its estimates.',
+        detail:
+          'The workflow stage is the single source of truth for an estimate’s lifecycle (there is no separate “status”).',
+      },
+      {
+        text: 'Use “Recent activity” to jump back into estimates you touched lately.',
+        detail:
+          'A GM’s dashboard is scoped to their queue: the stage breakdown and totals cover only In Review / Approved, and Recent activity shows estimates the GM personally acted on.',
+      },
     ],
     related: ['find-estimates', 'manage-fx-rates'],
   },
@@ -362,7 +375,31 @@ export const HELP_USE_CASES: UseCase[] = [
       { text: 'Type an assumption and press Add — it’s timestamped and listed.' },
       { text: 'Repeat for each assumption; delete any that no longer apply.' },
     ],
-    related: ['comments-collab', 'baselines-versions'],
+    related: ['comments-collab', 'baselines-versions', 'upload-documents'],
+  },
+  {
+    id: 'upload-documents',
+    title: 'Attach supporting documents',
+    category: 'Building an estimate',
+    persona: 'Estimator',
+    goal: 'Upload and catalog supporting files (proposals, contracts, diagrams) on an estimate.',
+    featureIds: ['FR-29'],
+    route: '/',
+    keywords: ['document', 'upload', 'attachment', 'file', 'proposal', 'contract', 'supporting'],
+    steps: [
+      { text: 'Open the estimate and find the “Supporting documents” card.' },
+      {
+        text: 'Choose a file (≤ 10 MB), pick a Document type, add an optional description, then click “Upload”.',
+        detail:
+          'Document types come from reference data (Requirements/RFP, Contract/MSA, Statement of Work, …); an admin can add more under Reference Data.',
+      },
+      {
+        text: 'Each document is listed with its type, size, and who uploaded it — use “Download” to retrieve it or “Delete” to remove it.',
+        detail:
+          'Uploading/deleting requires the estimate.author permission, so a GM or Viewer can download documents but not add or remove them. Every upload and delete is recorded in the Audit Log.',
+      },
+    ],
+    related: ['record-assumptions', 'audit-log'],
   },
   {
     id: 'clone-estimate',
@@ -496,21 +533,38 @@ export const HELP_USE_CASES: UseCase[] = [
     id: 'approval-workflow',
     title: 'Move an estimate through the approval workflow',
     category: 'Governance & review',
-    persona: 'Estimator / Admin',
+    persona: 'Estimator / GM / Admin',
     goal: 'Transition an estimate between stages, gated by role and the checklist.',
     featureIds: ['FR-24', 'FE-43'],
     route: '/',
-    keywords: ['workflow', 'approval', 'review', 'stage', 'transition', 'submit', 'final'],
-    steps: [
-      { text: 'Open the “Approval workflow” panel — it shows the current stage.' },
-      {
-        text: 'Click an available transition (e.g. “Submit for review”).',
-        detail:
-          'A transition is disabled if your role isn’t permitted, or if a required smart-checklist BLOCKER is still failing.',
-      },
-      { text: 'Each transition is recorded in the history with who, when, and from→to.' },
+    keywords: [
+      'workflow',
+      'approval',
+      'review',
+      'stage',
+      'transition',
+      'submit',
+      'final',
+      'return to draft',
+      'gm',
     ],
-    related: ['smart-checklist', 'manage-reference-data'],
+    steps: [
+      {
+        text: 'Open the “Approval workflow” panel — it shows the current stage (the estimate’s single lifecycle indicator; there is no separate status).',
+        detail:
+          'An estimate is only editable in the Draft stage; once it moves to In Review / Approved / Final it is locked until returned to Draft.',
+      },
+      {
+        text: 'Click an available transition (e.g. “Submit for review”), add an optional note, then Confirm.',
+        detail:
+          'A transition is disabled if your role isn’t permitted, or if a required smart-checklist BLOCKER is still failing. Default gating: an Estimator submits Draft→In Review; a GM (or Admin) Approves or Returns to Draft.',
+      },
+      {
+        text: 'When a GM clicks “Return to draft”, they are prompted for a reason — that note appears in the history so the estimator knows what to fix.',
+        detail: 'Every transition is recorded with who, when, from→to, and the note.',
+      },
+    ],
+    related: ['smart-checklist', 'roles-permissions', 'manage-workflow'],
   },
   {
     id: 'baselines-versions',
@@ -653,11 +707,11 @@ export const HELP_USE_CASES: UseCase[] = [
   // ── Administration ───────────────────────────────────────────────────────────
   {
     id: 'roles-permissions',
-    title: 'Understand roles & permissions',
+    title: 'Understand & create roles and permissions',
     category: 'Administration',
-    persona: 'All users',
-    goal: 'See exactly what Admin, Estimator, and Viewer can and cannot do.',
-    featureIds: ['FR-2', 'FR-26', 'NFR-16'],
+    persona: 'Administrator',
+    goal: 'See what each role can do, and create custom roles with tailored permissions.',
+    featureIds: ['FR-2', 'FR-26', 'FR-30', 'NFR-16'],
     route: '/roles',
     keywords: [
       'roles',
@@ -665,23 +719,31 @@ export const HELP_USE_CASES: UseCase[] = [
       'rbac',
       'access',
       'admin',
+      'gm',
+      'general manager',
       'estimator',
       'viewer',
+      'custom role',
       'can',
       'cannot',
     ],
     steps: [
-      { text: 'Open “Roles” from the top navigation.' },
       {
-        text: 'Read the per-role summary cards (your current role is highlighted).',
+        text: 'Open “Roles” under the Governance menu (Admin only).',
+        detail:
+          'The four built-in roles are Admin (everything), GM/General Manager (review & approve estimates or return to draft — no authoring), Estimator (create/edit estimates), and Viewer (read/export).',
       },
       {
-        text: 'Scan the capability matrix — a ✓/✕ per capability for each role, grouped by area.',
+        text: 'Scan the capability matrix — a ✓/✕ per permission for each role, grouped by area.',
         detail:
           'Access is deny-by-default and enforced on the server, so the matrix reflects what each role is actually allowed to do.',
       },
+      {
+        text: 'Create a new role, then toggle exactly which permissions it grants (e.g. a “Reviewer” that can approve but not edit). Roles are data-driven — no code change or redeploy.',
+        detail: 'Role and permission changes are audited.',
+      },
     ],
-    related: ['manage-users', 'sign-in'],
+    related: ['manage-users', 'approval-workflow', 'audit-log'],
   },
   {
     id: 'manage-users',
@@ -693,16 +755,40 @@ export const HELP_USE_CASES: UseCase[] = [
     route: '/users',
     keywords: ['users', 'roles', 'admin', 'rbac', 'invite', 'deactivate', 'permissions'],
     steps: [
-      { text: 'Open “Users” (Admin only) from the top navigation.' },
+      { text: 'Open “Users” under the Admin menu (Admin only).' },
       {
-        text: 'Create a user with an email and a role: Admin, Estimator, or Viewer.',
-        detail: 'Access is deny-by-default and enforced server-side; role changes are audited.',
+        text: 'Create a user with an email and a role: Admin, GM, Estimator, Viewer, or any custom role you’ve defined.',
+        detail:
+          'A GM reviews/approves estimates but cannot author them. Access is deny-by-default and enforced server-side; role changes are audited.',
       },
       {
         text: 'Deactivate an account to revoke access without deleting history; reactivate when needed.',
       },
     ],
-    related: ['manage-rate-card', 'manage-reference-data'],
+    related: ['roles-permissions', 'audit-log', 'manage-reference-data'],
+  },
+  {
+    id: 'audit-log',
+    title: 'Review the audit log',
+    category: 'Administration',
+    persona: 'Administrator',
+    goal: 'See an immutable, read-only trail of who changed what and when.',
+    featureIds: ['FR-11', 'NFR-16'],
+    route: '/audit',
+    keywords: ['audit', 'trail', 'history', 'who', 'changed', 'compliance', 'log', 'security'],
+    steps: [
+      { text: 'Open “Audit Log” under the Admin menu (requires the audit.view permission).' },
+      {
+        text: 'Browse events newest-first; filter by entity type or search by entity/action, and page through with the rows-per-page control.',
+        detail:
+          'Each row shows the actor, action (CREATE / UPDATE / DELETE / UPLOAD / COMMENT / workflow transitions…), entity, and a UTC timestamp.',
+      },
+      {
+        text: 'The log is read-only and append-only — it cannot be edited or deleted, so it stands as the accountability record.',
+        detail: 'Document uploads/deletes, user & role changes, and estimate edits all land here.',
+      },
+    ],
+    related: ['manage-users', 'roles-permissions', 'upload-documents'],
   },
   {
     id: 'manage-rate-card',
@@ -732,9 +818,25 @@ export const HELP_USE_CASES: UseCase[] = [
     goal: 'Inspect the catalog and pull fresh provider prices on demand.',
     featureIds: ['FR-21a', 'FR-21b', 'FE-40'],
     route: '/cloud-prices',
-    keywords: ['cloud prices', 'catalog', 'refresh', 'sync', 'last pulled', 'aws', 'gcp', 'azure'],
+    keywords: [
+      'cloud prices',
+      'catalog',
+      'refresh',
+      'sync',
+      'last pulled',
+      'aws',
+      'gcp',
+      'azure',
+      'region',
+      'sort',
+    ],
     steps: [
-      { text: 'Open “Cloud prices” from the top navigation.' },
+      { text: 'Open “Cloud prices” under the Pricing menu.' },
+      {
+        text: 'Filter by provider/category or search, sort any column, and page through with the rows-per-page control.',
+        detail:
+          'The catalog covers AWS (incl. us-east-1 and us-west-2), GCP, Azure and SaaS; an estimate’s cloud line snapshots the unit price you pick.',
+      },
       {
         text: 'Review the per-provider “last pulled” dates (MM/DD/CCYY) to see how current each provider is.',
       },
@@ -758,14 +860,15 @@ export const HELP_USE_CASES: UseCase[] = [
       'reference data',
       'lookup',
       'phases',
-      'statuses',
+      'priorities',
+      'document types',
       'categories',
       'configurable',
       'no code',
     ],
     steps: [
-      { text: 'Open “Reference data” (Admin only) from the top navigation.' },
-      { text: 'Pick a reference type (e.g. SDLC Phase, Cost Category, Estimate Status).' },
+      { text: 'Open “Reference data” under the Admin menu (Admin only).' },
+      { text: 'Pick a reference type (e.g. SDLC Phase, Cost Category, Document Type, Priority).' },
       {
         text: 'Add a new value, rename a label, change display order, or deactivate one.',
         detail:
