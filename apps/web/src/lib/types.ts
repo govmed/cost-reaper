@@ -333,6 +333,77 @@ export interface ChecklistRuleSet {
 }
 
 // ── Checklist-rule authoring (FR-25, admin) ──────────────────────────────────
+
+export interface ChecklistRuleCatalogEntry {
+  key: string;
+  description: string;
+  severity: string;
+  scope: string;
+}
+/**
+ * The built-in checklist rules the engine knows how to evaluate (FR-25). The
+ * Rules editor offers these **by description** so an admin picks a real check
+ * instead of typing an unknown rule key. Mirrors the seeded built-ins; a rule
+ * key not in this catalog is an "advisory" rule (no built-in check).
+ */
+export const CHECKLIST_RULE_CATALOG: ChecklistRuleCatalogEntry[] = [
+  {
+    key: 'rate_card_selected',
+    description: 'A rate card is selected for the estimate',
+    severity: 'BLOCKER',
+    scope: 'ESTIMATE',
+  },
+  {
+    key: 'labor_role_assigned',
+    description: 'Every labor line has a role/resource assigned with quantity and units',
+    severity: 'BLOCKER',
+    scope: 'LABOR',
+  },
+  {
+    key: 'cloud_line_complete',
+    description:
+      'Every cloud line has provider, region, instance, usage and a snapshotted unit price',
+    severity: 'BLOCKER',
+    scope: 'CLOUD',
+  },
+  {
+    key: 'nonlabor_amount_period',
+    description: 'Every non-labor line has an amount and a billing period',
+    severity: 'BLOCKER',
+    scope: 'NONLABOR',
+  },
+  {
+    key: 'billing_period_set',
+    description: 'No recurring line is missing a billing period',
+    severity: 'BLOCKER',
+    scope: 'ESTIMATE',
+  },
+  {
+    key: 'resource_capacity',
+    description: 'No resource is allocated over 100% on any date',
+    severity: 'BLOCKER',
+    scope: 'RESOURCE',
+  },
+  {
+    key: 'upcharge_set',
+    description: 'An upcharge percentage is set (or explicitly zero)',
+    severity: 'WARNING',
+    scope: 'ESTIMATE',
+  },
+  {
+    key: 'contingency_set',
+    description: 'A contingency percentage is set (or explicitly zero)',
+    severity: 'WARNING',
+    scope: 'ESTIMATE',
+  },
+  {
+    key: 'totals_reconcile',
+    description: 'One-time, monthly and yearly totals reconcile',
+    severity: 'INFO',
+    scope: 'ESTIMATE',
+  },
+];
+
 export interface ChecklistRuleAdmin {
   id: string;
   key: string;
