@@ -13,6 +13,7 @@ import { RolesGuard } from './common/guards/roles.guard';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 import { HealthModule } from './modules/health/health.module';
 import { RolesModule } from './modules/roles/roles.module';
+import { DocumentsModule } from './modules/documents/documents.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RateCardsModule } from './modules/rate-cards/rate-cards.module';
@@ -41,6 +42,7 @@ import { FxModule } from './modules/fx/fx.module';
     DashboardModule,
     FxModule,
     RolesModule,
+    DocumentsModule,
   ],
   providers: [
     // Auth runs first (authenticate), then RBAC (authorize) — deny-by-default (NFR-16).

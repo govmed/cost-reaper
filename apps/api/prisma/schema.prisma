@@ -100,8 +100,30 @@ model User {
   workflowDefs     WorkflowDefinition[]
   transitionEvents WorkflowTransitionEvent[]
   auditEvents      AuditEvent[]
+  uploadedDocuments EstimateDocument[]
 
   @@map("users")
+}
+
+/// Supporting documents attached to an estimate (FR-29 doc types). File bytes are
+/// stored in-DB (bytea); the document_type is validated against DOCUMENT_TYPE.
+model EstimateDocument {
+  id           String   @id @default(uuid()) @db.Uuid
+  estimateId   String   @map("estimate_id") @db.Uuid
+  estimate     Estimate @relation(fields: [estimateId], references: [id], onDelete: Cascade)
+  fileName     String   @map("file_name")
+  /// Reference code from DOCUMENT_TYPE (FR-29); shown by display name in the UI.
+  documentType String   @map("document_type")
+  description  String?
+  contentType  String   @map("content_type")
+  sizeBytes    Int      @map("size_bytes")
+  content      Bytes
+  uploadedById String?  @map("uploaded_by_id") @db.Uuid
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  @@index([estimateId])
+  @@map("estimate_documents")
 }
 
 // ─── Reference data: rate cards (FR-3) ───────────────────────────────────────
@@ -191,6 +213,7 @@ model Estimate {
   assumptions       Assumption[]
   comments          Comment[]
   baselines         Baseline[]
+  documents         EstimateDocument[]
   transitionEvents  WorkflowTransitionEvent[]
   statementsOfWork  StatementOfWork[]
 

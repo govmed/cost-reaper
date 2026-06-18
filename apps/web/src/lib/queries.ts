@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from './api';
+import { api, uploadDocument } from './api';
 import type {
   AuditEvent,
   Baseline,
+  EstimateDocument,
   ChecklistResult,
   ChecklistRuleAdmin,
   ChecklistRuleSet,
@@ -287,6 +288,31 @@ export function useCloudPrices() {
 
 export function useUsers() {
   return useQuery({ queryKey: ['users'], queryFn: () => api<UserDto[]>('/users') });
+}
+
+// ── Estimate supporting documents (FR-29) ───────────────────────────────────
+export function useEstimateDocuments(id: string | undefined) {
+  return useQuery({
+    queryKey: ['documents', id],
+    queryFn: () => api<EstimateDocument[]>(`/estimates/${id}/documents`),
+    enabled: !!id,
+  });
+}
+export function useDocumentMutations(estimateId: string) {
+  const qc = useQueryClient();
+  const onSuccess = () => void qc.invalidateQueries({ queryKey: ['documents', estimateId] });
+  return {
+    upload: useMutation({
+      mutationFn: (v: { file: File; documentType: string; description: string }) =>
+        uploadDocument(estimateId, v.file, v.documentType, v.description),
+      onSuccess,
+    }),
+    remove: useMutation({
+      mutationFn: (docId: string) =>
+        api(`/estimates/${estimateId}/documents/${docId}`, { method: 'DELETE' }),
+      onSuccess,
+    }),
+  };
 }
 
 // ── Audit trail (FR-11) — read-only ─────────────────────────────────────────

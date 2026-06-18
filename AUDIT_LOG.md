@@ -908,3 +908,15 @@ When creating rules the Rule needs to be a dropdown (user doesn't know the rule_
 ### [2026-06-17 14:15 UTC] — AGENT
 Made the checklist-rule create field a dropdown of built-in rules by description (CHECKLIST_RULE_CATALOG, 9 engine built-ins), auto-filling key/description/severity/scope; kept a "Custom advisory rule" escape hatch. Built-ins not already in the set are offered. Prettier clean; PR opening. (Rule-sets test cases addressed separately.)
 ---
+
+---
+### [2026-06-17 14:35 UTC] — USER
+In the Estimates Card add a card to allow a user to upload supporting documents and catalog them. Add a reference data set of document types. In the dropdown show the Description.
+
+### [2026-06-17 14:55 UTC] — AGENT
+Added a Supporting Documents card to the estimate editor with upload + catalog by DOCUMENT_TYPE.
+**Actions taken:**
+- EstimateDocument model (bytea storage) + migration; expanded DOCUMENT_TYPE reference seed to 16 values; documents module (multipart upload ≤10MB, list, download, delete; estimate.author gated; type validated via ReferenceService).
+- EstimateDocumentDto/MAX_DOCUMENT_BYTES types; web Supporting-documents card (table + upload form with a document-type dropdown showing the display name) + api/query hooks; uploads audited.
+- documents.spec.ts (6); api tsc + spec pass in-container; prettier clean. Opening PR.
+---
