@@ -888,3 +888,15 @@ In the Statement of Work Card - columns should be sortable
 ### [2026-06-17 13:10 UTC] — AGENT
 Added client-side sortable columns to the SOW list (Number/Title/Estimate/Client/Status) — clickable headers with ▲/▼, default = API order (most recent first). Mirrors the Rate Cards sort idiom. Prettier clean; opening PR (web tsc/e2e via CI).
 ---
+
+---
+### [2026-06-17 13:30 UTC] — USER
+In the Admin menu, add a new menu item to select and see the immutable audit file (read-only) in a user-friendly way.
+
+### [2026-06-17 13:45 UTC] — AGENT
+Added an Admin → Audit Log read-only viewer (FR-11).
+**Actions taken:**
+- New `audit.view` permission; read-only `GET /audit` + `/audit/entity-types` on the global AuditModule; `AuditService.list()` (paginated, actor email, q + entityType filters).
+- AuditEventDto/AuditListQuery types; web AuditPage (table + action badges + search/entity-type filter + Prev/Next pagination); nav item Admin → Audit Log + route.
+- audit.spec.ts (16); api tsc + 52 specs pass in-container; prettier clean. Opening PR.
+---

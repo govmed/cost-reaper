@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from './api';
 import type {
+  AuditEvent,
   Baseline,
   ChecklistResult,
   ChecklistRuleAdmin,
@@ -286,6 +287,31 @@ export function useCloudPrices() {
 
 export function useUsers() {
   return useQuery({ queryKey: ['users'], queryFn: () => api<UserDto[]>('/users') });
+}
+
+// ── Audit trail (FR-11) — read-only ─────────────────────────────────────────
+export function useAudit(params: {
+  q?: string;
+  entityType?: string;
+  page: number;
+  pageSize: number;
+}) {
+  const qs = new URLSearchParams();
+  if (params.q) qs.set('q', params.q);
+  if (params.entityType) qs.set('entityType', params.entityType);
+  qs.set('page', String(params.page));
+  qs.set('pageSize', String(params.pageSize));
+  return useQuery({
+    queryKey: ['audit', params],
+    queryFn: () => api<Paginated<AuditEvent>>(`/audit?${qs.toString()}`),
+  });
+}
+export function useAuditEntityTypes() {
+  return useQuery({
+    queryKey: ['audit-entity-types'],
+    queryFn: () => api<string[]>('/audit/entity-types'),
+    staleTime: 5 * 60 * 1000,
+  });
 }
 
 // ── Roles & permissions (FR-30) ─────────────────────────────────────────────

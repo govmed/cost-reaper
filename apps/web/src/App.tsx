@@ -23,6 +23,7 @@ import SowEditorPage from './pages/SowEditorPage';
 import SowPrintPage from './pages/SowPrintPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import RolesPage from './pages/RolesPage';
+import AuditPage from './pages/AuditPage';
 import UserGuidePage from './pages/UserGuidePage';
 import EstimationGuidePage from './pages/EstimationGuidePage';
 
@@ -60,6 +61,7 @@ const NAV: NavEntry[] = [
     items: [
       { to: '/users', label: 'Users', admin: true },
       { to: '/reference-data', label: 'Reference Data', admin: true },
+      { to: '/audit', label: 'Audit Log', admin: true },
     ],
   },
   {
@@ -305,6 +307,14 @@ export default function App() {
             element={
               <Protected>
                 <HelpPage />
+              </Protected>
+            }
+          />
+          <Route
+            path="/audit"
+            element={
+              <Protected>
+                <AuditPage />
               </Protected>
             }
           />
