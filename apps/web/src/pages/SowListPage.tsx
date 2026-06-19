@@ -5,7 +5,7 @@ import { useSows, useCreateSow, useSowMutations, useEligibleEstimates } from '..
 import { usePagedSort } from '../lib/usePagedSort';
 import { Pagination } from '../components/Pagination';
 import { SortableTh } from '../components/SortableTh';
-import type { SowSummary } from '../lib/types';
+import { SOW_FLAVORS, type SowSummary } from '../lib/types';
 
 /** Statements of Work (BR-7) — list + create from an *approved* estimate. */
 export default function SowListPage() {
@@ -16,13 +16,16 @@ export default function SowListPage() {
   const { data: eligible } = useEligibleEstimates();
   const create = useCreateSow();
   const [estimateId, setEstimateId] = useState('');
+  const [flavor, setFlavor] = useState('ENTERPRISE');
   // Client-side sort + pagination (the list loads all SOWs); newest first.
   const grid = usePagedSort(data ?? [], { initialSort: 'updatedAt', initialDir: 'desc' });
 
   function add() {
     if (!estimateId) return;
-    create.mutate({ estimateId }, { onSuccess: (sow) => navigate(`/sow/${sow.id}`) });
+    create.mutate({ estimateId, flavor }, { onSuccess: (sow) => navigate(`/sow/${sow.id}`) });
   }
+
+  const flavorDesc = SOW_FLAVORS.find((f) => f.key === flavor)?.description;
 
   const hasEligible = (eligible?.length ?? 0) > 0;
 
@@ -40,32 +43,47 @@ export default function SowListPage() {
 
       {canEdit &&
         (hasEligible ? (
-          <div className="flex flex-wrap gap-2 items-center bg-white border border-slate-200 rounded-xl p-3">
-            <select
-              value={estimateId}
-              onChange={(e) => setEstimateId(e.target.value)}
-              className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64"
-              title="Source estimate"
-            >
-              <option value="">Select an approved estimate…</option>
-              {eligible?.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name} · {e.stageLabel}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={add}
-              disabled={!estimateId || create.isPending}
-              className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
-            >
-              New SOW from estimate
-            </button>
-            {create.error && (
-              <span className="text-rose-700 text-sm" role="alert">
-                {(create.error as Error).message}
-              </span>
-            )}
+          <div className="bg-white border border-slate-200 rounded-xl p-3 space-y-2">
+            <div className="flex flex-wrap gap-2 items-center">
+              <select
+                value={estimateId}
+                onChange={(e) => setEstimateId(e.target.value)}
+                className="border border-slate-300 rounded px-2 py-1 text-sm min-w-64"
+                title="Source estimate"
+              >
+                <option value="">Select an approved estimate…</option>
+                {eligible?.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name} · {e.stageLabel}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={flavor}
+                onChange={(e) => setFlavor(e.target.value)}
+                className="border border-slate-300 rounded px-2 py-1 text-sm"
+                title="Template style"
+              >
+                {SOW_FLAVORS.map((f) => (
+                  <option key={f.key} value={f.key}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={add}
+                disabled={!estimateId || create.isPending}
+                className="bg-slate-800 text-white rounded px-3 py-1 text-sm disabled:opacity-50"
+              >
+                New SOW from estimate
+              </button>
+              {create.error && (
+                <span className="text-rose-700 text-sm" role="alert">
+                  {(create.error as Error).message}
+                </span>
+              )}
+            </div>
+            {flavorDesc && <p className="text-xs text-slate-500">{flavorDesc}</p>}
           </div>
         ) : (
           <div className="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 text-sm">

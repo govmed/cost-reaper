@@ -113,6 +113,105 @@ const DEFAULT_CHANGE_CONTROL =
   'schedule estimate, risk assessment, Client review, approval or rejection, baseline update, and ' +
   'implementation tracking. No out-of-scope work begins until the change is approved by both parties.';
 
+/**
+ * SOW template flavors (BR-7). The ENTERPRISE base uses the defaults above; each
+ * other flavor overrides only the sections whose tone/content meaningfully differs
+ * for that style. See docs/templates/sow-flavors/ for the full reference styles.
+ */
+type SowBoilerplate = {
+  executiveSummary: string;
+  customerUnderstanding: string;
+  scope: string;
+  outOfScope: string;
+  solutionOverview: string;
+  deliverables: string;
+  timeline: string;
+  paymentTerms: string;
+  governanceModel: string;
+  rolesResponsibilities: string;
+  nonFunctionalRequirements: string;
+  testingStrategy: string;
+  maintenanceSupport: string;
+  risksMitigation: string;
+  acceptanceCriteria: string;
+  changeControl: string;
+  termsAndConditions: string;
+};
+
+function flavorBoilerplate(flavor: string): SowBoilerplate {
+  const base: SowBoilerplate = {
+    executiveSummary: DEFAULT_EXECUTIVE_SUMMARY,
+    customerUnderstanding: DEFAULT_CUSTOMER_UNDERSTANDING,
+    scope: DEFAULT_SCOPE,
+    outOfScope: DEFAULT_OUT_OF_SCOPE,
+    solutionOverview: DEFAULT_SOLUTION_OVERVIEW,
+    deliverables: DEFAULT_DELIVERABLES,
+    timeline: DEFAULT_TIMELINE,
+    paymentTerms: DEFAULT_PAYMENT_TERMS,
+    governanceModel: DEFAULT_GOVERNANCE,
+    rolesResponsibilities: DEFAULT_ROLES,
+    nonFunctionalRequirements: DEFAULT_NFRS,
+    testingStrategy: DEFAULT_TESTING,
+    maintenanceSupport: DEFAULT_MAINTENANCE,
+    risksMitigation: DEFAULT_RISKS,
+    acceptanceCriteria: DEFAULT_ACCEPTANCE,
+    changeControl: DEFAULT_CHANGE_CONTROL,
+    termsAndConditions: DEFAULT_TERMS,
+  };
+  const overrides: Record<string, Partial<SowBoilerplate>> = {
+    ENTERPRISE: {},
+    CONCISE: {
+      paymentTerms: '50% on signature and 50% on acceptance, invoiced electronically, net 15 days.',
+      acceptanceCriteria:
+        'A deliverable is accepted on written approval, or 5 business days after delivery if no ' +
+        'issues are raised.',
+      changeControl:
+        'Out-of-scope work is handled by a brief written change note agreed by both parties before ' +
+        'it begins.',
+      termsAndConditions:
+        'Governed by the parties’ existing Master Services Agreement; this SOW states only the ' +
+        'work, schedule, and fees.',
+    },
+    PROPOSAL: {
+      solutionOverview:
+        'The Provider will deliver and configure the solution as a hosted subscription, completed in ' +
+        'collaboration with the Client team. Final scope and related fees are confirmed at kickoff ' +
+        'and approved by both parties before the Order Form is executed.',
+      deliverables:
+        'Deployment: provisioned environment, security and SSO (SAML 2.0), and branding.\n' +
+        'Configuration: solution set up to the agreed use cases.\n' +
+        'Training & documentation: admin, end-user, and train-the-trainer sessions plus guides.\n' +
+        'Support: ticketing access, onboarding guide, and support SLAs.',
+      paymentTerms:
+        'Subscription fees are billed annually in advance; one-time implementation is invoiced 50% ' +
+        'at kickoff and 50% at go-live. All pricing is in the estimate’s currency, exclusive of taxes.',
+      termsAndConditions:
+        'Final scope and fees are confirmed in an Order Form. The solution may be purchased directly ' +
+        'or via a cloud marketplace private offer (AWS Marketplace / Microsoft Azure Marketplace), ' +
+        'applicable toward EDP/MACC commitments, with identical terms and simplified onboarding.',
+    },
+    TIME_MATERIALS: {
+      solutionOverview:
+        'This is a time-and-materials engagement delivered in iterative sprints. The Provider supplies ' +
+        'the roles in the pricing table at the stated rates; the Client directs priorities through a ' +
+        'shared backlog. Fees accrue against actual effort, capped at the not-to-exceed amount.',
+      scope:
+        'Scope is managed as a prioritized backlog and may evolve by mutual agreement within the ' +
+        'not-to-exceed ceiling. The initial backlog reflects the line items in the pricing section.',
+      paymentTerms:
+        'Time & materials, invoiced monthly in arrears for hours/days worked plus approved expenses, ' +
+        'net 30 days, capped at the not-to-exceed amount (the grand total / client price below).',
+      changeControl:
+        'Backlog re-prioritization within the ceiling needs no change order. Changes to rates, roles, ' +
+        'or the not-to-exceed amount are made by a written change note signed by both parties.',
+      acceptanceCriteria:
+        'Increments are reviewed at each sprint review and accepted on Client sign-off, or 5 business ' +
+        'days after the demo if no issues are raised.',
+    },
+  };
+  return { ...base, ...(overrides[flavor] ?? {}) };
+}
+
 @Injectable()
 export class SowService {
   constructor(
@@ -132,6 +231,7 @@ export class SowService {
       estimateName: detail.name,
       title: sow.title,
       status: sow.status as StatementOfWorkDto['status'],
+      flavor: sow.templateFlavor as StatementOfWorkDto['flavor'],
       clientName: sow.clientName,
       providerName: sow.providerName,
       executiveSummary: sow.executiveSummary,
@@ -260,32 +360,35 @@ export class SowService {
     const assumptionsText = (detail.assumptions ?? [])
       .map((a: { text: string }) => `• ${a.text}`)
       .join('\n');
+    const flavor = dto.flavor ?? 'ENTERPRISE';
+    const bp = flavorBoilerplate(flavor);
     const sow = await this.prisma.statementOfWork.create({
       data: {
         estimateId: dto.estimateId,
         number,
         title: dto.title ?? `Statement of Work — ${detail.name}`,
+        templateFlavor: flavor,
         clientName: dto.clientName ?? '',
         providerName: dto.providerName ?? '',
-        executiveSummary: DEFAULT_EXECUTIVE_SUMMARY,
-        customerUnderstanding: DEFAULT_CUSTOMER_UNDERSTANDING,
+        executiveSummary: bp.executiveSummary,
+        customerUnderstanding: bp.customerUnderstanding,
         overview: detail.description ?? '',
-        scope: DEFAULT_SCOPE,
-        outOfScope: DEFAULT_OUT_OF_SCOPE,
-        solutionOverview: DEFAULT_SOLUTION_OVERVIEW,
-        deliverables: DEFAULT_DELIVERABLES,
-        timeline: DEFAULT_TIMELINE,
-        paymentTerms: DEFAULT_PAYMENT_TERMS,
-        governanceModel: DEFAULT_GOVERNANCE,
-        rolesResponsibilities: DEFAULT_ROLES,
-        nonFunctionalRequirements: DEFAULT_NFRS,
-        testingStrategy: DEFAULT_TESTING,
-        maintenanceSupport: DEFAULT_MAINTENANCE,
+        scope: bp.scope,
+        outOfScope: bp.outOfScope,
+        solutionOverview: bp.solutionOverview,
+        deliverables: bp.deliverables,
+        timeline: bp.timeline,
+        paymentTerms: bp.paymentTerms,
+        governanceModel: bp.governanceModel,
+        rolesResponsibilities: bp.rolesResponsibilities,
+        nonFunctionalRequirements: bp.nonFunctionalRequirements,
+        testingStrategy: bp.testingStrategy,
+        maintenanceSupport: bp.maintenanceSupport,
         assumptions: assumptionsText,
-        risksMitigation: DEFAULT_RISKS,
-        acceptanceCriteria: DEFAULT_ACCEPTANCE,
-        changeControl: DEFAULT_CHANGE_CONTROL,
-        termsAndConditions: DEFAULT_TERMS,
+        risksMitigation: bp.risksMitigation,
+        acceptanceCriteria: bp.acceptanceCriteria,
+        changeControl: bp.changeControl,
+        termsAndConditions: bp.termsAndConditions,
         preparedByEmail: user.email,
       },
     });

@@ -513,6 +513,34 @@ export interface SowSummary {
   updatedAt: string;
   estimateUpdatedAt: string;
 }
+/** SOW template flavors (BR-7) — selectable at creation, shown in the print view. */
+export const SOW_FLAVORS: { key: string; label: string; description: string }[] = [
+  {
+    key: 'ENTERPRISE',
+    label: 'Enterprise (Fixed-Price)',
+    description: 'Comprehensive, milestone-billed, full terms — large clients / procurement.',
+  },
+  {
+    key: 'CONCISE',
+    label: 'Concise (SMB)',
+    description: 'Lean, fast sign-off — small or short engagements.',
+  },
+  {
+    key: 'PROPOSAL',
+    label: 'Proposal — Pricing & Implementation',
+    description: 'Subscription / implementation overview — SaaS deals & RFP responses.',
+  },
+  {
+    key: 'TIME_MATERIALS',
+    label: 'Time & Materials (Agile)',
+    description: 'Rate-card team, sprints, not-to-exceed — evolving scope.',
+  },
+];
+
+export function sowFlavorLabel(key: string): string {
+  return SOW_FLAVORS.find((f) => f.key === key)?.label ?? key;
+}
+
 export interface StatementOfWork {
   id: string;
   number: string;
@@ -520,6 +548,7 @@ export interface StatementOfWork {
   estimateName: string;
   title: string;
   status: string;
+  flavor: string;
   clientName: string;
   providerName: string;
   executiveSummary: string;

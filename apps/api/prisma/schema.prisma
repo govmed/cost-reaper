@@ -353,6 +353,7 @@ model StatementOfWork {
   number             String    @unique
   title              String
   status             String    @default("DRAFT")
+  templateFlavor     String    @default("ENTERPRISE") @map("template_flavor")
   clientName         String    @default("") @map("client_name")
   providerName       String    @default("") @map("provider_name")
   // Narrative sections (BR-7) — composed from the SOW template; tailored before issue.

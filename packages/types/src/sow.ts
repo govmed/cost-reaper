@@ -6,6 +6,34 @@ import { EngineResult } from './estimate';
 export const SowStatus = z.enum(['DRAFT', 'ISSUED']);
 export type SowStatus = z.infer<typeof SowStatus>;
 
+/** SOW template flavor (BR-7) — selects the boilerplate style at creation. */
+export const SowFlavor = z.enum(['ENTERPRISE', 'CONCISE', 'PROPOSAL', 'TIME_MATERIALS']);
+export type SowFlavor = z.infer<typeof SowFlavor>;
+
+/** Flavor catalog for the create picker (label + when to use). */
+export const SOW_FLAVORS: { key: SowFlavor; label: string; description: string }[] = [
+  {
+    key: 'ENTERPRISE',
+    label: 'Enterprise (Fixed-Price)',
+    description: 'Comprehensive, milestone-billed, full terms — large clients / procurement.',
+  },
+  {
+    key: 'CONCISE',
+    label: 'Concise (SMB)',
+    description: 'Lean, fast sign-off — small or short engagements.',
+  },
+  {
+    key: 'PROPOSAL',
+    label: 'Proposal — Pricing & Implementation',
+    description: 'Subscription / implementation overview — SaaS deals & RFP responses.',
+  },
+  {
+    key: 'TIME_MATERIALS',
+    label: 'Time & Materials (Agile)',
+    description: 'Rate-card team, sprints, not-to-exceed — evolving scope.',
+  },
+];
+
 /** One row of the estimate's cost detail, flattened for the SOW table (BR-7). */
 export const SowLineItemDto = z.object({
   kind: z.enum(['LABOR', 'NONLABOR', 'CLOUD']),
@@ -27,6 +55,7 @@ export const StatementOfWorkDto = z.object({
   estimateName: z.string(),
   title: z.string(),
   status: SowStatus,
+  flavor: SowFlavor,
   clientName: z.string(),
   providerName: z.string(),
   executiveSummary: z.string(),
@@ -80,6 +109,8 @@ export const CreateSowRequest = z.object({
   title: z.string().min(1).max(200).optional(),
   clientName: z.string().max(200).optional(),
   providerName: z.string().max(200).optional(),
+  /** Template style; defaults to ENTERPRISE when omitted. */
+  flavor: SowFlavor.optional(),
 });
 export type CreateSowRequest = z.infer<typeof CreateSowRequest>;
 
