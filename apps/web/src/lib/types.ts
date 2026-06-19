@@ -546,6 +546,17 @@ export interface StatementOfWork {
   preparedByEmail: string | null;
   currency: string;
   pricing: EngineResult;
+  lineItems: SowLineItem[];
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SowLineItem {
+  kind: 'LABOR' | 'NONLABOR' | 'CLOUD';
+  category: string;
+  item: string;
+  quantity: string;
+  unitPrice: string;
+  billingPeriod: string;
+  lineTotal: string;
 }

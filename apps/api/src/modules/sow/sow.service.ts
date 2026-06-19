@@ -158,9 +158,47 @@ export class SowService {
       preparedByEmail: sow.preparedByEmail,
       currency: useSnapshot ? (sow.currencySnapshot ?? detail.currency) : detail.currency,
       pricing: useSnapshot ? (sow.totalsSnapshot as StatementOfWorkDto['pricing']) : detail.totals,
+      // Line items: an issued SOW uses its snapshot (older issued SOWs that predate
+      // the snapshot fall back to the live estimate).
+      lineItems:
+        useSnapshot && sow.lineItemsSnapshot
+          ? (sow.lineItemsSnapshot as unknown as StatementOfWorkDto['lineItems'])
+          : this.buildLineItems(detail),
       createdAt: sow.createdAt.toISOString(),
       updatedAt: sow.updatedAt.toISOString(),
     };
+  }
+
+  /** Flatten an estimate's labor / non-labor / cloud lines into SOW table rows. */
+  private buildLineItems(detail: any): StatementOfWorkDto['lineItems'] {
+    const labor = (detail.laborItems ?? []).map((l: any) => ({
+      kind: 'LABOR' as const,
+      category: 'Labor',
+      item: [l.roleName, l.resourceName].filter(Boolean).join(' · ') || 'Labor',
+      quantity: `${l.quantity} × ${l.units}`,
+      unitPrice: l.rateSnapshot,
+      billingPeriod: l.billingPeriod,
+      lineTotal: l.lineTotal,
+    }));
+    const nonLabor = (detail.nonLaborItems ?? []).map((n: any) => ({
+      kind: 'NONLABOR' as const,
+      category: n.category,
+      item: n.description || n.category,
+      quantity: String(n.periods ?? 1),
+      unitPrice: n.amount,
+      billingPeriod: n.billingPeriod,
+      lineTotal: n.lineTotal,
+    }));
+    const cloud = (detail.cloudItems ?? []).map((c: any) => ({
+      kind: 'CLOUD' as const,
+      category: `${c.provider} ${c.service}`.trim(),
+      item: `${c.skuOrInstance} (${c.region})`,
+      quantity: String(c.quantity),
+      unitPrice: c.unitPriceSnapshot,
+      billingPeriod: c.billingPeriod,
+      lineTotal: c.lineTotal,
+    }));
+    return [...labor, ...nonLabor, ...cloud];
   }
 
   async list(): Promise<SowSummaryDto[]> {
@@ -311,6 +349,7 @@ export class SowService {
         status: 'ISSUED',
         issuedAt: new Date(),
         totalsSnapshot: detail.totals as Prisma.InputJsonValue,
+        lineItemsSnapshot: this.buildLineItems(detail) as unknown as Prisma.InputJsonValue,
         currencySnapshot: detail.currency,
       },
     });
