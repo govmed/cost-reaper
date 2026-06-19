@@ -809,3 +809,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-19 — SOW: full per-line-item table, snapshotted on issue (BR-7)
 - **Action:** Follow-up to the SOW estimate table. Added `SowLineItemDto` (kind/category/item/quantity/unitPrice/billingPeriod/lineTotal) + `lineItems` on `StatementOfWorkDto`. sow.service `buildLineItems()` flattens the estimate's labor/non-labor/cloud lines; draft SOWs build live, issued SOWs use a new `lineItemsSnapshot` JSON column (migration `20260619120000_sow_line_items_snapshot`) captured in `issue()`. SOW print §9 now shows an "Estimate detail (line items)" table above the by-category breakdown and totals. Older issued SOWs (no snapshot) fall back to live.
 - **Result:** api tsc + 797 tests; web tsc/eslint/format; migration applied + live-verified (SOW returns line items). PR next.
+
+### 2026-06-19 — Docs: store example SOW PDFs for reference (BR-7)
+- **Action:** User supplied two real-world SOW/pricing PDFs; stored under `docs/examples/sow/` (SOW-NAVIANT-ONBASE.pdf ~7.9MB; KMS-Lighthouse-Gainwell-Pricing-and-Implementation-Overview-2025-04-21.pdf ~0.9MB) + a README describing them as confidential reference material informing the SOW feature/template.
+- **Result:** prettier clean. PR next.
