@@ -597,8 +597,12 @@ export function useSow(id: string | undefined) {
 export function useCreateSow() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: { estimateId: string; title?: string; clientName?: string }) =>
-      api<StatementOfWork>('/sow', { method: 'POST', body: JSON.stringify(body) }),
+    mutationFn: (body: {
+      estimateId: string;
+      title?: string;
+      clientName?: string;
+      flavor?: string;
+    }) => api<StatementOfWork>('/sow', { method: 'POST', body: JSON.stringify(body) }),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['sow'] }),
   });
 }

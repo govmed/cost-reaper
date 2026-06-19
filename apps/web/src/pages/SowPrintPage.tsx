@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useSow } from '../lib/queries';
+import { sowFlavorLabel } from '../lib/types';
 import { formatMoney } from '../lib/money';
 
 /** Official, print-ready Statement of Work — "Save as PDF" via the browser (BR-7). */
@@ -33,7 +34,8 @@ export default function SowPrintPage() {
         <h1 className="text-2xl font-bold uppercase tracking-wide">Statement of Work</h1>
         <p className="text-base font-medium mt-1">{sow.title}</p>
         <p className="text-xs text-slate-500 mt-1">
-          {sow.number} · {sow.status === 'ISSUED' ? 'Issued' : 'Draft'}
+          {sow.number} · {sow.status === 'ISSUED' ? 'Issued' : 'Draft'} ·{' '}
+          {sowFlavorLabel(sow.flavor)}
           {sow.effectiveDate ? ` · Effective ${sow.effectiveDate}` : ''}
           {sow.issuedAt ? ` · Issued ${sow.issuedAt.slice(0, 10)}` : ''}
         </p>
