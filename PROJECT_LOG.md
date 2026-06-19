@@ -813,3 +813,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-19 — Docs: store example SOW PDFs for reference (BR-7)
 - **Action:** User supplied two real-world SOW/pricing PDFs; stored under `docs/examples/sow/` (SOW-NAVIANT-ONBASE.pdf ~7.9MB; KMS-Lighthouse-Gainwell-Pricing-and-Implementation-Overview-2025-04-21.pdf ~0.9MB) + a README describing them as confidential reference material informing the SOW feature/template.
 - **Result:** prettier clean. PR next.
+
+### 2026-06-19 — SOW: author multiple template flavors mined from examples (BR-7)
+- **Action:** Mined the example SOWs (KMS text-extracted via pdfminer; NAVIANT is a scanned/image PDF — no text layer). Authored 4 distinct SOW template flavors in `docs/templates/sow-flavors/` (.md + pandoc .docx) + an index README: (1) Enterprise Fixed-Price (full legal + RACI + milestone schedule + signatures), (2) Concise SMB (lean 1–2pp), (3) Proposal — Pricing & Implementation Overview (KMS-style: intro, impl details, timeline gantt, RACI, project team, subscription tiers + optional modules + impl fee, marketplace purchasing), (4) Time & Materials / Agile (rate-card team, sprints, not-to-exceed). All use `{{MERGE_FIELD}}` placeholders that map to Kerdos estimate data (line items, by-category, per-phase milestones, one-time/monthly/yearly totals). README documents which flavor fits which deal + a note about a future in-app flavor picker.
+- **Result:** prettier/format:check clean; docx rendered. PR next. (Future enhancement: in-app flavor selector at SOW creation.)
