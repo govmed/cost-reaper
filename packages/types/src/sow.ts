@@ -6,6 +6,18 @@ import { EngineResult } from './estimate';
 export const SowStatus = z.enum(['DRAFT', 'ISSUED']);
 export type SowStatus = z.infer<typeof SowStatus>;
 
+/** One row of the estimate's cost detail, flattened for the SOW table (BR-7). */
+export const SowLineItemDto = z.object({
+  kind: z.enum(['LABOR', 'NONLABOR', 'CLOUD']),
+  category: z.string(),
+  item: z.string(),
+  quantity: z.string(),
+  unitPrice: z.string(),
+  billingPeriod: z.string(),
+  lineTotal: z.string(),
+});
+export type SowLineItemDto = z.infer<typeof SowLineItemDto>;
+
 /** Full SOW, including the pricing (live for a draft, snapshotted once issued). */
 export const StatementOfWorkDto = z.object({
   id: z.string().uuid(),
@@ -41,6 +53,8 @@ export const StatementOfWorkDto = z.object({
   preparedByEmail: z.string().nullable(),
   currency: z.string(),
   pricing: EngineResult,
+  /** The estimate's line items (live for a draft, snapshotted once issued). */
+  lineItems: z.array(SowLineItemDto),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

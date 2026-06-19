@@ -97,6 +97,37 @@ export default function SowPrintPage() {
         <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
           9. Pricing
         </h2>
+        {sow.lineItems.length > 0 && (
+          <>
+            <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
+              Estimate detail (line items)
+            </p>
+            <table className="w-full text-sm mb-4">
+              <thead>
+                <tr className="text-slate-500 text-left border-b border-slate-300">
+                  <th className="py-1">Item</th>
+                  <th className="py-1">Category</th>
+                  <th className="py-1 text-right">Qty</th>
+                  <th className="py-1 text-right">Rate / amount</th>
+                  <th className="py-1">Billing</th>
+                  <th className="py-1 text-right">Line total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sow.lineItems.map((li, i) => (
+                  <tr key={i} className="border-t border-slate-100">
+                    <td className="py-1">{li.item}</td>
+                    <td className="py-1 text-slate-500">{li.category}</td>
+                    <td className="py-1 text-right tabular-nums">{li.quantity}</td>
+                    <td className="py-1 text-right tabular-nums">{money(li.unitPrice)}</td>
+                    <td className="py-1 text-slate-500">{li.billingPeriod.toLowerCase()}</td>
+                    <td className="py-1 text-right tabular-nums">{money(li.lineTotal)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
         {p.categories.length > 0 && (
           <>
             <p className="text-xs font-medium text-slate-500 mt-2 mb-1">

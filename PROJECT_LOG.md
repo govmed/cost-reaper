@@ -805,3 +805,7 @@ We are building **cost-reaper**, a production web app that estimates technology-
 ### 2026-06-17 — SOW: embed the estimate cost breakdown as a professional table (BR-7)
 - **Action:** Item 2 of 2. Added a "Cost breakdown by category" table to the SOW §9 Pricing (one-time/monthly/yearly per category + subtotal), rendered from the snapshot `pricing.categories` so it's professional and immutable for issued SOWs (consistent with the existing per-phase milestone schedule + totals waterfall). Snapshot-safe: works for both draft (live) and issued (locked) SOWs.
 - **Result:** web tsc + eslint + format:check PASS. PR next. (Full per-line-item detail would require snapshotting line items onto the SOW — offered as a follow-up.)
+
+### 2026-06-19 — SOW: full per-line-item table, snapshotted on issue (BR-7)
+- **Action:** Follow-up to the SOW estimate table. Added `SowLineItemDto` (kind/category/item/quantity/unitPrice/billingPeriod/lineTotal) + `lineItems` on `StatementOfWorkDto`. sow.service `buildLineItems()` flattens the estimate's labor/non-labor/cloud lines; draft SOWs build live, issued SOWs use a new `lineItemsSnapshot` JSON column (migration `20260619120000_sow_line_items_snapshot`) captured in `issue()`. SOW print §9 now shows an "Estimate detail (line items)" table above the by-category breakdown and totals. Older issued SOWs (no snapshot) fall back to live.
+- **Result:** api tsc + 797 tests; web tsc/eslint/format; migration applied + live-verified (SOW returns line items). PR next.

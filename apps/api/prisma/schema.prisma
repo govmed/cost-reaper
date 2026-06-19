@@ -378,6 +378,7 @@ model StatementOfWork {
   effectiveDate      DateTime? @map("effective_date")
   issuedAt           DateTime? @map("issued_at")
   totalsSnapshot     Json?     @map("totals_snapshot")
+  lineItemsSnapshot  Json?     @map("line_items_snapshot")
   currencySnapshot   String?   @map("currency_snapshot")
   preparedByEmail    String?   @map("prepared_by_email")
   createdAt          DateTime  @default(now()) @map("created_at")
