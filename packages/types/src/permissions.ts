@@ -21,6 +21,7 @@ export const PERMISSION_KEYS = [
   'roles.manage',
   'users.manage',
   'audit.view',
+  'settings.manage',
 ] as const;
 
 export const PermissionKey = z.enum(PERMISSION_KEYS);
@@ -108,6 +109,12 @@ export const PERMISSIONS: PermissionMeta[] = [
     key: 'audit.view',
     label: 'View the audit log',
     description: 'Read the immutable audit trail of who changed what, and when.',
+    group: 'Administration',
+  },
+  {
+    key: 'settings.manage',
+    label: 'Manage app settings',
+    description: 'Change application configuration such as the document upload size limit.',
     group: 'Administration',
   },
 ];

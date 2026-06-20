@@ -17,5 +17,6 @@ export const EstimateDocumentDto = z.object({
 });
 export type EstimateDocumentDto = z.infer<typeof EstimateDocumentDto>;
 
-/** Max upload size for a supporting document (10 MB). */
-export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
+/** Absolute hard ceiling for a single document upload (100 MB). The effective
+ *  limit is admin-configurable up to this — see DOCUMENT_UPLOAD_MAX_MB. */
+export const MAX_DOCUMENT_BYTES = 100 * 1024 * 1024;

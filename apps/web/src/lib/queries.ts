@@ -633,3 +633,23 @@ export function useSowMutations(id: string) {
     }),
   };
 }
+
+// ── App settings (admin-configurable) ────────────────────────────────────────
+export function useDocumentUploadLimit() {
+  return useQuery({
+    queryKey: ['settings', 'doc-upload-limit'],
+    queryFn: () => api<{ maxUploadMb: number }>('/settings/document-upload-limit'),
+  });
+}
+
+export function useUpdateDocumentUploadLimit() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (maxUploadMb: number) =>
+      api<{ maxUploadMb: number }>('/settings/document-upload-limit', {
+        method: 'PUT',
+        body: JSON.stringify({ maxUploadMb }),
+      }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['settings'] }),
+  });
+}

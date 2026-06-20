@@ -12,3 +12,4 @@ export * from './reference';
 export * from './dashboard';
 export * from './fx';
 export * from './sow';
+export * from './settings';

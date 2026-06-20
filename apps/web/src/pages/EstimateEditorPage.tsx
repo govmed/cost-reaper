@@ -5,6 +5,7 @@ import {
   useChecklist,
   useCloudPrices,
   useDocumentMutations,
+  useDocumentUploadLimit,
   useEstimate,
   useEstimateDocuments,
   useEstimateMutations,
@@ -1634,6 +1635,8 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
   // editable (Draft); a locked (In Review / Approved / Final) estimate is read-only.
   const canEdit = canAuthorEstimates(user) && est.editable;
   const { data: docs } = useEstimateDocuments(est.id);
+  const { data: limit } = useDocumentUploadLimit();
+  const maxMb = limit?.maxUploadMb ?? 100;
   const m = useDocumentMutations(est.id);
   const types = useRefLabeler('DOCUMENT_TYPE');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -1641,9 +1644,10 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
   const [docType, setDocType] = useState('');
   const [description, setDescription] = useState('');
 
-  const canUpload = !!file && !!docType && !m.upload.isPending;
+  const tooBig = !!file && file.size > maxMb * 1024 * 1024;
+  const canUpload = !!file && !!docType && !tooBig && !m.upload.isPending;
   function upload() {
-    if (!file || !docType) return;
+    if (!file || !docType || tooBig) return;
     m.upload.mutate(
       { file, documentType: docType, description },
       {
@@ -1661,7 +1665,7 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
     <Section title="Supporting documents" id="sec-documents">
       <p className="text-xs text-slate-500 -mt-1">
         Attach and catalog supporting files (proposals, contracts, diagrams, …). Pick the document
-        type so each file is classified. Max 10&nbsp;MB per file.
+        type so each file is classified. Max {maxMb}&nbsp;MB per file.
       </p>
 
       <div className="overflow-x-auto">
@@ -1764,6 +1768,11 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
               {m.upload.isPending ? 'Uploading…' : 'Upload'}
             </button>
           </div>
+          {tooBig && (
+            <p className="text-rose-700 text-sm" role="alert">
+              That file exceeds the {maxMb} MB limit.
+            </p>
+          )}
           {m.upload.isError && (
             <p className="text-rose-700 text-sm" role="alert">
               {(m.upload.error as Error).message}

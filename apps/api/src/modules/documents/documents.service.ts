@@ -5,10 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { EstimateDocumentDto } from '@cost-reaper/types';
-import { MAX_DOCUMENT_BYTES } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import { ReferenceService } from '../reference/reference.service';
+import { SettingsService } from '../settings/settings.service';
 
 /** A multipart upload as populated by multer (memory storage). */
 export interface UploadedDoc {
@@ -28,6 +28,7 @@ export class DocumentsService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly reference: ReferenceService,
+    private readonly settings: SettingsService,
   ) {}
 
   private async ensureEstimate(estimateId: string): Promise<void> {
@@ -95,8 +96,9 @@ export class DocumentsService {
   ): Promise<EstimateDocumentDto[]> {
     await this.ensureEditable(estimateId);
     if (!file || !file.buffer?.length) throw new BadRequestException('A file is required');
-    if (file.size > MAX_DOCUMENT_BYTES) {
-      throw new BadRequestException('File exceeds the 10 MB limit');
+    const limitMb = await this.settings.getDocumentUploadLimitMb();
+    if (file.size > limitMb * 1024 * 1024) {
+      throw new BadRequestException(`File exceeds the ${limitMb} MB limit`);
     }
     if (!documentType) throw new BadRequestException('A document type is required');
     // Validate against the DOCUMENT_TYPE reference set (FR-29).
