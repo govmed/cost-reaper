@@ -208,8 +208,88 @@ function flavorBoilerplate(flavor: string): SowBoilerplate {
         'Increments are reviewed at each sprint review and accepted on Client sign-off, or 5 business ' +
         'days after the demo if no issues are raised.',
     },
+    IMPL_MAINTENANCE: {
+      solutionOverview:
+        'This SOW covers two connected phases: the implementation of the solution and its subsequent ' +
+        'maintenance and support once live. The work is delivered through discovery, design, build & ' +
+        'configure, test, deploy, a hypercare stabilization period, and ongoing maintenance.',
+      scope:
+        'In scope: discovery and requirements confirmation; solution design and architecture; build, ' +
+        'configuration, and customization; data migration; integrations; testing (unit, system, UAT ' +
+        'support); deployment to production; documentation and knowledge transfer; and post-go-live ' +
+        'maintenance and support (see the Maintenance & Support and SLA sections).',
+      deliverables:
+        'Deliverables include a requirements baseline (Discovery), a solution design document (Design), ' +
+        'the configured solution (Build), migrated and validated data (Deploy), tested integrations, ' +
+        'documentation and runbooks, and go-live — each accepted against its criteria.',
+      maintenanceSupport:
+        'Following go-live and the hypercare period, the Provider delivers ongoing maintenance: incident ' +
+        'management and break/fix, application of patches/updates and minor configuration changes, ' +
+        'proactive monitoring, root-cause analysis for recurring issues, and periodic service reporting. ' +
+        'Excluded: new features/enhancements (handled via Change Control), issues caused by client-side ' +
+        'changes or unsupported third-party software, and major version upgrades. Service levels and ' +
+        'support hours are defined in the SLA and Support sections.',
+      paymentTerms:
+        'Implementation is invoiced per the milestone schedule (e.g. 30% kickoff, 40% UAT sign-off, ' +
+        '30% go-live). Maintenance is billed on its recurring cadence (monthly/annual). All pricing is ' +
+        'in the estimate’s currency, exclusive of taxes; invoices are due net 30 days.',
+    },
   };
   return { ...base, ...(overrides[flavor] ?? {}) };
+}
+
+// ── Implementation & Maintenance structured defaults (BR-7) ───────────────────
+const DEFAULT_SLA_TIERS = [
+  {
+    priority: 'P1 – Critical',
+    definition: 'Service down / major business impact',
+    response: '15 minutes',
+    resolution: '4 hours',
+  },
+  {
+    priority: 'P2 – High',
+    definition: 'Significant degradation',
+    response: '1 hour',
+    resolution: '1 business day',
+  },
+  {
+    priority: 'P3 – Medium',
+    definition: 'Minor issue / workaround exists',
+    response: '4 hours',
+    resolution: '3 business days',
+  },
+  {
+    priority: 'P4 – Low',
+    definition: 'Request / query',
+    response: '1 business day',
+    resolution: 'Scheduled',
+  },
+];
+const DEFAULT_SUPPORT_TIERS = [
+  { tier: 'Standard', coverage: 'Business hours (8×5)', channel: 'Support portal / email' },
+  { tier: 'Extended (optional)', coverage: '24×7 / on-call', channel: 'Phone / portal' },
+];
+const DEFAULT_SECURITY_COMPLIANCE =
+  'Data is handled in accordance with applicable law and Client policy (e.g. GDPR / HIPAA). The ' +
+  'Provider maintains relevant certifications (e.g. ISO 27001 / SOC 2) where applicable. Access ' +
+  'follows least-privilege principles with credentials managed per policy. Data residency: as agreed.';
+
+/** Structured maintenance sections — populated only for the maintenance flavor. */
+function maintenanceDefaults(flavor: string): {
+  slaTiers: typeof DEFAULT_SLA_TIERS;
+  supportTiers: typeof DEFAULT_SUPPORT_TIERS;
+  warrantyDays: number | null;
+  securityCompliance: string;
+} {
+  if (flavor === 'IMPL_MAINTENANCE') {
+    return {
+      slaTiers: DEFAULT_SLA_TIERS,
+      supportTiers: DEFAULT_SUPPORT_TIERS,
+      warrantyDays: 90,
+      securityCompliance: DEFAULT_SECURITY_COMPLIANCE,
+    };
+  }
+  return { slaTiers: [], supportTiers: [], warrantyDays: null, securityCompliance: '' };
 }
 
 @Injectable()
@@ -264,6 +344,10 @@ export class SowService {
         useSnapshot && sow.lineItemsSnapshot
           ? (sow.lineItemsSnapshot as unknown as StatementOfWorkDto['lineItems'])
           : this.buildLineItems(detail),
+      slaTiers: (sow.slaTiers as unknown as StatementOfWorkDto['slaTiers']) ?? [],
+      supportTiers: (sow.supportTiers as unknown as StatementOfWorkDto['supportTiers']) ?? [],
+      warrantyDays: sow.warrantyDays ?? null,
+      securityCompliance: sow.securityCompliance ?? '',
       createdAt: sow.createdAt.toISOString(),
       updatedAt: sow.updatedAt.toISOString(),
     };
@@ -362,12 +446,17 @@ export class SowService {
       .join('\n');
     const flavor = dto.flavor ?? 'ENTERPRISE';
     const bp = flavorBoilerplate(flavor);
+    const md = maintenanceDefaults(flavor);
     const sow = await this.prisma.statementOfWork.create({
       data: {
         estimateId: dto.estimateId,
         number,
         title: dto.title ?? `Statement of Work — ${detail.name}`,
         templateFlavor: flavor,
+        slaTiers: md.slaTiers as unknown as Prisma.InputJsonValue,
+        supportTiers: md.supportTiers as unknown as Prisma.InputJsonValue,
+        warrantyDays: md.warrantyDays,
+        securityCompliance: md.securityCompliance,
         clientName: dto.clientName ?? '',
         providerName: dto.providerName ?? '',
         executiveSummary: bp.executiveSummary,
@@ -433,6 +522,16 @@ export class SowService {
         acceptanceCriteria: dto.acceptanceCriteria,
         changeControl: dto.changeControl,
         termsAndConditions: dto.termsAndConditions,
+        slaTiers:
+          dto.slaTiers === undefined
+            ? undefined
+            : (dto.slaTiers as unknown as Prisma.InputJsonValue),
+        supportTiers:
+          dto.supportTiers === undefined
+            ? undefined
+            : (dto.supportTiers as unknown as Prisma.InputJsonValue),
+        warrantyDays: dto.warrantyDays === undefined ? undefined : dto.warrantyDays,
+        securityCompliance: dto.securityCompliance,
         effectiveDate,
       },
     });
