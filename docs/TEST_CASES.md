@@ -4,7 +4,7 @@ A human-readable catalog of **every automated test case** in the project, derive
 directly from the test suites (`*.spec.ts` / `*.test.ts`). Each case is one `it()`
 assertion; suites are grouped by the card / area they exercise.
 
-**Total: 833 test cases across 33 suites.** All run in CI
+**Total: 883 test cases across 35 suites.** All run in CI
 (build → format → lint → typecheck → **test** → build) and must pass before merge;
 the Playwright suite additionally runs the full stack end-to-end.
 
@@ -15,7 +15,7 @@ the Playwright suite additionally runs the full stack end-to-end.
 
 | Area                                        | Source file                                                                  |   Cases |
 | ------------------------------------------- | ---------------------------------------------------------------------------- | ------: |
-| Audit log                                   | `apps/api/src/common/audit/audit.spec.ts`                                    |      16 |
+| Audit log                                   | `apps/api/src/common/audit/audit.spec.ts`                                    |      18 |
 | GM visibility scope (FR-2)                  | `apps/api/src/common/gm-scope.spec.ts`                                       |      13 |
 | RFC7807 problem+json                        | `apps/api/src/common/http/problem-details.spec.ts`                           |       2 |
 | Pagination (FR-9)                           | `apps/api/src/common/pagination.spec.ts`                                     |      42 |
@@ -40,6 +40,8 @@ the Playwright suite additionally runs the full stack end-to-end.
 | Rate cards card                             | `apps/api/src/modules/rate-cards/rate-card.spec.ts`                          |      52 |
 | Reference tree                              | `apps/api/src/modules/reference/reference-tree.spec.ts`                      |       3 |
 | Roles & permissions (FR-30)                 | `apps/api/src/modules/roles/roles-permissions.spec.ts`                       |      36 |
+| Settings — upload limit (FR-26)             | `apps/api/src/modules/settings/settings-card.spec.ts`                        |      24 |
+| SOW template flavors (BR-7)                 | `apps/api/src/modules/sow/sow-flavor.spec.ts`                                |      24 |
 | SOW milestone schedule                      | `apps/api/src/modules/sow/sow-milestones.spec.ts`                            |      14 |
 | Users & Roles (RBAC)                        | `apps/api/src/modules/users/users-rbac-card.spec.ts`                         |      52 |
 | Checklist rule sets card                    | `apps/api/src/modules/workflow/checklist-rule-sets.spec.ts`                  |      61 |
@@ -48,13 +50,13 @@ the Playwright suite additionally runs the full stack end-to-end.
 | smoke                                       | `apps/web/e2e/smoke.spec.ts`                                                 |      13 |
 | Estimation engine                           | `packages/engine/src/estimation-engine.test.ts`                              |      19 |
 | Resource capacity (FR-27)                   | `packages/engine/src/resource-capacity.test.ts`                              |       6 |
-| **Total**                                   |                                                                              | **833** |
+| **Total**                                   |                                                                              | **883** |
 
 ---
 
 ## Audit log
 
-_Source: `apps/api/src/common/audit/audit.spec.ts` — 16 cases_
+_Source: `apps/api/src/common/audit/audit.spec.ts` — 18 cases_
 
 **Audit · list query contract**
 
@@ -75,6 +77,8 @@ _Source: `apps/api/src/common/audit/audit.spec.ts` — 16 cases_
 - AU-12 allows a null actor (system / deleted user)
 - AU-13 rejects a missing action
 - AU-14 rejects a non-uuid id
+- AU-17 allows a null IP and location (captured best-effort)
+- AU-18 rejects a missing ipAddress field
 
 **Audit · permission (FR-30)**
 
@@ -333,7 +337,7 @@ _Source: `apps/api/src/modules/documents/documents.spec.ts` — 6 cases_
 - DOC-03 allows a null uploader (deleted user)
 - DOC-04 rejects a non-integer size
 - DOC-05 rejects a non-uuid id
-- DOC-06 the upload limit is 10 MB
+- DOC-06 the hard upload ceiling is 100 MB
 
 ## Assumptions / Comments / Reference / FX
 
@@ -1011,6 +1015,89 @@ _Source: `apps/api/src/modules/roles/roles-permissions.spec.ts` — 36 cases_
 - TC-34 may clear the description with null
 - TC-35 rejects an unknown permission on update
 - TC-36 rejects an empty display name on update
+
+## Settings — upload limit (FR-26)
+
+_Source: `apps/api/src/modules/settings/settings-card.spec.ts` — 24 cases_
+
+**Settings · upload-limit constants**
+
+- ST-01 the hard ceiling is 100 MB
+- ST-02 the default limit is 100 MB
+- ST-03 MAX_DOCUMENT_BYTES is 100 MB in bytes
+- ST-04 MAX_DOCUMENT_BYTES equals the hard ceiling in bytes
+
+**Settings · update-limit request**
+
+- ST-05 accepts 100 (the ceiling)
+- ST-06 accepts 1 (the floor)
+- ST-07 accepts a mid value (25)
+- ST-08 rejects 0
+- ST-09 rejects a negative
+- ST-10 rejects above the ceiling (101)
+- ST-11 rejects a large value (1000)
+- ST-12 rejects a non-integer (1.5)
+- ST-13 rejects a string
+- ST-14 rejects a missing field
+- ST-15 ignores extra keys (strips them)
+
+**Settings · upload-limit DTO**
+
+- ST-16 accepts a valid limit
+- ST-17 rejects 0
+- ST-18 rejects above the ceiling
+- ST-19 rejects a non-integer
+- ST-20 rejects a missing field
+
+**Settings · settings.manage permission (FR-30)**
+
+- ST-21 settings.manage is a catalog permission key
+- ST-22 settings.manage has a catalog entry
+- ST-23 settings.manage is grouped under Administration
+- ST-24 the wildcard is not settings.manage
+
+## SOW template flavors (BR-7)
+
+_Source: `apps/api/src/modules/sow/sow-flavor.spec.ts` — 24 cases_
+
+**SOW flavor · enum**
+
+- FL-01 accepts every flavor
+- FL-02 rejects an unknown flavor
+- FL-03 rejects a lowercase flavor
+- FL-04 has exactly the four flavors
+
+**SOW flavor · catalog (SOW_FLAVORS)**
+
+- FL-05 lists all four flavors
+- FL-06 catalog keys match the enum
+- FL-07 every entry has a label and description
+- FL-08 keys are unique
+- FL-09 every catalog key is a valid flavor
+
+**SOW flavor · create request**
+
+- FL-10 valid with a flavor
+- FL-11 valid without a flavor (optional)
+- FL-12 rejects an unknown flavor
+- FL-13 still requires the estimateId
+- FL-14 rejects a non-uuid estimateId
+- FL-15 each flavor is accepted
+
+**SOW flavor · SOW DTO carries the flavor**
+
+- FL-16 the DTO schema has a flavor field
+- FL-17 the DTO flavor validates against the enum
+
+**SOW flavor · line-item rows (SowLineItemDto)**
+
+- FL-18 a LABOR row is valid
+- FL-19 a NONLABOR row is valid
+- FL-20 a CLOUD row is valid
+- FL-21 rejects an unknown kind
+- FL-22 rejects a missing lineTotal
+- FL-23 rejects a missing item
+- FL-24 the three kinds are exactly LABOR / NONLABOR / CLOUD
 
 ## SOW milestone schedule
 
