@@ -31,6 +31,8 @@ NAMES = {
     "dashboard-card": "Dashboard card",
     "dashboard-summary": "Dashboard summariser",
     "sow-milestones": "SOW milestone schedule",
+    "sow-flavor": "SOW template flavors (BR-7)",
+    "settings-card": "Settings — upload limit (FR-26)",
     "documents": "Supporting documents",
     "audit": "Audit log",
     "volume": "Volume / performance",
