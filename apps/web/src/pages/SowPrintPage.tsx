@@ -1,9 +1,13 @@
+import { Fragment, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSow } from '../lib/queries';
 import { sowFlavorLabel } from '../lib/types';
 import { formatMoney } from '../lib/money';
 
-/** Official, print-ready Statement of Work — "Save as PDF" via the browser (BR-7). */
+/** Official, print-ready Statement of Work — "Save as PDF" via the browser (BR-7).
+ *  The layout adapts to the SOW's template flavor: Concise trims the heavy sections,
+ *  Proposal leads pricing with a subscription table, and Time & Materials shows a
+ *  team-&-rates table with a not-to-exceed. */
 export default function SowPrintPage() {
   const { id } = useParams<{ id: string }>();
   const { data: sow, isLoading, error } = useSow(id);
@@ -15,6 +19,259 @@ export default function SowPrintPage() {
   const cur = sow.currency;
   const money = (v: string) => formatMoney(v, cur);
   const p = sow.pricing;
+  const flavor = sow.flavor;
+
+  // ── Deliverables & milestone schedule (all flavors) ────────────────────────
+  const renderDeliverables = (n: number): ReactNode => (
+    <section className="mt-5 break-inside-avoid">
+      <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
+        {n}. Deliverables &amp; Milestone Schedule
+      </h2>
+      <p className="text-sm whitespace-pre-wrap leading-relaxed">{sow.deliverables || '—'}</p>
+      {p.phases.length > 0 && (
+        <table className="w-full text-sm mt-3">
+          <thead>
+            <tr className="text-slate-500 text-left border-b border-slate-300">
+              <th className="py-1">Phase / Milestone</th>
+              <th className="py-1 text-right">Milestone fee (one-time)</th>
+              <th className="py-1 text-right">Recurring (monthly)</th>
+              <th className="py-1 text-right">Recurring (yearly)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {p.phases.map((ph) => (
+              <tr key={ph.phase} className="border-t border-slate-100">
+                <td className="py-1">{ph.phase}</td>
+                <td className="py-1 text-right tabular-nums">{money(ph.oneTime)}</td>
+                <td className="py-1 text-right tabular-nums">{money(ph.monthly)}</td>
+                <td className="py-1 text-right tabular-nums">{money(ph.yearly)}</td>
+              </tr>
+            ))}
+            <tr className="border-t border-slate-300 font-semibold">
+              <td className="py-1">Total</td>
+              <td className="py-1 text-right tabular-nums">{money(p.oneTimeSubtotal)}</td>
+              <td className="py-1 text-right tabular-nums">{money(p.monthlySubtotal)}</td>
+              <td className="py-1 text-right tabular-nums">{money(p.yearlySubtotal)}</td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+      <p className="text-xs text-slate-400 mt-1">
+        Each completed phase is a billable milestone: the one-time milestone fee is invoiced upon
+        the Client&apos;s acceptance of that phase&apos;s deliverables. Recurring amounts bill on
+        their stated cadence. Phase amounts exclude the project contingency.
+      </p>
+    </section>
+  );
+
+  // ── Pricing — flavor-aware ─────────────────────────────────────────────────
+  const lineItemsTable = (
+    <>
+      <p className="text-xs font-medium text-slate-500 mt-2 mb-1">Estimate detail (line items)</p>
+      <table className="w-full text-sm mb-4">
+        <thead>
+          <tr className="text-slate-500 text-left border-b border-slate-300">
+            <th className="py-1">Item</th>
+            <th className="py-1">Category</th>
+            <th className="py-1 text-right">Qty</th>
+            <th className="py-1 text-right">Rate / amount</th>
+            <th className="py-1">Billing</th>
+            <th className="py-1 text-right">Line total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sow.lineItems.map((li, i) => (
+            <tr key={i} className="border-t border-slate-100">
+              <td className="py-1">{li.item}</td>
+              <td className="py-1 text-slate-500">{li.category}</td>
+              <td className="py-1 text-right tabular-nums">{li.quantity}</td>
+              <td className="py-1 text-right tabular-nums">{money(li.unitPrice)}</td>
+              <td className="py-1 text-slate-500">{li.billingPeriod.toLowerCase()}</td>
+              <td className="py-1 text-right tabular-nums">{money(li.lineTotal)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+
+  const categoryTable = p.categories.length > 0 && (
+    <>
+      <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
+        Cost breakdown by category (post-upcharge, pre-contingency)
+      </p>
+      <table className="w-full text-sm mb-4">
+        <thead>
+          <tr className="text-slate-500 text-left border-b border-slate-300">
+            <th className="py-1">Cost category</th>
+            <th className="py-1 text-right">One-time</th>
+            <th className="py-1 text-right">Monthly</th>
+            <th className="py-1 text-right">Yearly</th>
+          </tr>
+        </thead>
+        <tbody>
+          {p.categories.map((c) => (
+            <tr key={c.category} className="border-t border-slate-100">
+              <td className="py-1">{c.category}</td>
+              <td className="py-1 text-right tabular-nums">{money(c.oneTime)}</td>
+              <td className="py-1 text-right tabular-nums">{money(c.monthly)}</td>
+              <td className="py-1 text-right tabular-nums">{money(c.yearly)}</td>
+            </tr>
+          ))}
+          <tr className="border-t border-slate-300 font-semibold">
+            <td className="py-1">Subtotal</td>
+            <td className="py-1 text-right tabular-nums">{money(p.oneTimeSubtotal)}</td>
+            <td className="py-1 text-right tabular-nums">{money(p.monthlySubtotal)}</td>
+            <td className="py-1 text-right tabular-nums">{money(p.yearlySubtotal)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </>
+  );
+
+  const fullTotals = (
+    <table className="w-full text-sm">
+      <tbody>
+        <Row label="One-time total" value={money(p.oneTimeTotal)} />
+        <Row label="Monthly total" value={money(p.monthlyTotal)} />
+        <Row label="Yearly total (annualized)" value={money(p.yearlyTotal)} />
+        <Row label="Upcharge" value={money(p.upchargeAmount)} />
+        <Row label="Contingency" value={money(p.contingencyAmount)} />
+        <Row label="Grand total (cost)" value={money(p.grandTotal)} strong />
+        <Row label="Total price to Client" value={money(p.clientPrice)} strong />
+      </tbody>
+    </table>
+  );
+
+  const renderPricing = (n: number): ReactNode => (
+    <section className="mt-5">
+      <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
+        {n}. Pricing
+      </h2>
+
+      {flavor === 'TIME_MATERIALS' && (
+        <>
+          <p className="text-xs font-medium text-slate-500 mt-2 mb-1">Team &amp; rates</p>
+          <table className="w-full text-sm mb-4">
+            <thead>
+              <tr className="text-slate-500 text-left border-b border-slate-300">
+                <th className="py-1">Role / item</th>
+                <th className="py-1">Category</th>
+                <th className="py-1 text-right">Qty × units</th>
+                <th className="py-1 text-right">Rate</th>
+                <th className="py-1 text-right">Estimated cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sow.lineItems.map((li, i) => (
+                <tr key={i} className="border-t border-slate-100">
+                  <td className="py-1">{li.item}</td>
+                  <td className="py-1 text-slate-500">{li.category}</td>
+                  <td className="py-1 text-right tabular-nums">{li.quantity}</td>
+                  <td className="py-1 text-right tabular-nums">{money(li.unitPrice)}</td>
+                  <td className="py-1 text-right tabular-nums">{money(li.lineTotal)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <table className="w-full text-sm">
+            <tbody>
+              <Row label="Estimated cost" value={money(p.grandTotal)} />
+              <Row label="Monthly run-rate (recurring)" value={money(p.monthlyTotal)} />
+              <Row label="Not-to-exceed (incl. contingency)" value={money(p.clientPrice)} strong />
+            </tbody>
+          </table>
+          <p className="text-xs text-slate-400 mt-1">
+            Time &amp; materials: invoiced monthly for actual effort, capped at the not-to-exceed.
+          </p>
+        </>
+      )}
+
+      {flavor === 'PROPOSAL' && (
+        <>
+          <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
+            Subscription &amp; implementation
+          </p>
+          <table className="w-full text-sm mb-4">
+            <tbody>
+              <Row label="One-time implementation" value={money(p.oneTimeTotal)} />
+              <Row label="Monthly subscription (recurring)" value={money(p.monthlyTotal)} />
+              <Row label="Annual subscription (annualized)" value={money(p.yearlyTotal)} />
+            </tbody>
+          </table>
+          {categoryTable}
+          <table className="w-full text-sm">
+            <tbody>
+              <Row label="Contingency" value={money(p.contingencyAmount)} />
+              <Row label="Grand total (cost)" value={money(p.grandTotal)} strong />
+              <Row label="Total price to Client" value={money(p.clientPrice)} strong />
+            </tbody>
+          </table>
+        </>
+      )}
+
+      {flavor === 'CONCISE' && (
+        <table className="w-full text-sm">
+          <tbody>
+            <Row label="One-time total" value={money(p.oneTimeTotal)} />
+            <Row label="Monthly total" value={money(p.monthlyTotal)} />
+            <Row label="Grand total (cost)" value={money(p.grandTotal)} strong />
+            <Row label="Total price to Client" value={money(p.clientPrice)} strong />
+          </tbody>
+        </table>
+      )}
+
+      {flavor !== 'TIME_MATERIALS' && flavor !== 'PROPOSAL' && flavor !== 'CONCISE' && (
+        <>
+          {lineItemsTable}
+          {categoryTable}
+          {fullTotals}
+        </>
+      )}
+
+      <p className="text-xs text-slate-400 mt-1">
+        {sow.status === 'ISSUED'
+          ? 'Pricing snapshotted at issue; it will not change if the estimate is later edited.'
+          : 'Draft pricing reflects the current estimate; issuing the SOW locks these figures.'}
+      </p>
+    </section>
+  );
+
+  // ── Section list — numbered dynamically; Concise trims the heavy ones ───────
+  type Sec = {
+    title: string;
+    body?: string;
+    render?: (n: number) => ReactNode;
+    hideFor?: string[];
+  };
+  const sections: Sec[] = [
+    { title: 'Executive Summary', body: sow.executiveSummary },
+    { title: 'Customer Understanding', body: sow.customerUnderstanding, hideFor: ['CONCISE'] },
+    { title: 'Overview', body: sow.overview },
+    { title: 'Scope of Services', body: sow.scope },
+    { title: 'Out of Scope', body: sow.outOfScope },
+    { title: 'Proposed Solution', body: sow.solutionOverview },
+    { title: 'Deliverables & Milestone Schedule', render: renderDeliverables },
+    { title: 'Timeline', body: sow.timeline, hideFor: ['CONCISE'] },
+    { title: 'Pricing', render: renderPricing },
+    { title: 'Payment Terms', body: sow.paymentTerms },
+    { title: 'Governance Model', body: sow.governanceModel, hideFor: ['CONCISE'] },
+    { title: 'Roles & Responsibilities', body: sow.rolesResponsibilities, hideFor: ['CONCISE'] },
+    {
+      title: 'Non-Functional Requirements',
+      body: sow.nonFunctionalRequirements,
+      hideFor: ['CONCISE'],
+    },
+    { title: 'Testing Strategy', body: sow.testingStrategy, hideFor: ['CONCISE'] },
+    { title: 'Maintenance & Support', body: sow.maintenanceSupport, hideFor: ['CONCISE'] },
+    { title: 'Assumptions', body: sow.assumptions },
+    { title: 'Risks & Mitigation', body: sow.risksMitigation, hideFor: ['CONCISE'] },
+    { title: 'Acceptance Criteria', body: sow.acceptanceCriteria },
+    { title: 'Change Control', body: sow.changeControl, hideFor: ['CONCISE'] },
+    { title: 'Terms & Conditions', body: sow.termsAndConditions },
+  ];
+  const visible = sections.filter((s) => !s.hideFor?.includes(flavor));
+  const acceptanceNo = visible.length + 1;
 
   return (
     <div className="max-w-3xl mx-auto bg-white text-slate-900 p-2 print:p-0">
@@ -46,156 +303,18 @@ export default function SowPrintPage() {
         <Party label="Provider" name={sow.providerName} />
       </section>
 
-      <Prose title="1. Executive Summary" body={sow.executiveSummary} />
-      <Prose title="2. Customer Understanding" body={sow.customerUnderstanding} />
-      <Prose title="3. Overview" body={sow.overview} />
-      <Prose title="4. Scope of Services" body={sow.scope} />
-      <Prose title="5. Out of Scope" body={sow.outOfScope} />
-      <Prose title="6. Proposed Solution" body={sow.solutionOverview} />
-      <section className="mt-5 break-inside-avoid">
-        <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
-          7. Deliverables &amp; Milestone Schedule
-        </h2>
-        <p className="text-sm whitespace-pre-wrap leading-relaxed">{sow.deliverables || '—'}</p>
-        {p.phases.length > 0 && (
-          <table className="w-full text-sm mt-3">
-            <thead>
-              <tr className="text-slate-500 text-left border-b border-slate-300">
-                <th className="py-1">Phase / Milestone</th>
-                <th className="py-1 text-right">Milestone fee (one-time)</th>
-                <th className="py-1 text-right">Recurring (monthly)</th>
-                <th className="py-1 text-right">Recurring (yearly)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {p.phases.map((ph) => (
-                <tr key={ph.phase} className="border-t border-slate-100">
-                  <td className="py-1">{ph.phase}</td>
-                  <td className="py-1 text-right tabular-nums">{money(ph.oneTime)}</td>
-                  <td className="py-1 text-right tabular-nums">{money(ph.monthly)}</td>
-                  <td className="py-1 text-right tabular-nums">{money(ph.yearly)}</td>
-                </tr>
-              ))}
-              <tr className="border-t border-slate-300 font-semibold">
-                <td className="py-1">Total</td>
-                <td className="py-1 text-right tabular-nums">{money(p.oneTimeSubtotal)}</td>
-                <td className="py-1 text-right tabular-nums">{money(p.monthlySubtotal)}</td>
-                <td className="py-1 text-right tabular-nums">{money(p.yearlySubtotal)}</td>
-              </tr>
-            </tbody>
-          </table>
-        )}
-        <p className="text-xs text-slate-400 mt-1">
-          Each completed phase is a billable milestone: the one-time milestone fee is invoiced upon
-          the Client&apos;s acceptance of that phase&apos;s deliverables. Recurring amounts are
-          billed on their stated cadence (see §9 Pricing). Phase amounts exclude the project
-          contingency.
-        </p>
-      </section>
-
-      <Prose title="8. Timeline" body={sow.timeline} />
-
-      <section className="mt-5">
-        <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
-          9. Pricing
-        </h2>
-        {sow.lineItems.length > 0 && (
-          <>
-            <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
-              Estimate detail (line items)
-            </p>
-            <table className="w-full text-sm mb-4">
-              <thead>
-                <tr className="text-slate-500 text-left border-b border-slate-300">
-                  <th className="py-1">Item</th>
-                  <th className="py-1">Category</th>
-                  <th className="py-1 text-right">Qty</th>
-                  <th className="py-1 text-right">Rate / amount</th>
-                  <th className="py-1">Billing</th>
-                  <th className="py-1 text-right">Line total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sow.lineItems.map((li, i) => (
-                  <tr key={i} className="border-t border-slate-100">
-                    <td className="py-1">{li.item}</td>
-                    <td className="py-1 text-slate-500">{li.category}</td>
-                    <td className="py-1 text-right tabular-nums">{li.quantity}</td>
-                    <td className="py-1 text-right tabular-nums">{money(li.unitPrice)}</td>
-                    <td className="py-1 text-slate-500">{li.billingPeriod.toLowerCase()}</td>
-                    <td className="py-1 text-right tabular-nums">{money(li.lineTotal)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-        {p.categories.length > 0 && (
-          <>
-            <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
-              Cost breakdown by category (post-upcharge, pre-contingency)
-            </p>
-            <table className="w-full text-sm mb-4">
-              <thead>
-                <tr className="text-slate-500 text-left border-b border-slate-300">
-                  <th className="py-1">Cost category</th>
-                  <th className="py-1 text-right">One-time</th>
-                  <th className="py-1 text-right">Monthly</th>
-                  <th className="py-1 text-right">Yearly</th>
-                </tr>
-              </thead>
-              <tbody>
-                {p.categories.map((c) => (
-                  <tr key={c.category} className="border-t border-slate-100">
-                    <td className="py-1">{c.category}</td>
-                    <td className="py-1 text-right tabular-nums">{money(c.oneTime)}</td>
-                    <td className="py-1 text-right tabular-nums">{money(c.monthly)}</td>
-                    <td className="py-1 text-right tabular-nums">{money(c.yearly)}</td>
-                  </tr>
-                ))}
-                <tr className="border-t border-slate-300 font-semibold">
-                  <td className="py-1">Subtotal</td>
-                  <td className="py-1 text-right tabular-nums">{money(p.oneTimeSubtotal)}</td>
-                  <td className="py-1 text-right tabular-nums">{money(p.monthlySubtotal)}</td>
-                  <td className="py-1 text-right tabular-nums">{money(p.yearlySubtotal)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </>
-        )}
-        <table className="w-full text-sm">
-          <tbody>
-            <Row label="One-time total" value={money(p.oneTimeTotal)} />
-            <Row label="Monthly total" value={money(p.monthlyTotal)} />
-            <Row label="Yearly total (annualized)" value={money(p.yearlyTotal)} />
-            <Row label="Upcharge" value={money(p.upchargeAmount)} />
-            <Row label="Contingency" value={money(p.contingencyAmount)} />
-            <Row label="Grand total (cost)" value={money(p.grandTotal)} strong />
-            <Row label="Total price to Client" value={money(p.clientPrice)} strong />
-          </tbody>
-        </table>
-        <p className="text-xs text-slate-400 mt-1">
-          {sow.status === 'ISSUED'
-            ? 'Pricing snapshotted at issue; it will not change if the estimate is later edited.'
-            : 'Draft pricing reflects the current estimate; issuing the SOW locks these figures.'}
-        </p>
-      </section>
-
-      <Prose title="10. Payment Terms" body={sow.paymentTerms} />
-      <Prose title="11. Governance Model" body={sow.governanceModel} />
-      <Prose title="12. Roles &amp; Responsibilities" body={sow.rolesResponsibilities} />
-      <Prose title="13. Non-Functional Requirements" body={sow.nonFunctionalRequirements} />
-      <Prose title="14. Testing Strategy" body={sow.testingStrategy} />
-      <Prose title="15. Maintenance &amp; Support" body={sow.maintenanceSupport} />
-      <Prose title="16. Assumptions" body={sow.assumptions} />
-      <Prose title="17. Risks &amp; Mitigation" body={sow.risksMitigation} />
-      <Prose title="18. Acceptance Criteria" body={sow.acceptanceCriteria} />
-      <Prose title="19. Change Control" body={sow.changeControl} />
-      <Prose title="20. Terms &amp; Conditions" body={sow.termsAndConditions} />
+      {visible.map((s, idx) => {
+        const n = idx + 1;
+        return s.render ? (
+          <Fragment key={s.title}>{s.render(n)}</Fragment>
+        ) : (
+          <Prose key={s.title} title={`${n}. ${s.title}`} body={s.body ?? ''} />
+        );
+      })}
 
       <section className="mt-8 break-inside-avoid">
         <h2 className="font-semibold border-b border-slate-300 mb-3 text-sm uppercase tracking-wide">
-          21. Acceptance
+          {acceptanceNo}. Acceptance
         </h2>
         <p className="text-xs text-slate-500 mb-6">
           The parties, by their authorized representatives, agree to this Statement of Work.
