@@ -560,3 +560,13 @@ model ReferenceValue {
   @@index([parentId])
   @@map("reference_values")
 }
+
+/// Admin-configurable application settings (key/value), e.g. the document upload limit.
+model AppSetting {
+  key         String   @id
+  value       String
+  updatedById String?  @map("updated_by_id") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}

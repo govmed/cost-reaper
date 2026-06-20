@@ -25,6 +25,7 @@ import { WorkflowModule } from './modules/workflow/workflow.module';
 import { ReferenceModule } from './modules/reference/reference.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { FxModule } from './modules/fx/fx.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FxModule } from './modules/fx/fx.module';
     FxModule,
     RolesModule,
     DocumentsModule,
+    SettingsModule,
   ],
   providers: [
     // Auth runs first (authenticate), then RBAC (authorize) — deny-by-default (NFR-16).

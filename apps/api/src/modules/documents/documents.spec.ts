@@ -33,7 +33,7 @@ describe('Documents · DTO + limits', () => {
   it('DOC-05 rejects a non-uuid id', () => {
     expect(EstimateDocumentDto.safeParse(doc({ id: 'x' })).success).toBe(false);
   });
-  it('DOC-06 the upload limit is 10 MB', () => {
-    expect(MAX_DOCUMENT_BYTES).toBe(10 * 1024 * 1024);
+  it('DOC-06 the hard upload ceiling is 100 MB', () => {
+    expect(MAX_DOCUMENT_BYTES).toBe(100 * 1024 * 1024);
   });
 });
