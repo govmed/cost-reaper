@@ -235,8 +235,13 @@ function flavorBoilerplate(flavor: string): SowBoilerplate {
         'in the estimate’s currency, exclusive of taxes; invoices are due net 30 days.',
     },
   };
+  // The split-pricing flavor shares the maintenance narrative.
+  overrides.IMPL_MAINT_SPLIT = overrides.IMPL_MAINTENANCE;
   return { ...base, ...(overrides[flavor] ?? {}) };
 }
+
+/** Flavors that carry the structured maintenance sections (SLA/support/warranty). */
+const MAINTENANCE_FLAVORS = ['IMPL_MAINTENANCE', 'IMPL_MAINT_SPLIT'];
 
 // ── Implementation & Maintenance structured defaults (BR-7) ───────────────────
 const DEFAULT_SLA_TIERS = [
@@ -281,7 +286,7 @@ function maintenanceDefaults(flavor: string): {
   warrantyDays: number | null;
   securityCompliance: string;
 } {
-  if (flavor === 'IMPL_MAINTENANCE') {
+  if (MAINTENANCE_FLAVORS.includes(flavor)) {
     return {
       slaTiers: DEFAULT_SLA_TIERS,
       supportTiers: DEFAULT_SUPPORT_TIERS,
