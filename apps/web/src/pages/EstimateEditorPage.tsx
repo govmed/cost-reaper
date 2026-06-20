@@ -1630,7 +1630,9 @@ function formatBytes(n: number): string {
 /** Upload + catalog supporting documents for an estimate (FR-29). */
 function DocumentsSection({ est }: { est: EstimateDetail }) {
   const { user } = useAuth();
-  const canAuthor = canAuthorEstimates(user);
+  // Can change documents only with authoring rights AND while the estimate is
+  // editable (Draft); a locked (In Review / Approved / Final) estimate is read-only.
+  const canEdit = canAuthorEstimates(user) && est.editable;
   const { data: docs } = useEstimateDocuments(est.id);
   const m = useDocumentMutations(est.id);
   const types = useRefLabeler('DOCUMENT_TYPE');
@@ -1703,7 +1705,7 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
                   >
                     Download
                   </button>
-                  {canAuthor && (
+                  {canEdit && (
                     <button
                       onClick={() => {
                         if (window.confirm(`Delete "${d.fileName}"?`)) m.remove.mutate(d.id);
@@ -1720,7 +1722,7 @@ function DocumentsSection({ est }: { est: EstimateDetail }) {
         </table>
       </div>
 
-      {canAuthor && (
+      {canEdit && (
         <div className="pt-3 border-t border-slate-100 space-y-2">
           <div className="text-xs font-medium text-slate-500">Upload a document</div>
           <div className="flex flex-wrap items-end gap-3">
