@@ -143,6 +143,52 @@ export default function SowPrintPage() {
     </table>
   );
 
+  // Split Implementation (one-time) vs Maintenance (annual) breakdown by category.
+  const oneTimeContingency = (Number(p.oneTimeTotal) - Number(p.oneTimeSubtotal)).toFixed(4);
+  const annualContingency = (Number(p.yearlyTotal) - Number(p.yearlySubtotal)).toFixed(4);
+  const splitPricing = (
+    <>
+      <p className="text-xs text-slate-400 mb-2">
+        Figures are produced by the project estimate — labor by SDLC phase, compute/infrastructure,
+        and non-labor — with contingency applied.
+      </p>
+      <p className="text-xs font-medium text-slate-500 mt-2 mb-1">Implementation (one-time)</p>
+      <table className="w-full text-sm mb-4">
+        <tbody>
+          {p.categories
+            .filter((c) => Number(c.oneTime) !== 0)
+            .map((c) => (
+              <Row key={c.category} label={c.category} value={money(c.oneTime)} />
+            ))}
+          <Row label="Subtotal (one-time)" value={money(p.oneTimeSubtotal)} />
+          <Row label="Contingency" value={money(oneTimeContingency)} />
+          <Row label="Total implementation" value={money(p.oneTimeTotal)} strong />
+        </tbody>
+      </table>
+      <p className="text-xs font-medium text-slate-500 mt-2 mb-1">
+        Maintenance (annual / recurring)
+      </p>
+      <table className="w-full text-sm mb-4">
+        <tbody>
+          {p.categories
+            .filter((c) => Number(c.yearly) !== 0)
+            .map((c) => (
+              <Row key={c.category} label={c.category} value={money(c.yearly)} />
+            ))}
+          <Row label="Subtotal (annual)" value={money(p.yearlySubtotal)} />
+          <Row label="Contingency" value={money(annualContingency)} />
+          <Row label="Annual maintenance total" value={money(p.yearlyTotal)} strong />
+          <Row label="Monthly equivalent" value={money(p.monthlyTotal)} />
+        </tbody>
+      </table>
+      <table className="w-full text-sm">
+        <tbody>
+          <Row label="Total price to Client" value={money(p.clientPrice)} strong />
+        </tbody>
+      </table>
+    </>
+  );
+
   const renderPricing = (n: number): ReactNode => (
     <section className="mt-5">
       <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
@@ -221,13 +267,18 @@ export default function SowPrintPage() {
         </table>
       )}
 
-      {flavor !== 'TIME_MATERIALS' && flavor !== 'PROPOSAL' && flavor !== 'CONCISE' && (
-        <>
-          {lineItemsTable}
-          {categoryTable}
-          {fullTotals}
-        </>
-      )}
+      {flavor === 'IMPL_MAINT_SPLIT' && splitPricing}
+
+      {flavor !== 'TIME_MATERIALS' &&
+        flavor !== 'PROPOSAL' &&
+        flavor !== 'CONCISE' &&
+        flavor !== 'IMPL_MAINT_SPLIT' && (
+          <>
+            {lineItemsTable}
+            {categoryTable}
+            {fullTotals}
+          </>
+        )}
 
       <p className="text-xs text-slate-400 mt-1">
         {sow.status === 'ISSUED'

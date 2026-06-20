@@ -6,13 +6,14 @@ deal; all use `{{MERGE_FIELD}}` placeholders that map to a Kerdos estimate's dat
 (line items, by-category breakdown, per-SDLC-phase milestones, and one-time / monthly
 / yearly totals).
 
-| #   | Flavor                                                                                    | Best for                                            | Style                                                                                       |
-| --- | ----------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| 1   | [Enterprise (Fixed-Price)](SOW-FLAVOR-1-Enterprise-FixedPrice.md)                         | Large clients, procurement/legal review             | Comprehensive, milestone-billed, full T&Cs + RACI + signatures                              |
-| 2   | [Concise (SMB / Fast-Turn)](SOW-FLAVOR-2-Concise-SMB.md)                                  | SMB, short engagements, repeat clients              | Lean 1–2 pages, quick sign-off                                                              |
-| 3   | [Proposal — Pricing & Implementation Overview](SOW-FLAVOR-3-Proposal-Pricing-Overview.md) | SaaS/subscription, RFP responses, marketplace deals | Pricing-led overview with tiers, modules, timeline gantt, team                              |
-| 4   | [Time & Materials (Agile)](SOW-FLAVOR-4-TimeAndMaterials-Agile.md)                        | Evolving scope, staff aug, agile delivery           | Rate-card team + sprints + not-to-exceed                                                    |
-| 5   | [Implementation & Maintenance](SOW-FLAVOR-5-Implementation-Maintenance.md)                | Build-then-run; deploy + support live               | Implementation + ongoing support with SLAs, support tiers, warranty (structured app fields) |
+| #   | Flavor                                                                                       | Best for                                            | Style                                                                                       |
+| --- | -------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 1   | [Enterprise (Fixed-Price)](SOW-FLAVOR-1-Enterprise-FixedPrice.md)                            | Large clients, procurement/legal review             | Comprehensive, milestone-billed, full T&Cs + RACI + signatures                              |
+| 2   | [Concise (SMB / Fast-Turn)](SOW-FLAVOR-2-Concise-SMB.md)                                     | SMB, short engagements, repeat clients              | Lean 1–2 pages, quick sign-off                                                              |
+| 3   | [Proposal — Pricing & Implementation Overview](SOW-FLAVOR-3-Proposal-Pricing-Overview.md)    | SaaS/subscription, RFP responses, marketplace deals | Pricing-led overview with tiers, modules, timeline gantt, team                              |
+| 4   | [Time & Materials (Agile)](SOW-FLAVOR-4-TimeAndMaterials-Agile.md)                           | Evolving scope, staff aug, agile delivery           | Rate-card team + sprints + not-to-exceed                                                    |
+| 5   | [Implementation & Maintenance](SOW-FLAVOR-5-Implementation-Maintenance.md)                   | Build-then-run; deploy + support live               | Implementation + ongoing support with SLAs, support tiers, warranty (structured app fields) |
+| 6   | [Implementation & Maintenance (Split Pricing)](SOW-FLAVOR-6-ImplMaintenance-SplitPricing.md) | Build-then-run; separate capex/opex                 | I&M with Implementation (one-time) and Maintenance (annual) cost tables                     |
 
 ## How they map to Kerdos
 

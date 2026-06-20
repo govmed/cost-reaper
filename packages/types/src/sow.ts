@@ -13,6 +13,7 @@ export const SowFlavor = z.enum([
   'PROPOSAL',
   'TIME_MATERIALS',
   'IMPL_MAINTENANCE',
+  'IMPL_MAINT_SPLIT',
 ]);
 export type SowFlavor = z.infer<typeof SowFlavor>;
 
@@ -59,6 +60,12 @@ export const SOW_FLAVORS: { key: SowFlavor; label: string; description: string }
     key: 'IMPL_MAINTENANCE',
     label: 'Implementation & Maintenance',
     description: 'Implementation + ongoing support with SLAs, support tiers, and warranty.',
+  },
+  {
+    key: 'IMPL_MAINT_SPLIT',
+    label: 'Implementation & Maintenance (Split Pricing)',
+    description:
+      'Same as Implementation & Maintenance, with separate one-time vs annual cost tables.',
   },
 ];
 

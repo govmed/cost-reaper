@@ -15,7 +15,14 @@ import {
 } from '@cost-reaper/types';
 
 const UUID = '550e8400-e29b-41d4-a716-446655440000';
-const FLAVORS = ['ENTERPRISE', 'CONCISE', 'PROPOSAL', 'TIME_MATERIALS', 'IMPL_MAINTENANCE'];
+const FLAVORS = [
+  'ENTERPRISE',
+  'CONCISE',
+  'PROPOSAL',
+  'TIME_MATERIALS',
+  'IMPL_MAINTENANCE',
+  'IMPL_MAINT_SPLIT',
+];
 
 describe('SOW flavor · enum', () => {
   it('FL-01 accepts every flavor', () => {
@@ -33,8 +40,8 @@ describe('SOW flavor · enum', () => {
 });
 
 describe('SOW flavor · catalog (SOW_FLAVORS)', () => {
-  it('FL-05 lists all five flavors', () => {
-    expect(SOW_FLAVORS).toHaveLength(5);
+  it('FL-05 lists all six flavors', () => {
+    expect(SOW_FLAVORS).toHaveLength(6);
   });
   it('FL-06 catalog keys match the enum', () => {
     expect(SOW_FLAVORS.map((f) => f.key).sort()).toEqual([...FLAVORS].sort());
@@ -158,5 +165,11 @@ describe('SOW flavor · Implementation & Maintenance structured sections', () =>
   it('FL-30 warrantyDays accepts a number or null', () => {
     expect(StatementOfWorkDto.shape.warrantyDays.safeParse(90).success).toBe(true);
     expect(StatementOfWorkDto.shape.warrantyDays.safeParse(null).success).toBe(true);
+  });
+  it('FL-31 IMPL_MAINT_SPLIT is a valid flavor', () => {
+    expect(SowFlavor.safeParse('IMPL_MAINT_SPLIT').success).toBe(true);
+  });
+  it('FL-32 IMPL_MAINT_SPLIT is in the catalog', () => {
+    expect(SOW_FLAVORS.some((f) => f.key === 'IMPL_MAINT_SPLIT')).toBe(true);
   });
 });

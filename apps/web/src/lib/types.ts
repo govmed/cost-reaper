@@ -540,6 +540,12 @@ export const SOW_FLAVORS: { key: string; label: string; description: string }[] 
     label: 'Implementation & Maintenance',
     description: 'Implementation + ongoing support with SLAs, support tiers, and warranty.',
   },
+  {
+    key: 'IMPL_MAINT_SPLIT',
+    label: 'Implementation & Maintenance (Split Pricing)',
+    description:
+      'Same as Implementation & Maintenance, with separate one-time vs annual cost tables.',
+  },
 ];
 
 export function sowFlavorLabel(key: string): string {

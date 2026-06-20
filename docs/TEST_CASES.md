@@ -4,7 +4,7 @@ A human-readable catalog of **every automated test case** in the project, derive
 directly from the test suites (`*.spec.ts` / `*.test.ts`). Each case is one `it()`
 assertion; suites are grouped by the card / area they exercise.
 
-**Total: 889 test cases across 35 suites.** All run in CI
+**Total: 891 test cases across 35 suites.** All run in CI
 (build → format → lint → typecheck → **test** → build) and must pass before merge;
 the Playwright suite additionally runs the full stack end-to-end.
 
@@ -41,7 +41,7 @@ the Playwright suite additionally runs the full stack end-to-end.
 | Reference tree                              | `apps/api/src/modules/reference/reference-tree.spec.ts`                      |       3 |
 | Roles & permissions (FR-30)                 | `apps/api/src/modules/roles/roles-permissions.spec.ts`                       |      36 |
 | Settings — upload limit (FR-26)             | `apps/api/src/modules/settings/settings-card.spec.ts`                        |      24 |
-| SOW template flavors (BR-7)                 | `apps/api/src/modules/sow/sow-flavor.spec.ts`                                |      30 |
+| SOW template flavors (BR-7)                 | `apps/api/src/modules/sow/sow-flavor.spec.ts`                                |      32 |
 | SOW milestone schedule                      | `apps/api/src/modules/sow/sow-milestones.spec.ts`                            |      14 |
 | Users & Roles (RBAC)                        | `apps/api/src/modules/users/users-rbac-card.spec.ts`                         |      52 |
 | Checklist rule sets card                    | `apps/api/src/modules/workflow/checklist-rule-sets.spec.ts`                  |      61 |
@@ -50,7 +50,7 @@ the Playwright suite additionally runs the full stack end-to-end.
 | smoke                                       | `apps/web/e2e/smoke.spec.ts`                                                 |      13 |
 | Estimation engine                           | `packages/engine/src/estimation-engine.test.ts`                              |      19 |
 | Resource capacity (FR-27)                   | `packages/engine/src/resource-capacity.test.ts`                              |       6 |
-| **Total**                                   |                                                                              | **889** |
+| **Total**                                   |                                                                              | **891** |
 
 ---
 
@@ -1058,7 +1058,7 @@ _Source: `apps/api/src/modules/settings/settings-card.spec.ts` — 24 cases_
 
 ## SOW template flavors (BR-7)
 
-_Source: `apps/api/src/modules/sow/sow-flavor.spec.ts` — 30 cases_
+_Source: `apps/api/src/modules/sow/sow-flavor.spec.ts` — 32 cases_
 
 **SOW flavor · enum**
 
@@ -1069,7 +1069,7 @@ _Source: `apps/api/src/modules/sow/sow-flavor.spec.ts` — 30 cases_
 
 **SOW flavor · catalog (SOW_FLAVORS)**
 
-- FL-05 lists all five flavors
+- FL-05 lists all six flavors
 - FL-06 catalog keys match the enum
 - FL-07 every entry has a label and description
 - FL-08 keys are unique
@@ -1107,6 +1107,8 @@ _Source: `apps/api/src/modules/sow/sow-flavor.spec.ts` — 30 cases_
 - FL-28 a valid support tier parses
 - FL-29 the SOW DTO exposes slaTiers / supportTiers / warrantyDays / securityCompliance
 - FL-30 warrantyDays accepts a number or null
+- FL-31 IMPL_MAINT_SPLIT is a valid flavor
+- FL-32 IMPL_MAINT_SPLIT is in the catalog
 
 ## SOW milestone schedule
 
