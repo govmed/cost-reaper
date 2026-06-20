@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { EstimateDocumentDto } from '@cost-reaper/types';
 import { MAX_DOCUMENT_BYTES } from '@cost-reaper/types';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -31,6 +36,25 @@ export class DocumentsService {
       select: { id: true },
     });
     if (!est) throw new NotFoundException('Estimate not found');
+  }
+
+  /**
+   * Documents may only be added/removed while the estimate is editable — i.e. in
+   * its workflow's initial (Draft) stage. Once it's In Review / Approved / Final /
+   * Archived its supporting documents are locked, consistent with the estimate's
+   * line items (FR-24).
+   */
+  private async ensureEditable(estimateId: string): Promise<void> {
+    const est = await this.prisma.estimate.findUnique({
+      where: { id: estimateId },
+      select: { id: true, currentStage: { select: { isInitial: true, label: true } } },
+    });
+    if (!est) throw new NotFoundException('Estimate not found');
+    if (est.currentStage && !est.currentStage.isInitial) {
+      throw new ConflictException(
+        `This estimate is locked while in "${est.currentStage.label}". Return it to Draft to change its documents.`,
+      );
+    }
   }
 
   async list(estimateId: string): Promise<EstimateDocumentDto[]> {
@@ -69,7 +93,7 @@ export class DocumentsService {
     description: string | undefined,
     userId: string,
   ): Promise<EstimateDocumentDto[]> {
-    await this.ensureEstimate(estimateId);
+    await this.ensureEditable(estimateId);
     if (!file || !file.buffer?.length) throw new BadRequestException('A file is required');
     if (file.size > MAX_DOCUMENT_BYTES) {
       throw new BadRequestException('File exceeds the 10 MB limit');
@@ -106,6 +130,7 @@ export class DocumentsService {
   }
 
   async remove(estimateId: string, docId: string, userId: string): Promise<EstimateDocumentDto[]> {
+    await this.ensureEditable(estimateId);
     const d = await this.prisma.estimateDocument.findFirst({
       where: { id: docId, estimateId },
       select: { id: true },
