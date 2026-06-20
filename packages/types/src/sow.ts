@@ -7,8 +7,31 @@ export const SowStatus = z.enum(['DRAFT', 'ISSUED']);
 export type SowStatus = z.infer<typeof SowStatus>;
 
 /** SOW template flavor (BR-7) — selects the boilerplate style at creation. */
-export const SowFlavor = z.enum(['ENTERPRISE', 'CONCISE', 'PROPOSAL', 'TIME_MATERIALS']);
+export const SowFlavor = z.enum([
+  'ENTERPRISE',
+  'CONCISE',
+  'PROPOSAL',
+  'TIME_MATERIALS',
+  'IMPL_MAINTENANCE',
+]);
 export type SowFlavor = z.infer<typeof SowFlavor>;
+
+/** One row of the Service Level (SLA) table (BR-7). */
+export const SowSlaTier = z.object({
+  priority: z.string(),
+  definition: z.string(),
+  response: z.string(),
+  resolution: z.string(),
+});
+export type SowSlaTier = z.infer<typeof SowSlaTier>;
+
+/** One row of the support-hours / tier table (BR-7). */
+export const SowSupportTier = z.object({
+  tier: z.string(),
+  coverage: z.string(),
+  channel: z.string(),
+});
+export type SowSupportTier = z.infer<typeof SowSupportTier>;
 
 /** Flavor catalog for the create picker (label + when to use). */
 export const SOW_FLAVORS: { key: SowFlavor; label: string; description: string }[] = [
@@ -31,6 +54,11 @@ export const SOW_FLAVORS: { key: SowFlavor; label: string; description: string }
     key: 'TIME_MATERIALS',
     label: 'Time & Materials (Agile)',
     description: 'Rate-card team, sprints, not-to-exceed — evolving scope.',
+  },
+  {
+    key: 'IMPL_MAINTENANCE',
+    label: 'Implementation & Maintenance',
+    description: 'Implementation + ongoing support with SLAs, support tiers, and warranty.',
   },
 ];
 
@@ -84,6 +112,15 @@ export const StatementOfWorkDto = z.object({
   pricing: EngineResult,
   /** The estimate's line items (live for a draft, snapshotted once issued). */
   lineItems: z.array(SowLineItemDto),
+  // ── Implementation & Maintenance structured sections (BR-7) ─────────────────
+  /** Service Level (SLA) tiers; empty unless the SOW uses a maintenance flavor. */
+  slaTiers: z.array(SowSlaTier),
+  /** Support hours / tiers. */
+  supportTiers: z.array(SowSupportTier),
+  /** Warranty period in days, or null if not applicable. */
+  warrantyDays: z.number().int().nullable(),
+  /** Security, data & compliance narrative. */
+  securityCompliance: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -148,6 +185,10 @@ export const UpdateSowRequest = z.object({
   acceptanceCriteria: longText.optional(),
   changeControl: longText.optional(),
   termsAndConditions: longText.optional(),
+  slaTiers: z.array(SowSlaTier).max(20).optional(),
+  supportTiers: z.array(SowSupportTier).max(20).optional(),
+  warrantyDays: z.number().int().min(0).max(3650).nullable().optional(),
+  securityCompliance: longText.optional(),
   /** ISO date (YYYY-MM-DD) or empty string to clear. */
   effectiveDate: z.string().max(40).optional(),
 });

@@ -8,12 +8,14 @@ import {
   SowFlavor,
   SOW_FLAVORS,
   SowLineItemDto,
+  SowSlaTier,
+  SowSupportTier,
   CreateSowRequest,
   StatementOfWorkDto,
 } from '@cost-reaper/types';
 
 const UUID = '550e8400-e29b-41d4-a716-446655440000';
-const FLAVORS = ['ENTERPRISE', 'CONCISE', 'PROPOSAL', 'TIME_MATERIALS'];
+const FLAVORS = ['ENTERPRISE', 'CONCISE', 'PROPOSAL', 'TIME_MATERIALS', 'IMPL_MAINTENANCE'];
 
 describe('SOW flavor · enum', () => {
   it('FL-01 accepts every flavor', () => {
@@ -31,8 +33,8 @@ describe('SOW flavor · enum', () => {
 });
 
 describe('SOW flavor · catalog (SOW_FLAVORS)', () => {
-  it('FL-05 lists all four flavors', () => {
-    expect(SOW_FLAVORS).toHaveLength(4);
+  it('FL-05 lists all five flavors', () => {
+    expect(SOW_FLAVORS).toHaveLength(5);
   });
   it('FL-06 catalog keys match the enum', () => {
     expect(SOW_FLAVORS.map((f) => f.key).sort()).toEqual([...FLAVORS].sort());
@@ -122,5 +124,39 @@ describe('SOW flavor · line-item rows (SowLineItemDto)', () => {
   });
   it('FL-24 the three kinds are exactly LABOR / NONLABOR / CLOUD', () => {
     expect([...SowLineItemDto.shape.kind.options].sort()).toEqual(['CLOUD', 'LABOR', 'NONLABOR']);
+  });
+});
+
+describe('SOW flavor · Implementation & Maintenance structured sections', () => {
+  it('FL-25 IMPL_MAINTENANCE is a valid flavor', () => {
+    expect(SowFlavor.safeParse('IMPL_MAINTENANCE').success).toBe(true);
+  });
+  it('FL-26 a valid SLA tier parses', () => {
+    expect(
+      SowSlaTier.safeParse({
+        priority: 'P1',
+        definition: 'Down',
+        response: '15 min',
+        resolution: '4 hours',
+      }).success,
+    ).toBe(true);
+  });
+  it('FL-27 an SLA tier missing resolution is rejected', () => {
+    expect(
+      SowSlaTier.safeParse({ priority: 'P1', definition: 'Down', response: '15 min' }).success,
+    ).toBe(false);
+  });
+  it('FL-28 a valid support tier parses', () => {
+    expect(
+      SowSupportTier.safeParse({ tier: 'Standard', coverage: '8×5', channel: 'portal' }).success,
+    ).toBe(true);
+  });
+  it('FL-29 the SOW DTO exposes slaTiers / supportTiers / warrantyDays / securityCompliance', () => {
+    for (const k of ['slaTiers', 'supportTiers', 'warrantyDays', 'securityCompliance'])
+      expect(k in StatementOfWorkDto.shape).toBe(true);
+  });
+  it('FL-30 warrantyDays accepts a number or null', () => {
+    expect(StatementOfWorkDto.shape.warrantyDays.safeParse(90).success).toBe(true);
+    expect(StatementOfWorkDto.shape.warrantyDays.safeParse(null).success).toBe(true);
   });
 });

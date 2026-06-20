@@ -237,13 +237,73 @@ export default function SowPrintPage() {
     </section>
   );
 
+  // ── Implementation & Maintenance structured tables ─────────────────────────
+  const renderSla = (n: number): ReactNode => (
+    <section className="mt-5 break-inside-avoid">
+      <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
+        {n}. Service Levels (SLAs)
+      </h2>
+      <table className="w-full text-sm mt-1">
+        <thead>
+          <tr className="text-slate-500 text-left border-b border-slate-300">
+            <th className="py-1">Priority</th>
+            <th className="py-1">Definition</th>
+            <th className="py-1">Response</th>
+            <th className="py-1">Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sow.slaTiers.map((s, i) => (
+            <tr key={i} className="border-t border-slate-100">
+              <td className="py-1 font-medium whitespace-nowrap">{s.priority}</td>
+              <td className="py-1">{s.definition}</td>
+              <td className="py-1 whitespace-nowrap">{s.response}</td>
+              <td className="py-1 whitespace-nowrap">{s.resolution}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+
+  const renderSupport = (n: number): ReactNode => (
+    <section className="mt-5 break-inside-avoid">
+      <h2 className="font-semibold border-b border-slate-300 mb-1 text-sm uppercase tracking-wide">
+        {n}. Support Hours
+      </h2>
+      <table className="w-full text-sm mt-1">
+        <thead>
+          <tr className="text-slate-500 text-left border-b border-slate-300">
+            <th className="py-1">Tier</th>
+            <th className="py-1">Coverage</th>
+            <th className="py-1">Channel</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sow.supportTiers.map((s, i) => (
+            <tr key={i} className="border-t border-slate-100">
+              <td className="py-1 font-medium whitespace-nowrap">{s.tier}</td>
+              <td className="py-1">{s.coverage}</td>
+              <td className="py-1">{s.channel}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+
   // ── Section list — numbered dynamically; Concise trims the heavy ones ───────
   type Sec = {
     title: string;
     body?: string;
     render?: (n: number) => ReactNode;
     hideFor?: string[];
+    showIf?: boolean;
   };
+  const warrantyBody =
+    sow.warrantyDays != null
+      ? `The Provider warrants that delivered work will conform to the agreed specifications for ${sow.warrantyDays} days following acceptance. Defects reported in that window are remediated at no additional cost, excluding issues arising from client changes or out-of-scope factors.`
+      : '';
   const sections: Sec[] = [
     { title: 'Executive Summary', body: sow.executiveSummary },
     { title: 'Customer Understanding', body: sow.customerUnderstanding, hideFor: ['CONCISE'] },
@@ -264,13 +324,21 @@ export default function SowPrintPage() {
     },
     { title: 'Testing Strategy', body: sow.testingStrategy, hideFor: ['CONCISE'] },
     { title: 'Maintenance & Support', body: sow.maintenanceSupport, hideFor: ['CONCISE'] },
+    { title: 'Service Levels (SLAs)', render: renderSla, showIf: sow.slaTiers.length > 0 },
+    { title: 'Support Hours', render: renderSupport, showIf: sow.supportTiers.length > 0 },
+    { title: 'Warranty', body: warrantyBody, showIf: sow.warrantyDays != null },
+    {
+      title: 'Security, Data & Compliance',
+      body: sow.securityCompliance,
+      showIf: sow.securityCompliance.trim() !== '',
+    },
     { title: 'Assumptions', body: sow.assumptions },
     { title: 'Risks & Mitigation', body: sow.risksMitigation, hideFor: ['CONCISE'] },
     { title: 'Acceptance Criteria', body: sow.acceptanceCriteria },
     { title: 'Change Control', body: sow.changeControl, hideFor: ['CONCISE'] },
     { title: 'Terms & Conditions', body: sow.termsAndConditions },
   ];
-  const visible = sections.filter((s) => !s.hideFor?.includes(flavor));
+  const visible = sections.filter((s) => !s.hideFor?.includes(flavor) && (s.showIf ?? true));
   const acceptanceNo = visible.length + 1;
 
   return (

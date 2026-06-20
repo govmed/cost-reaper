@@ -535,6 +535,11 @@ export const SOW_FLAVORS: { key: string; label: string; description: string }[] 
     label: 'Time & Materials (Agile)',
     description: 'Rate-card team, sprints, not-to-exceed — evolving scope.',
   },
+  {
+    key: 'IMPL_MAINTENANCE',
+    label: 'Implementation & Maintenance',
+    description: 'Implementation + ongoing support with SLAs, support tiers, and warranty.',
+  },
 ];
 
 export function sowFlavorLabel(key: string): string {
@@ -576,6 +581,10 @@ export interface StatementOfWork {
   currency: string;
   pricing: EngineResult;
   lineItems: SowLineItem[];
+  slaTiers: SowSlaTier[];
+  supportTiers: SowSupportTier[];
+  warrantyDays: number | null;
+  securityCompliance: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -588,4 +597,17 @@ export interface SowLineItem {
   unitPrice: string;
   billingPeriod: string;
   lineTotal: string;
+}
+
+export interface SowSlaTier {
+  priority: string;
+  definition: string;
+  response: string;
+  resolution: string;
+}
+
+export interface SowSupportTier {
+  tier: string;
+  coverage: string;
+  channel: string;
 }
